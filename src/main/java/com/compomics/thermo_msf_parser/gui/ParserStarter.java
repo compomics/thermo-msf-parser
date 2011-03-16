@@ -1,16 +1,11 @@
 package com.compomics.thermo_msf_parser.gui;
 
-import com.compomics.util.enumeration.CompomicsTools;
-import com.compomics.util.io.PropertiesManager;
-import com.jgoodies.looks.plastic.PlasticLookAndFeel;
-import com.jgoodies.looks.plastic.PlasticXPLookAndFeel;
-import com.jgoodies.looks.plastic.theme.SkyKrupp;
+import com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel;
 
 import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Properties;
 
 /**
  * Created by IntelliJ IDEA.
@@ -26,8 +21,7 @@ public class ParserStarter {
      */
     public ParserStarter() {
         try {
-            PlasticLookAndFeel.setPlasticTheme(new SkyKrupp());
-            UIManager.setLookAndFeel(new PlasticXPLookAndFeel());
+            UIManager.setLookAndFeel(new NimbusLookAndFeel());
         } catch (UnsupportedLookAndFeelException e) {
             // ignore exception
         }

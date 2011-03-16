@@ -11,9 +11,7 @@ import com.compomics.util.gui.spectrum.ChromatogramPanel;
 import com.compomics.util.gui.spectrum.DefaultSpectrumAnnotation;
 import com.compomics.util.gui.spectrum.ReferenceArea;
 import com.compomics.util.gui.spectrum.SpectrumPanel;
-import com.jgoodies.looks.plastic.PlasticLookAndFeel;
-import com.jgoodies.looks.plastic.PlasticXPLookAndFeel;
-import com.jgoodies.looks.plastic.theme.SkyKrupp;
+import com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel;
 import no.uib.jsparklines.renderers.JSparklinesBarChartTableCellRenderer;
 import no.uib.jsparklines.renderers.util.GradientColorCoding;
 import org.jfree.chart.plot.PlotOrientation;
@@ -1426,7 +1424,7 @@ public class Thermo_msf_parserGUI extends JFrame {
      */
     private Vector<Object[]> collectPeptides(Vector<Object[]> lPeptides) {
         boolean lCreateProteins = false;
-        if (iProteins.size() == 0) {
+        if (iProteins.isEmpty()) {
             //The proteins are not created yet, so we need to create them
             lCreateProteins = true;
             iProteins = new Vector<Protein>();
@@ -2356,8 +2354,7 @@ public class Thermo_msf_parserGUI extends JFrame {
      */
     public static void main(String[] args) {
         try {
-            PlasticLookAndFeel.setPlasticTheme(new SkyKrupp());
-            UIManager.setLookAndFeel(new PlasticXPLookAndFeel());
+            UIManager.setLookAndFeel(new NimbusLookAndFeel());
         } catch (UnsupportedLookAndFeelException e) {
             // ignore exception
         }
