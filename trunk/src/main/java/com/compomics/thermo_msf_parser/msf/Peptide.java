@@ -1,5 +1,8 @@
 package com.compomics.thermo_msf_parser.msf;
 
+import com.compomics.util.experiment.biology.ions.PeptideFragmentIon;
+import com.compomics.util.experiment.massspectrometry.Charge;
+
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -8,7 +11,6 @@ import java.util.Vector;
  * User: Niklaas
  * Date: 18-Feb-2011
  * Time: 09:17:23
- * To change this template use File | Settings | File Templates.
  */
 public class Peptide {
 
@@ -88,7 +90,7 @@ public class Peptide {
     /**
      * The fragment ions
      */
-    private Vector<FragmentIon> iTheoreticalFragmentIons;
+    private Vector<PeptideFragmentIon> iTheoreticalFragmentIons;
     /**
      * This vector holds the peptide sequence in amino acid objects
      */
@@ -97,6 +99,10 @@ public class Peptide {
      * The spectrum linked to this peptide
      */
     private Spectrum iParentSpectrum;
+    /**
+     * The processing node number
+     */
+    private int iProcessingNodeNumber;
 
     /**
      * Constructor for the peptide
@@ -109,7 +115,7 @@ public class Peptide {
      * @param iAnnotation The annotation
      * @param iAminoAcids The amino acids found in the msf file
      */
-    public Peptide(int iPeptideId, int iSpectrumId, int iConfidenceLevel, String iSequence, int iTotalIonsCount, int iMatchedIonsCount, String iAnnotation, Vector<AminoAcid> iAminoAcids) {
+    public Peptide(int iPeptideId, int iSpectrumId, int iConfidenceLevel, String iSequence, int iTotalIonsCount, int iMatchedIonsCount, String iAnnotation, int iProcessingNodeNumber, Vector<AminoAcid> iAminoAcids) {
         this.iPeptideId = iPeptideId;
         this.iSpectrumId = iSpectrumId;
         this.iConfidenceLevel = iConfidenceLevel;
@@ -118,6 +124,7 @@ public class Peptide {
         this.iMatchedIonsCount = iMatchedIonsCount;
         this.iAnnotation = iAnnotation;
         this.iAminoAcids = iAminoAcids;
+        this.iProcessingNodeNumber = iProcessingNodeNumber;
         iAminoAcidSequence = new Vector<AminoAcid>();
         for (int i = 0; i < iSequence.length(); i++) {
             String lAaOneLetterCode = String.valueOf(iSequence.charAt(i));
@@ -291,7 +298,7 @@ public class Peptide {
      * Getter for a vector with all theoretical fragment ions
      * @return vector with all theoretical fragment ions
      */
-    public Vector<FragmentIon> getTheoreticalFragmentIons() {
+    public Vector<PeptideFragmentIon> getTheoreticalFragmentIons() {
         return iTheoreticalFragmentIons;
     }
 
@@ -434,6 +441,15 @@ public class Peptide {
         return iChannelId;
     }
 
+
+    /**
+     * Getter for the processing node number
+     * @return int with the processing node number
+     */
+    public int getProcessingNodeNumber() {
+        return iProcessingNodeNumber;
+    }
+
     /**
      * This method will add a value in the custom data field map by the id off the custom data field
      * @param lId The custom data field id
@@ -449,7 +465,7 @@ public class Peptide {
      */
     public void calculateFragmentions(int iSpectrumCharge){
 
-        iTheoreticalFragmentIons = new Vector<FragmentIon>();
+        iTheoreticalFragmentIons = new Vector<PeptideFragmentIon>();
         double lHydrogenMass = 1.007825;
         double lCarbonMass = 12.000000;
         double lNitrogenMass = 14.003070;
@@ -486,33 +502,57 @@ public class Peptide {
 
                 // Create an instance for each fragment ion
 
+                Charge lCharge = new Charge(1,charge);
                 //B Ion
-                iTheoreticalFragmentIons.add(new FragmentIon((bMass + charge * lHydrogenMass) / charge, FragmentIonType.b, i + 1, charge, bMass, yMass));
+                PeptideFragmentIon lIon = new PeptideFragmentIon(PeptideFragmentIon.B_ION, i + 1, (bMass + charge * lHydrogenMass) / charge);
+                lIon.setCharge(lCharge);
+                iTheoreticalFragmentIons.add(lIon);
                 //BNH3 Ion
-                iTheoreticalFragmentIons.add(new FragmentIon((bMass - lNitrogenMass - 3 * lHydrogenMass + charge * lHydrogenMass) / charge, FragmentIonType.NH3_b, i + 1, charge, bMass, yMass));
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.BNH3_ION, i + 1, (bMass - lNitrogenMass - 3 * lHydrogenMass + charge * lHydrogenMass) / charge);
+                lIon.setCharge(lCharge);
+                iTheoreticalFragmentIons.add(lIon);
                 //BH2O Ion
-                iTheoreticalFragmentIons.add(new FragmentIon((bMass - lOxygenMass - 2 * lHydrogenMass + charge * lHydrogenMass) / charge, FragmentIonType.H2O_b, i + 1, charge, bMass, yMass));
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.BH2O_ION, i + 1, (bMass - lOxygenMass - 2 * lHydrogenMass + charge * lHydrogenMass) / charge);
+                lIon.setCharge(lCharge);
+                iTheoreticalFragmentIons.add(lIon);
                 //A Ion
-                iTheoreticalFragmentIons.add(new FragmentIon((bMass - lOxygenMass - lCarbonMass + charge * lHydrogenMass) / charge, FragmentIonType.a, i + 1, charge, bMass, yMass));
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.A_ION, i + 1, (bMass - lOxygenMass - lCarbonMass + charge * lHydrogenMass) / charge);
+                lIon.setCharge(lCharge);
+                iTheoreticalFragmentIons.add(lIon);
                 //ANH3 Ion
-                iTheoreticalFragmentIons.add(new FragmentIon((bMass - lOxygenMass - lCarbonMass - lNitrogenMass - 3 * lHydrogenMass + charge * lHydrogenMass) / charge, FragmentIonType.NH3_a, i + 1, charge, bMass, yMass));
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.ANH3_ION, i + 1, (bMass - lOxygenMass - lCarbonMass - lNitrogenMass - 3 * lHydrogenMass + charge * lHydrogenMass) / charge);
+                lIon.setCharge(lCharge);
+                iTheoreticalFragmentIons.add(lIon);
                 //AH2O Ion
-                iTheoreticalFragmentIons.add(new FragmentIon((bMass - 2 * lOxygenMass - lCarbonMass - 2 * lHydrogenMass + charge * lHydrogenMass) / charge, FragmentIonType.H20_a, i + 1, charge, bMass, yMass));
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.AH2O_ION, i + 1, (bMass - 2 * lOxygenMass - lCarbonMass - 2 * lHydrogenMass + charge * lHydrogenMass) / charge);
+                lIon.setCharge(lCharge);
+                iTheoreticalFragmentIons.add(lIon);
                 //C Ion
-                iTheoreticalFragmentIons.add(new FragmentIon((bMass + lNitrogenMass + 3 * lHydrogenMass + charge * lHydrogenMass) / charge, FragmentIonType.c, i + 1, charge, bMass, yMass));
-
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.C_ION, i + 1, (bMass + lNitrogenMass + 3 * lHydrogenMass + charge * lHydrogenMass) / charge);
+                lIon.setCharge(lCharge);
+                iTheoreticalFragmentIons.add(lIon);
 
                 // Create an instance of the fragment y ion
                 //Y Ion
-                iTheoreticalFragmentIons.add(new FragmentIon((yMass + charge * lHydrogenMass) / charge, FragmentIonType.y, i + 1, charge, bMass, yMass));
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.Y_ION, i + 1, (yMass + charge * lHydrogenMass) / charge);
+                lIon.setCharge(lCharge);
+                iTheoreticalFragmentIons.add(lIon);
                 //YNH3 Ion
-                iTheoreticalFragmentIons.add(new FragmentIon((yMass - lNitrogenMass - 3 * lHydrogenMass + charge * lHydrogenMass) / charge, FragmentIonType.NH3_y, i + 1, charge, bMass, yMass));
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.YNH3_ION, i + 1, (yMass - lNitrogenMass - 3 * lHydrogenMass + charge * lHydrogenMass) / charge);
+                lIon.setCharge(lCharge);
+                iTheoreticalFragmentIons.add(lIon);
                 //YH2O Ion
-                iTheoreticalFragmentIons.add(new FragmentIon((yMass - 2 * lHydrogenMass - lOxygenMass + charge * lHydrogenMass) / charge, FragmentIonType.H2O_y, i + 1, charge, bMass, yMass));
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.YH2O_ION, i + 1, (yMass - 2 * lHydrogenMass - lOxygenMass + charge * lHydrogenMass) / charge);
+                lIon.setCharge(lCharge);
+                iTheoreticalFragmentIons.add(lIon);
                 //X Ion
-                iTheoreticalFragmentIons.add(new FragmentIon((yMass + lCarbonMass + lOxygenMass - 2 * lHydrogenMass + charge * lHydrogenMass) / charge, FragmentIonType.x, i + 1, charge, bMass, yMass));
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.X_ION, i + 1, (yMass + lCarbonMass + lOxygenMass - 2 * lHydrogenMass + charge * lHydrogenMass) / charge);
+                lIon.setCharge(lCharge);
+                iTheoreticalFragmentIons.add(lIon);
                 //Z Ion
-                iTheoreticalFragmentIons.add(new FragmentIon((yMass - lNitrogenMass - 2 * lHydrogenMass + charge * lHydrogenMass) / charge, FragmentIonType.z, i + 1, charge, bMass, yMass));
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.Z_ION, i + 1, (yMass - lNitrogenMass - 2 * lHydrogenMass + charge * lHydrogenMass) / charge);
+                lIon.setCharge(lCharge);
+                iTheoreticalFragmentIons.add(lIon);
 
             }
         }
@@ -524,13 +564,17 @@ public class Peptide {
      * @param lTypes The typs of fragment ions wanted
      * @return Vector with the requested fragment ions
      */
-    public Vector<FragmentIon> getFragmentIonsByTypeAndCharge(int lCharge, Vector<FragmentIonType> lTypes){
-        Vector<FragmentIon> lResult = new Vector<FragmentIon>();
+    public Vector<PeptideFragmentIon> getFragmentIonsByTypeAndCharge(int lCharge, Vector<Integer> lTypes){
+        if(iTheoreticalFragmentIons == null){
+            this.calculateFragmentions(getParentSpectrum().getCharge());
+        }
+        Vector<PeptideFragmentIon> lResult = new Vector<PeptideFragmentIon>();
+
         for(int i = 0; i<iTheoreticalFragmentIons.size(); i ++){
-            if(iTheoreticalFragmentIons.get(i).getCharge() == lCharge){
+            if(iTheoreticalFragmentIons.get(i).getCharge().value == lCharge){
                 boolean lPass = false;
                 for(int t = 0; t<lTypes.size(); t ++){
-                    if(iTheoreticalFragmentIons.get(i).getFragmentIonType() == lTypes.get(t)){
+                    if(iTheoreticalFragmentIons.get(i).getType() == lTypes.get(t)){
                         lPass = true;
                     }
                 }

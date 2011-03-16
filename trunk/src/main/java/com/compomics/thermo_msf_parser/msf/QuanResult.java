@@ -42,11 +42,11 @@ public class QuanResult {
     /**
      * The processing node number
      */
-    private int iProcessingNodeNumber;
+    private Vector<Integer> iProcessingNodeNumbers = new Vector<Integer>();
     /**
      * The spectrum id
      */
-    private int iSpectrumId;
+    private Vector<Integer> iSpectrumIds = new Vector<Integer>();
     /**
      * The height
      */
@@ -121,14 +121,6 @@ public class QuanResult {
         return iIsotopePatterns;
     }
 
-    public int getProcessingNodeNumber() {
-        return iProcessingNodeNumber;
-    }
-
-    public int getSpectrumId() {
-        return iSpectrumId;
-    }
-
     public double getHeight() {
         return iHeight;
     }
@@ -185,15 +177,7 @@ public class QuanResult {
         }
     }
 
-    //setters 
-
-    public void setProcessingNodeNumber(int iProcessingNodeNumber) {
-        this.iProcessingNodeNumber = iProcessingNodeNumber;
-    }
-
-    public void setSpectrumId(int iSpectrumId) {
-        this.iSpectrumId = iSpectrumId;
-    }
+    //setters
 
     public void setHeight(double iHeight) {
         this.iHeight = iHeight;
@@ -250,5 +234,21 @@ public class QuanResult {
         this.iCharges.add(iCharge);
         this.iIntensities.add(iIntensity);
         this.iRetentionTimes.add(iRetentionTime);
+    }
+
+    public void addSpectrumId(int anInt) {
+        this.iSpectrumIds.add(anInt);
+    }
+
+    public void addProcessingNodeNumber(int anInt) {
+        this.iProcessingNodeNumbers.add(anInt);
+    }
+
+    public Vector<Integer> getSpectrumIds() {
+        return iSpectrumIds;
+    }
+
+    public Vector<Integer> getProcessingNodeNumbers() {
+        return iProcessingNodeNumbers;
     }
 }

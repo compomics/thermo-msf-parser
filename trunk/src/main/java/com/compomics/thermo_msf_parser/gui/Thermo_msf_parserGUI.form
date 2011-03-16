@@ -46,35 +46,25 @@
                 <properties/>
                 <border type="none"/>
                 <children>
-                  <grid id="eea0a" layout-manager="GridBagLayout">
+                  <tabbedpane id="86d8e" binding="jtabChromatogram">
                     <constraints>
                       <tabbedpane title="Chromatogram"/>
                     </constraints>
-                    <properties/>
+                    <properties>
+                      <background color="-3407770"/>
+                    </properties>
                     <border type="none"/>
                     <children>
-                      <tabbedpane id="86d8e" binding="jtabChromatogram">
+                      <grid id="4a30a" layout-manager="GridBagLayout">
                         <constraints>
-                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
-                            <preferred-size width="200" height="200"/>
-                          </grid>
-                          <gridbag weightx="1.0" weighty="1.0"/>
+                          <tabbedpane title="No chromatogram loaded"/>
                         </constraints>
                         <properties/>
                         <border type="none"/>
-                        <children>
-                          <grid id="4a30a" layout-manager="GridBagLayout">
-                            <constraints>
-                              <tabbedpane title="No chromatogram loaded"/>
-                            </constraints>
-                            <properties/>
-                            <border type="none"/>
-                            <children/>
-                          </grid>
-                        </children>
-                      </tabbedpane>
+                        <children/>
+                      </grid>
                     </children>
-                  </grid>
+                  </tabbedpane>
                   <grid id="16ece" binding="jpanMSHolder" layout-manager="GridBagLayout">
                     <constraints>
                       <tabbedpane title="MS spectrum"/>
@@ -309,6 +299,36 @@
                           </grid>
                         </children>
                       </grid>
+                      <grid id="c2e25" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                        <margin top="0" left="0" bottom="0" right="0"/>
+                        <constraints>
+                          <tabbedpane title="Processing nodes"/>
+                        </constraints>
+                        <properties/>
+                        <border type="none"/>
+                        <children>
+                          <tabbedpane id="27e3f" binding="processingNodeTabbedPane">
+                            <constraints>
+                              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                                <preferred-size width="200" height="200"/>
+                              </grid>
+                            </constraints>
+                            <properties/>
+                            <border type="none"/>
+                            <children>
+                              <grid id="1bf16" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+                                <margin top="0" left="0" bottom="0" right="0"/>
+                                <constraints>
+                                  <tabbedpane title="Nothing loaded"/>
+                                </constraints>
+                                <properties/>
+                                <border type="none"/>
+                                <children/>
+                              </grid>
+                            </children>
+                          </tabbedpane>
+                        </children>
+                      </grid>
                     </children>
                   </tabbedpane>
                   <tabbedpane id="c4da5">
@@ -327,7 +347,7 @@
                         <children>
                           <scrollpane id="6e6d7" binding="jscollPeptides" custom-create="true">
                             <constraints>
-                              <grid row="0" column="0" row-span="1" col-span="4" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                              <grid row="0" column="0" row-span="1" col-span="5" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                               <gridbag weightx="1.0" weighty="1.0"/>
                             </constraints>
                             <properties/>
@@ -406,6 +426,15 @@
                               <text value="Peptide spectrum match: "/>
                             </properties>
                           </component>
+                          <component id="fcad0" class="javax.swing.JLabel">
+                            <constraints>
+                              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                            </constraints>
+                            <properties>
+                              <text value="Load spectrum: "/>
+                            </properties>
+                          </component>
                           <component id="b60c1" class="javax.swing.JCheckBox" binding="onlyLowestScoringCheckBox" custom-create="true" default-binding="true">
                             <constraints>
                               <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -414,6 +443,46 @@
                             <properties>
                               <selected value="false"/>
                               <text value="Only lowest scoring"/>
+                            </properties>
+                          </component>
+                          <component id="931ed" class="javax.swing.JCheckBox" binding="chromatogramCheckBox" default-binding="true">
+                            <constraints>
+                              <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                            </constraints>
+                            <properties>
+                              <selected value="true"/>
+                              <text value="Chromatogram"/>
+                            </properties>
+                          </component>
+                          <component id="ea4b1" class="javax.swing.JCheckBox" binding="msCheckBox">
+                            <constraints>
+                              <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                            </constraints>
+                            <properties>
+                              <selected value="true"/>
+                              <text value="MS"/>
+                            </properties>
+                          </component>
+                          <component id="84964" class="javax.swing.JCheckBox" binding="quantCheckBox">
+                            <constraints>
+                              <grid row="3" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                            </constraints>
+                            <properties>
+                              <selected value="true"/>
+                              <text value="Quant"/>
+                            </properties>
+                          </component>
+                          <component id="5cb58" class="javax.swing.JCheckBox" binding="msmsCheckBox">
+                            <constraints>
+                              <grid row="3" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                            </constraints>
+                            <properties>
+                              <selected value="true"/>
+                              <text value="MS/MS"/>
                             </properties>
                           </component>
                         </children>

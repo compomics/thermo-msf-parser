@@ -3,7 +3,9 @@ package com.compomics.thermo_msf_parser.msf;
 
 import java.io.*;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Vector;
 import java.util.zip.ZipEntry;
@@ -89,6 +91,10 @@ public class Spectrum {
      * The peptides linked to this spectrum
      */
     private Vector<Peptide> iPeptides = new Vector<Peptide>();
+    /**
+     * The decoy peptides linked to this spectrum
+     */
+    private Vector<Peptide> iPeptidesDecoy = new Vector<Peptide>();
     /**
      * The quan result linked to this spectrum
      */
@@ -222,11 +228,21 @@ public class Spectrum {
      * @return A string with the spectrum xml
      * @throws IOException An exception is thrown when there is a problem with the connection to the msf file
      */
-    public String getUnzippedSpectrumXml() throws IOException {
-
+    public String getUnzippedSpectrumXml() throws Exception {
+            byte[] lZippedSpectrumXml = iZippedSpectrumXml;
+            if(lZippedSpectrumXml == null){
+                ResultSet rs;
+                Statement stat = iConnection.createStatement();
+                rs = stat.executeQuery("select * from Spectra where UniqueSpectrumID = " + iUniqueSpectrumId);
+                while (rs.next()) {
+                    lZippedSpectrumXml = rs.getBytes("Spectrum");
+                }
+                rs.close();
+                stat.close();
+            }
             File lZippedFile = new File("zip");
             FileOutputStream fos = new FileOutputStream(lZippedFile);
-            fos.write(iZippedSpectrumXml);
+            fos.write(lZippedSpectrumXml);
             fos.flush();
             fos.close();
             BufferedOutputStream out = null;
@@ -253,7 +269,7 @@ public class Spectrum {
      * @return vector with the MS/MS peaks found in the spectrum xml
      * @throws IOException An exception is thrown when there is a problem with the connection to the msf file
      */
-    public Vector<Peak> getMSMSPeaks() throws IOException {
+    public Vector<Peak> getMSMSPeaks() throws Exception {
         String lXml = getUnzippedSpectrumXml();
         lXml = lXml.substring(lXml.indexOf("<Peak ", lXml.indexOf("<PeakCentr")), lXml.lastIndexOf("</PeakCent"));
         String[] lLines = lXml.split("\n");
@@ -271,7 +287,7 @@ public class Spectrum {
      * @return vector with the MS peaks found in the spectrum xml
      * @throws IOException An exception is thrown when there is a problem with the connection to the msf file
      */
-    public Vector<Peak> getMSPeaks() throws IOException {
+    public Vector<Peak> getMSPeaks() throws Exception {
         String lXml = getUnzippedSpectrumXml();
         lXml = lXml.substring(lXml.indexOf("<Peak ", lXml.indexOf("<IsotopeClusterPeakCentroids")), lXml.lastIndexOf("</IsotopeClusterPeakCentroids"));
         String[] lLines = lXml.split("\n");
@@ -285,11 +301,11 @@ public class Spectrum {
     }
 
     /**
-     * This method will give a the MS peak that is used for the fragmentation
+     * This method will give the MS peak that is used for the fragmentation
      * @return peak (MS) that is used for the fragmentation
      * @throws IOException An exception is thrown when there is a problem with the connection to the msf file
      */
-    public Peak getMonoisotopicPeakCentroidsPeak() throws IOException {
+    public Peak getFragmentedMsPeak() throws Exception {
         String lXml = getUnzippedSpectrumXml();
         lXml = lXml.substring(lXml.indexOf("<MonoisotopicPeakCentroids"), lXml.lastIndexOf("</MonoisotopicPeakCentroids"));
         String[] lLines = lXml.split("\n");
@@ -356,10 +372,17 @@ public class Spectrum {
      */
     public void addPeptide(Peptide lPeptide) {
         this.iPeptides.add(lPeptide);
-        lPeptide.calculateFragmentions(iCharge);
         lPeptide.setParentSpectrum(this);
     }
 
+    /**
+     * This will add a peptide to this spectrum
+     * @param lPeptide
+     */
+    public void addDecoyPeptide(Peptide lPeptide) {
+        this.iPeptidesDecoy.add(lPeptide);
+        lPeptide.setParentSpectrum(this);
+    }
     public void setQuanResult(QuanResult lQuanResult) {
         if(iQuanResult != null){
             System.out.println("Double quanresult added to the spectrum");
@@ -391,26 +414,34 @@ public class Spectrum {
 
     public boolean isHighestScoring(Peptide iSelectedPeptide, ScoreType scoreType) {
         boolean lIsHighestScore = true;
-        double lScore = iSelectedPeptide.getScoreByScoreType(scoreType);
-        for(int i = 0; i<iPeptides.size(); i ++){
-            if(!iSelectedPeptide.getModifiedPeptide().equalsIgnoreCase(iPeptides.get(i).getModifiedPeptide())){
-                if(lScore < iPeptides.get(i).getScoreByScoreType(scoreType)){
-                    lIsHighestScore = false;
+        if(iSelectedPeptide.getScoreByScoreType(scoreType) != null){
+            double lScore = iSelectedPeptide.getScoreByScoreType(scoreType);
+            for(int i = 0; i<iPeptides.size(); i ++){
+                if(!iSelectedPeptide.getModifiedPeptide().equalsIgnoreCase(iPeptides.get(i).getModifiedPeptide())){
+                    if(lScore < iPeptides.get(i).getScoreByScoreType(scoreType)){
+                        lIsHighestScore = false;
+                    }
                 }
             }
+        } else {
+            lIsHighestScore = false;
         }
         return lIsHighestScore;
     }
 
     public boolean isLowestScoring(Peptide iSelectedPeptide, ScoreType scoreType) {
         boolean lIsLowestScore = true;
-        double lScore = iSelectedPeptide.getScoreByScoreType(scoreType);
-        for(int i = 0; i<iPeptides.size(); i ++){
-            if(!iSelectedPeptide.getModifiedPeptide().equalsIgnoreCase(iPeptides.get(i).getModifiedPeptide())){
-                if(lScore > iPeptides.get(i).getScoreByScoreType(scoreType)){
-                    lIsLowestScore = false;
+        if(iSelectedPeptide.getScoreByScoreType(scoreType) != null){
+            double lScore = iSelectedPeptide.getScoreByScoreType(scoreType);
+            for(int i = 0; i<iPeptides.size(); i ++){
+                if(!iSelectedPeptide.getModifiedPeptide().equalsIgnoreCase(iPeptides.get(i).getModifiedPeptide())){
+                    if(lScore > iPeptides.get(i).getScoreByScoreType(scoreType)){
+                        lIsLowestScore = false;
+                    }
                 }
             }
+        } else {
+            lIsLowestScore = false;
         }
         return lIsLowestScore;
     }

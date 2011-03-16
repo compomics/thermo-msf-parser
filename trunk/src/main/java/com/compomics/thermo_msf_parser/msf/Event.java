@@ -184,16 +184,19 @@ public class Event {
         for(int i = 0; i<lIds.size(); i ++){
             lIdsString = lIdsString  + lIds.get(i) + ",";
         }
-        lIdsString = lIdsString.substring(0, lIdsString.lastIndexOf(","));
+        if(lIds.size() > 0){
 
-        Statement stat = lConn.createStatement();
-        ResultSet rs;
+            lIdsString = lIdsString.substring(0, lIdsString.lastIndexOf(","));
 
-        //get all the events
-        rs = stat.executeQuery("select * from Events where EventID in (" + lIdsString + ")");
+            Statement stat = lConn.createStatement();
+            ResultSet rs;
 
-        while(rs.next()){
-            lEvents.add(new Event(rs));
+            //get all the events
+            rs = stat.executeQuery("select * from Events where EventID in (" + lIdsString + ")");
+
+            while(rs.next()){
+                lEvents.add(new Event(rs));
+            }
         }
 
         return lEvents;
