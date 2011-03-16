@@ -6,21 +6,23 @@ import com.compomics.thermo_msf_parser.msf.Event;
 import com.compomics.thermo_msf_parser.msf.proteinsorter.ProteinSorterByAccession;
 import com.compomics.thermo_msf_parser.msf.proteinsorter.ProteinSorterByNumberOfPeptides;
 import com.compomics.util.Util;
+import com.compomics.util.experiment.biology.ions.PeptideFragmentIon;
 import com.compomics.util.gui.spectrum.ChromatogramPanel;
 import com.compomics.util.gui.spectrum.DefaultSpectrumAnnotation;
+import com.compomics.util.gui.spectrum.ReferenceArea;
 import com.compomics.util.gui.spectrum.SpectrumPanel;
+import com.intellij.uiDesigner.core.GridConstraints;
+import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.jgoodies.looks.plastic.PlasticLookAndFeel;
 import com.jgoodies.looks.plastic.PlasticXPLookAndFeel;
 import com.jgoodies.looks.plastic.theme.SkyKrupp;
 import no.uib.jsparklines.renderers.JSparklinesBarChartTableCellRenderer;
+import no.uib.jsparklines.renderers.util.GradientColorCoding;
 import org.jfree.chart.plot.PlotOrientation;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
+import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -75,6 +77,11 @@ public class Thermo_msf_parserGUI extends JFrame {
     private JCheckBox onlyHighestScoringCheckBox;
     private JCheckBox onlyLowestScoringCheckBox;
     private JCheckBox allCheckBox;
+    private JTabbedPane processingNodeTabbedPane;
+    private JCheckBox chromatogramCheckBox;
+    private JCheckBox msCheckBox;
+    private JCheckBox quantCheckBox;
+    private JCheckBox msmsCheckBox;
     private JEditorPane proteinSequenceCoverageJEditorPane;
     private SpectrumPanel iMSMSspectrumPanel;
     private SpectrumPanel iMSspectrumPanel;
@@ -279,7 +286,7 @@ public class Thermo_msf_parserGUI extends JFrame {
                                 for (int j = 0; j < iParsedMsfs.get(i).getSpectra().size(); j++) {
                                     Spectrum lSpectrum = iParsedMsfs.get(i).getSpectra().get(j);
                                     String lSpectrumLine = "BEGIN IONS\nTITLE=" + lSpectrum.getSpectrumTitle() + "\n";
-                                    Peak lMono = lSpectrum.getMonoisotopicPeakCentroidsPeak();
+                                    Peak lMono = lSpectrum.getFragmentedMsPeak();
                                     lSpectrumLine = lSpectrumLine + "PEPMASS=" + lMono.getX() + "\t" + lMono.getY() + "\n";
                                     lSpectrumLine = lSpectrumLine + "CHARGE=" + lSpectrum.getCharge() + "+\n";
                                     lSpectrumLine = lSpectrumLine + "RTINSECONDS=" + (lSpectrum.getRetentionTime() / 60.0) + "\n";
@@ -337,8 +344,11 @@ public class Thermo_msf_parserGUI extends JFrame {
         //create JFrame parameters
         this.setTitle("Thermo msf parser GUI");
         this.setContentPane(jpanContent);
-        this.setSize(1200, 800);
-        this.setLocation(150, 150);
+        Toolkit tk = Toolkit.getDefaultToolkit();
+        int xSize = ((int) tk.getScreenSize().getWidth());
+        int ySize = ((int) tk.getScreenSize().getHeight());
+        this.setSize(xSize, ySize);
+        this.setLocation(0, 0);
         this.setVisible(true);
 
 
@@ -395,7 +405,7 @@ public class Thermo_msf_parserGUI extends JFrame {
                             progressBar.setValue(i + 1);
                             progressBar.setString("Parsing: " + iMsfFileLocations.get(i));
                             //progressBar.updateUI();
-                            iParsedMsfs.add(new Parser(iMsfFileLocations.get(i)));
+                            iParsedMsfs.add(new Parser(iMsfFileLocations.get(i), true));
                         } catch (SQLException e) {
                             e.printStackTrace();
                             iParsedMsfs.add(null);
@@ -412,8 +422,6 @@ public class Thermo_msf_parserGUI extends JFrame {
                     JOptionPane.showMessageDialog(new JFrame(), "There was a problem saving your data!", "Problem saving", JOptionPane.ERROR_MESSAGE);
                 }
 
-                //create the peptide table
-                createPeptideTable(null);
 
                 //add the menuitems to the menu
                 lExportMenu.add(item);
@@ -486,15 +494,95 @@ public class Thermo_msf_parserGUI extends JFrame {
                 onlyHighestScoringCheckBox.addActionListener(chbChangeActionListener);
                 onlyLowestScoringCheckBox.addActionListener(chbChangeActionListener);
 
+                //load processing nodes
+                processingNodeTabbedPane.removeAll();
+                for (int i = 0; i < iParsedMsfs.get(0).getProcessingNodes().size(); i++) {
+                    ProcessingNode lNode = iParsedMsfs.get(0).getProcessingNodes().get(i);
+                    String lTitle = lNode.getProcessingNodeNumber() + " " + lNode.getFriendlyName();
+                    //JPanel lPanel = new JPanel();
+
+                    //create holders for the different columns
+                    Vector<String> lTableColumnsTitleVector = new Vector<String>();
+                    Vector<Boolean> lTableColumnsEditableVector = new Vector<Boolean>();
+                    Vector<Class> lTableColumnsClassVector = new Vector<Class>();
+                    Vector<Object[]> lElements = new Vector<Object[]>();
+                    for (int j = 0; j < lNode.getProcessingNodeParameters().size(); j++) {
+                        Object[] lInfo = new Object[2];
+                        lInfo[0] = lNode.getProcessingNodeParameters().get(j).getFriendlyName();
+                        lInfo[1] = lNode.getProcessingNodeParameters().get(j).getValueDisplayString();
+                        lElements.add(lInfo);
+                    }
+
+                    //add different columns to the holders
+                    lTableColumnsTitleVector.add("Title");
+                    lTableColumnsEditableVector.add(false);
+                    lTableColumnsClassVector.add(String.class);
+                    lTableColumnsTitleVector.add("Value");
+                    lTableColumnsEditableVector.add(false);
+                    lTableColumnsClassVector.add(String.class);
+
+                    //create the arrays for the table model
+                    String[] lTableColumnsTitle = new String[lTableColumnsTitleVector.size()];
+                    lTableColumnsTitleVector.toArray(lTableColumnsTitle);
+                    final Boolean[] lTableColumnsEditable = new Boolean[lTableColumnsEditableVector.size()];
+                    lTableColumnsEditableVector.toArray(lTableColumnsEditable);
+                    final Class[] lTableColumnsClass = new Class[lTableColumnsClassVector.size()];
+                    lTableColumnsClassVector.toArray(lTableColumnsClass);
+                    final Object[][] ls = new Object[lElements.size()][];
+                    lElements.toArray(ls);
+
+                    //create the table model
+                    DefaultTableModel jtablePeptideModel = new DefaultTableModel(
+                            ls,
+                            lTableColumnsTitle) {
+
+                        Class[] types = lTableColumnsClass;
+                        Boolean[] canEdit = lTableColumnsEditable;
+
+                        @Override
+                        public Class getColumnClass(int columnIndex) {
+                            return types[columnIndex];
+                        }
+
+                        @Override
+                        public boolean isCellEditable(int rowIndex, int columnIndex) {
+                            return canEdit[columnIndex];
+                        }
+                    };
+
+                    JTable lTable = new JTable();
+                    lTable.setModel(jtablePeptideModel);
+                    JScrollPane lScrollPanel = new JScrollPane();
+                    lScrollPanel.setViewportView(lTable);
+
+                    GridBagConstraints gbc = new GridBagConstraints();
+                    gbc.gridx = 0;
+                    gbc.gridy = 0;
+                    gbc.gridwidth = 4;
+                    gbc.weightx = 1.0;
+                    gbc.weighty = 1.0;
+                    gbc.fill = GridBagConstraints.BOTH;
+                    //lPanel.add(lScrollPanel, gbc);
+                    //lPanel.setBackground(Color.BLACK);
+                    processingNodeTabbedPane.add(lTitle, lScrollPanel);
+
+                }
+
+                progressBar.setIndeterminate(true);
+                progressBar.setString("Collecting all peptide and protein information");
+                showAllPeptidesButton.doClick();
+                progressBar.setIndeterminate(false);
                 progressBar.setVisible(false);
                 progressBar.setString("");
                 progressBar.setStringPainted(false);
+
 
                 return true;
             }
 
             public void finished() {
                 //give a message to the user that everything is loaded
+
                 JOptionPane.showMessageDialog(new JFrame(), "All data was loaded", "Info", JOptionPane.INFORMATION_MESSAGE);
             }
 
@@ -586,6 +674,11 @@ public class Thermo_msf_parserGUI extends JFrame {
         lPeptideTableColumnsEditableVector.add(false);
         lPeptideTableColumnsClassVector.add(Integer.class);
 
+        //add different columns to the holders
+        lPeptideTableColumnsTitleVector.add("Processing node");
+        lPeptideTableColumnsEditableVector.add(false);
+        lPeptideTableColumnsClassVector.add(ProcessingNode.class);
+
         lPeptideTableColumnsTitleVector.add("Spectrum title");
         lPeptideTableColumnsEditableVector.add(false);
         lPeptideTableColumnsClassVector.add(Integer.class);
@@ -656,7 +749,7 @@ public class Thermo_msf_parserGUI extends JFrame {
         for (int i = 0; i < iMergedRatioTypes.size(); i++) {
             lPeptideTableColumnsTitleVector.add(iMergedRatioTypes.get(i).getRatioType());
             lPeptideTableColumnsEditableVector.add(false);
-            lPeptideTableColumnsClassVector.add(double.class);
+            lPeptideTableColumnsClassVector.add(Double.class);
         }
 
         //get the custom peptide data and add it as columns
@@ -717,15 +810,17 @@ public class Thermo_msf_parserGUI extends JFrame {
 
         jtablePeptides = new JTable();
         jtablePeptides.setModel(jtablePeptideModel);
+        jtablePeptides.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         //set some cell renderers
         jtablePeptides.getColumn("Confidence level").setCellRenderer(new ConfidenceLevelTableCellRenderer());
+        jtablePeptides.getColumn("Processing node").setCellRenderer(new ProcessingNodeRenderer());
 
         double lLowRT = Double.MAX_VALUE;
         double lHighRT = Double.MIN_VALUE;
 
         for (int p = 0; p < lPeptides.length; p++) {
-            Peptide lPeptide = (Peptide) lPeptides[p][2];
+            Peptide lPeptide = (Peptide) lPeptides[p][3];
             if (lLowRT > lPeptide.getParentSpectrum().getRetentionTime()) {
                 lLowRT = lPeptide.getParentSpectrum().getRetentionTime();
             }
@@ -743,26 +838,49 @@ public class Thermo_msf_parserGUI extends JFrame {
             double lHighScore = Double.MIN_VALUE;
 
             for (int p = 0; p < lPeptides.length; p++) {
-                double lScore = (Double) lPeptides[p][4 + i];
-                if (lLowScore > lScore) {
-                    lLowScore = lScore;
-                }
-                if (lHighScore < lScore) {
-                    lHighScore = lScore;
+                if (lPeptides[p][5 + i] != null) {
+                    double lScore = (Double) lPeptides[p][5 + i];
+                    if (lLowScore > lScore) {
+                        lLowScore = lScore;
+                    }
+                    if (lHighScore < lScore) {
+                        lHighScore = lScore;
+                    }
                 }
             }
 
 
             JSparklinesBarChartTableCellRenderer lScoreCellRenderer;
             lScoreCellRenderer = new JSparklinesBarChartTableCellRenderer(PlotOrientation.HORIZONTAL, lLowScore, lHighScore, Color.RED, Color.GREEN);
+            lScoreCellRenderer.setGradientColoring(GradientColorCoding.ColorGradient.BlueBlackGreen);
             jtablePeptides.getColumn(iMergedPeptidesScores.get(i).getFriendlyName()).setCellRenderer(lScoreCellRenderer);
             lScoreCellRenderer.showNumberAndChart(true, 50);
-
-            //lPeptideTableColumnsTitleVector.add(iMergedPeptidesScores.get(i).getFriendlyName());
-            //lPeptideTableColumnsEditableVector.add(false);
-            //lPeptideTableColumnsClassVector.add(Double.class);
         }
 
+        /*for (int i = 0; i < iMergedRatioTypes.size(); i++) {
+            double lLowScore = Double.MAX_VALUE;
+            double lHighScore = Double.MIN_VALUE;
+
+            for (int p = 0; p < lPeptides.length; p++) {
+                Peptide lPeptide = (Peptide) lPeptides[p][2];
+                if (lPeptide.getParentSpectrum().getQuanResult() != null && lPeptide.getParentSpectrum().getQuanResult().getRatioByRatioType(iMergedRatioTypes.get(i)) != null) {
+                lPeptide.getParentSpectrum().getQuanResult().getRatioByRatioType(iMergedRatioTypes.get(i));
+                    double lScore = lPeptide.getParentSpectrum().getQuanResult().getRatioByRatioType(iMergedRatioTypes.get(i));
+                    if (lLowScore > lScore) {
+                        lLowScore = lScore;
+                    }
+                    if (lHighScore < lScore) {
+                        lHighScore = lScore;
+                    }
+                }
+            }
+
+
+            JSparklinesBarChartTableCellRenderer lScoreCellRenderer;
+            lScoreCellRenderer = new JSparklinesBarChartTableCellRenderer(PlotOrientation.HORIZONTAL, lLowScore, lHighScore, Color.RED, Color.GREEN);
+            jtablePeptides.getColumn(iMergedRatioTypes.get(i).getRatioType()).setCellRenderer(lScoreCellRenderer);
+            lScoreCellRenderer.showNumberAndChart(true, 50);
+        } */
 
         jtablePeptides.setOpaque(false);
         jtablePeptides.addKeyListener(new KeyAdapter() {
@@ -850,20 +968,12 @@ public class Thermo_msf_parserGUI extends JFrame {
         panel1.add(splitPane1, gbc);
         jtabpanLower = new JTabbedPane();
         splitPane1.setRightComponent(jtabpanLower);
+        jtabChromatogram = new JTabbedPane();
+        jtabChromatogram.setBackground(new Color(-3407770));
+        jtabpanLower.addTab("Chromatogram", jtabChromatogram);
         final JPanel panel2 = new JPanel();
         panel2.setLayout(new GridBagLayout());
-        jtabpanLower.addTab("Chromatogram", panel2);
-        jtabChromatogram = new JTabbedPane();
-        gbc = new GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.weightx = 1.0;
-        gbc.weighty = 1.0;
-        gbc.fill = GridBagConstraints.BOTH;
-        panel2.add(jtabChromatogram, gbc);
-        final JPanel panel3 = new JPanel();
-        panel3.setLayout(new GridBagLayout());
-        jtabChromatogram.addTab("No chromatogram loaded", panel3);
+        jtabChromatogram.addTab("No chromatogram loaded", panel2);
         jpanMSHolder = new JPanel();
         jpanMSHolder.setLayout(new GridBagLayout());
         jtabpanLower.addTab("MS spectrum", jpanMSHolder);
@@ -894,87 +1004,87 @@ public class Thermo_msf_parserGUI extends JFrame {
         gbc.weighty = 0.95;
         gbc.fill = GridBagConstraints.BOTH;
         jpanMSMS.add(jpanMSMSLeft, gbc);
-        final JPanel panel4 = new JPanel();
-        panel4.setLayout(new GridBagLayout());
+        final JPanel panel3 = new JPanel();
+        panel3.setLayout(new GridBagLayout());
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.BOTH;
-        jpanMSMS.add(panel4, gbc);
+        jpanMSMS.add(panel3, gbc);
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
-        panel4.add(aIonsJCheckBox, gbc);
+        panel3.add(aIonsJCheckBox, gbc);
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
-        panel4.add(bIonsJCheckBox, gbc);
+        panel3.add(bIonsJCheckBox, gbc);
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
-        panel4.add(cIonsJCheckBox, gbc);
+        panel3.add(cIonsJCheckBox, gbc);
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
-        panel4.add(xIonsJCheckBox, gbc);
+        panel3.add(xIonsJCheckBox, gbc);
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 5;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
-        panel4.add(yIonsJCheckBox, gbc);
+        panel3.add(yIonsJCheckBox, gbc);
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 6;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
-        panel4.add(zIonsJCheckBox, gbc);
+        panel3.add(zIonsJCheckBox, gbc);
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 8;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
-        panel4.add(chargeOneJCheckBox, gbc);
+        panel3.add(chargeOneJCheckBox, gbc);
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 9;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
-        panel4.add(chargeTwoJCheckBox, gbc);
+        panel3.add(chargeTwoJCheckBox, gbc);
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 10;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
-        panel4.add(chargeOverTwoJCheckBox, gbc);
+        panel3.add(chargeOverTwoJCheckBox, gbc);
         final JSeparator separator1 = new JSeparator();
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 7;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = new Insets(5, 5, 5, 5);
-        panel4.add(separator1, gbc);
+        panel3.add(separator1, gbc);
         final JSeparator separator2 = new JSeparator();
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 3;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = new Insets(5, 5, 5, 5);
-        panel4.add(separator2, gbc);
+        panel3.add(separator2, gbc);
         final JSeparator separator3 = new JSeparator();
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 11;
         gbc.fill = GridBagConstraints.BOTH;
-        panel4.add(separator3, gbc);
+        panel3.add(separator3, gbc);
         nh3IonsJCheckBox.setMinimumSize(new Dimension(70, 22));
         nh3IonsJCheckBox.setText("NH3");
         gbc = new GridBagConstraints();
@@ -982,14 +1092,14 @@ public class Thermo_msf_parserGUI extends JFrame {
         gbc.gridy = 12;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
-        panel4.add(nh3IonsJCheckBox, gbc);
+        panel3.add(nh3IonsJCheckBox, gbc);
         h2oIonsJCheckBox.setText("H20");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 13;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
-        panel4.add(h2oIonsJCheckBox, gbc);
+        panel3.add(h2oIonsJCheckBox, gbc);
         txtMSMSerror.setText("0.5");
         txtMSMSerror.setToolTipText("The MS/MS fragmentation error (in Da)");
         gbc = new GridBagConstraints();
@@ -998,7 +1108,7 @@ public class Thermo_msf_parserGUI extends JFrame {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
-        panel4.add(txtMSMSerror, gbc);
+        panel3.add(txtMSMSerror, gbc);
         final JSplitPane splitPane2 = new JSplitPane();
         splitPane2.setOneTouchExpandable(true);
         splitPane1.setLeftComponent(splitPane2);
@@ -1033,6 +1143,14 @@ public class Thermo_msf_parserGUI extends JFrame {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanProteinLeft.add(sequenceCoverageJLabel, gbc);
+        final JPanel panel4 = new JPanel();
+        panel4.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        jtabpanSpectrum.addTab("Processing nodes", panel4);
+        processingNodeTabbedPane = new JTabbedPane();
+        panel4.add(processingNodeTabbedPane, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_CAN_GROW, null, new Dimension(200, 200), null, 0, false));
+        final JPanel panel5 = new JPanel();
+        panel5.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        processingNodeTabbedPane.addTab("Nothing loaded", panel5);
         final JTabbedPane tabbedPane1 = new JTabbedPane();
         splitPane2.setLeftComponent(tabbedPane1);
         jpanPeptides = new JPanel();
@@ -1041,7 +1159,7 @@ public class Thermo_msf_parserGUI extends JFrame {
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridwidth = 4;
+        gbc.gridwidth = 5;
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
@@ -1102,6 +1220,14 @@ public class Thermo_msf_parserGUI extends JFrame {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanPeptides.add(label2, gbc);
+        final JLabel label3 = new JLabel();
+        label3.setText("Load spectrum: ");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        jpanPeptides.add(label3, gbc);
         onlyLowestScoringCheckBox.setSelected(false);
         onlyLowestScoringCheckBox.setText("Only lowest scoring");
         gbc = new GridBagConstraints();
@@ -1110,13 +1236,49 @@ public class Thermo_msf_parserGUI extends JFrame {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         jpanPeptides.add(onlyLowestScoringCheckBox, gbc);
-        final JPanel panel5 = new JPanel();
-        panel5.setLayout(new GridBagLayout());
+        chromatogramCheckBox = new JCheckBox();
+        chromatogramCheckBox.setSelected(true);
+        chromatogramCheckBox.setText("Chromatogram");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        jpanPeptides.add(chromatogramCheckBox, gbc);
+        msCheckBox = new JCheckBox();
+        msCheckBox.setSelected(true);
+        msCheckBox.setText("MS");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.gridy = 3;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        jpanPeptides.add(msCheckBox, gbc);
+        quantCheckBox = new JCheckBox();
+        quantCheckBox.setSelected(true);
+        quantCheckBox.setText("Quant");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 3;
+        gbc.gridy = 3;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        jpanPeptides.add(quantCheckBox, gbc);
+        msmsCheckBox = new JCheckBox();
+        msmsCheckBox.setSelected(true);
+        msmsCheckBox.setText("MS/MS");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 4;
+        gbc.gridy = 3;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        jpanPeptides.add(msmsCheckBox, gbc);
+        final JPanel panel6 = new JPanel();
+        panel6.setLayout(new GridBagLayout());
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.fill = GridBagConstraints.BOTH;
-        panel1.add(panel5, gbc);
+        panel1.add(panel6, gbc);
         final JScrollPane scrollPane1 = new JScrollPane();
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -1126,7 +1288,7 @@ public class Thermo_msf_parserGUI extends JFrame {
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = new Insets(5, 5, 5, 5);
-        panel5.add(scrollPane1, gbc);
+        panel6.add(scrollPane1, gbc);
         scrollPane1.setViewportView(proteinList);
         jbuttonAlphabeticalSort = new JButton();
         jbuttonAlphabeticalSort.setText("A -> Z");
@@ -1135,7 +1297,7 @@ public class Thermo_msf_parserGUI extends JFrame {
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
-        panel5.add(jbuttonAlphabeticalSort, gbc);
+        panel6.add(jbuttonAlphabeticalSort, gbc);
         jbuttonNumberSort = new JButton();
         jbuttonNumberSort.setText("1 -> 20");
         gbc = new GridBagConstraints();
@@ -1143,7 +1305,7 @@ public class Thermo_msf_parserGUI extends JFrame {
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
-        panel5.add(jbuttonNumberSort, gbc);
+        panel6.add(jbuttonNumberSort, gbc);
         progressBar = new JProgressBar();
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -1181,6 +1343,21 @@ public class Thermo_msf_parserGUI extends JFrame {
             if (lValue == 3) {
                 cell.setBackground(Color.GREEN);
             }
+            return cell;
+        }
+    }
+
+
+    public class ProcessingNodeRenderer extends DefaultTableCellRenderer {
+        public Component getTableCellRendererComponent(JTable table, Object lProcessingNodeObject, boolean isSelected, boolean hasFocus, int row, int column) {
+            ProcessingNode lProcessingNode = (ProcessingNode) lProcessingNodeObject;
+            Component cell = super.getTableCellRendererComponent(table, lProcessingNode.getProcessingNodeNumber() + ": " + lProcessingNode.getFriendlyName(), isSelected, hasFocus, row, column);
+            /*String lToolTipHtml = "<html><b>" + lProcessingNode.getFriendlyName() + "</b>";
+            for (int i = 0; i < lProcessingNode.getProcessingNodeParameters().size(); i++) {
+                lToolTipHtml = lToolTipHtml + "<br>" + lProcessingNode.getProcessingNodeParameters().get(i).getFriendlyName() + ": " + lProcessingNode.getProcessingNodeParameters().get(i).getValueDisplayString();
+            }
+            lToolTipHtml = lToolTipHtml + "</html>";
+            setToolTipText(lToolTipHtml);           */
             return cell;
         }
     }
@@ -1287,7 +1464,14 @@ public class Thermo_msf_parserGUI extends JFrame {
                     for (int r = 0; r < lCoupledProteins.size(); r++) {
                         Protein lCoupledProtein = lCoupledProteins.get(r);
                         if (iProteinsMap.get(lCoupledProtein.getDescription()) == null) {
-                            Protein lNewProtein = new Protein(-1, lCoupledProtein.getSequence());
+                            Protein lNewProtein = null;
+                            try {
+                                lNewProtein = new Protein(-1, lCoupledProtein.getSequence());
+                            } catch (SQLException e) {
+                                lNewProtein = new Protein(-1, "");
+                                System.out.println("Protein sequence not found");
+                                //e.printStackTrace();
+                            }
                             lNewProtein.setDescription(lCoupledProtein.getDescription());
                             iProteinsMap.put(lNewProtein.getDescription(), lNewProtein);
                             iProteins.add(lNewProtein);
@@ -1336,6 +1520,7 @@ public class Thermo_msf_parserGUI extends JFrame {
     public Vector<Object> createPeptideLine(Peptide lPeptide) {
         Vector<Object> lPeptideObject = new Vector<Object>();
         lPeptideObject.add(lPeptide.getConfidenceLevel());
+        lPeptideObject.add(lPeptide.getParentSpectrum().getParser().getProcessingNodeByNumber(lPeptide.getProcessingNodeNumber()));
         lPeptideObject.add(lPeptide.getParentSpectrum().getSpectrumTitle());
         lPeptideObject.add(lPeptide);
         lPeptideObject.add(lPeptide.getModifiedPeptide());
@@ -1351,19 +1536,33 @@ public class Thermo_msf_parserGUI extends JFrame {
         lPeptideObject.add(lPeptide.getParentSpectrum().getRetentionTime());
         lPeptideObject.add(lPeptide.getParentSpectrum().getFirstScan());
         lPeptideObject.add(lPeptide.getParentSpectrum().getLastScan());
-        lPeptideObject.add(lPeptide.getAnnotation());
+        if (lPeptide.getAnnotation() != null) {
+            lPeptideObject.add(lPeptide.getAnnotation());
+        } else {
+            lPeptideObject.add("");
+        }
+
         for (int i = 0; i < iMergedRatioTypes.size(); i++) {
-            if (lPeptide.getParentSpectrum().getQuanResult() != null) {
+            //lPeptideObject.add(0.0);
+            if (lPeptide.getParentSpectrum().getQuanResult() != null && lPeptide.getParentSpectrum().getQuanResult().getRatioByRatioType(iMergedRatioTypes.get(i)) != null) {
                 lPeptideObject.add(lPeptide.getParentSpectrum().getQuanResult().getRatioByRatioType(iMergedRatioTypes.get(i)));
             } else {
                 lPeptideObject.add(null);
             }
         }
         for (int j = 0; j < iMergedCustomPeptideData.size(); j++) {
-            lPeptideObject.add(lPeptide.getCustomDataFieldValues().get(iMergedCustomPeptideData.get(j).getFieldId()));
+            if (lPeptide.getCustomDataFieldValues().get(iMergedCustomPeptideData.get(j).getFieldId()) != null) {
+                lPeptideObject.add(lPeptide.getCustomDataFieldValues().get(iMergedCustomPeptideData.get(j).getFieldId()));
+            } else {
+                lPeptideObject.add("");
+            }
         }
         for (int j = 0; j < iMergedCustomSpectrumData.size(); j++) {
-            lPeptideObject.add(lPeptide.getParentSpectrum().getCustomDataFieldValues().get(iMergedCustomSpectrumData.get(j).getFieldId()));
+            if (lPeptide.getParentSpectrum().getCustomDataFieldValues().get(iMergedCustomSpectrumData.get(j).getFieldId()) != null) {
+                lPeptideObject.add(lPeptide.getParentSpectrum().getCustomDataFieldValues().get(iMergedCustomSpectrumData.get(j).getFieldId()));
+            } else {
+                lPeptideObject.add("");
+            }
         }
 
         return lPeptideObject;
@@ -1489,120 +1688,84 @@ public class Thermo_msf_parserGUI extends JFrame {
      * @return Vector with the annotations
      */
     public Vector<DefaultSpectrumAnnotation> addIonAnnotationByCharge(Vector<DefaultSpectrumAnnotation> lAnnotations, int lCharge, Peptide lPeptide) {
-        Vector<FragmentIonType> lIonTypes = new Vector<FragmentIonType>();
+        Vector<Integer> lIonTypes = new Vector<Integer>();
         if (aIonsJCheckBox.isSelected()) {
-            lIonTypes.add(FragmentIonType.a);
+            lIonTypes.add(PeptideFragmentIon.A_ION);
             if (nh3IonsJCheckBox.isSelected()) {
-                lIonTypes.add(FragmentIonType.NH3_a);
+                lIonTypes.add(PeptideFragmentIon.ANH3_ION);
             }
             if (h2oIonsJCheckBox.isSelected()) {
-                lIonTypes.add(FragmentIonType.H20_a);
+                lIonTypes.add(PeptideFragmentIon.AH2O_ION);
             }
         }
         if (bIonsJCheckBox.isSelected()) {
-            lIonTypes.add(FragmentIonType.b);
+            lIonTypes.add(PeptideFragmentIon.B_ION);
             if (nh3IonsJCheckBox.isSelected()) {
-                lIonTypes.add(FragmentIonType.NH3_b);
+                lIonTypes.add(PeptideFragmentIon.BNH3_ION);
             }
             if (h2oIonsJCheckBox.isSelected()) {
-                lIonTypes.add(FragmentIonType.H2O_b);
+                lIonTypes.add(PeptideFragmentIon.BH2O_ION);
             }
         }
         if (cIonsJCheckBox.isSelected()) {
-            lIonTypes.add(FragmentIonType.c);
-            if (nh3IonsJCheckBox.isSelected()) {
-                lIonTypes.add(FragmentIonType.NH3_c);
-            }
-            if (h2oIonsJCheckBox.isSelected()) {
-                lIonTypes.add(FragmentIonType.H2O_c);
-            }
+            lIonTypes.add(PeptideFragmentIon.C_ION);
         }
         if (xIonsJCheckBox.isSelected()) {
-            lIonTypes.add(FragmentIonType.x);
-            if (nh3IonsJCheckBox.isSelected()) {
-                lIonTypes.add(FragmentIonType.NH3_x);
-            }
-            if (h2oIonsJCheckBox.isSelected()) {
-                lIonTypes.add(FragmentIonType.H2O_x);
-            }
+            lIonTypes.add(PeptideFragmentIon.X_ION);
         }
         if (yIonsJCheckBox.isSelected()) {
-            lIonTypes.add(FragmentIonType.y);
+            lIonTypes.add(PeptideFragmentIon.Y_ION);
             if (nh3IonsJCheckBox.isSelected()) {
-                lIonTypes.add(FragmentIonType.NH3_y);
+                lIonTypes.add(PeptideFragmentIon.YNH3_ION);
             }
             if (h2oIonsJCheckBox.isSelected()) {
-                lIonTypes.add(FragmentIonType.H2O_y);
+                lIonTypes.add(PeptideFragmentIon.YH2O_ION);
             }
         }
         if (zIonsJCheckBox.isSelected()) {
-            lIonTypes.add(FragmentIonType.z);
-            if (nh3IonsJCheckBox.isSelected()) {
-                lIonTypes.add(FragmentIonType.NH3_z);
-            }
-            if (h2oIonsJCheckBox.isSelected()) {
-                lIonTypes.add(FragmentIonType.H2O_z);
-            }
+            lIonTypes.add(PeptideFragmentIon.Z_ION);
         }
 
-        Vector<FragmentIon> lFragmentIons = lPeptide.getFragmentIonsByTypeAndCharge(lCharge, lIonTypes);
+        Vector<PeptideFragmentIon> lFragmentIons = lPeptide.getFragmentIonsByTypeAndCharge(lCharge, lIonTypes);
 
         for (int i = 0; i < lFragmentIons.size(); i++) {
             DefaultSpectrumAnnotation lAnno = null;
-            FragmentIon lIon = lFragmentIons.get(i);
-            if (lIon.getFragmentIonType() == FragmentIonType.a) {
-                lAnno = new DefaultSpectrumAnnotation(lIon.getMass(), iMSMSerror, Color.BLUE, lIon.toString());
+            PeptideFragmentIon lIon = lFragmentIons.get(i);
+            if (lIon.getType() == PeptideFragmentIon.A_ION) {
+                lAnno = new DefaultSpectrumAnnotation(lIon.theoreticMass, iMSMSerror, Color.BLUE, lIon.getIonType() + lIon.getNeutralLoss() + lIon.getNumber());
             }
-            if (lIon.getFragmentIonType() == FragmentIonType.H20_a) {
-                lAnno = new DefaultSpectrumAnnotation(lIon.getMass(), iMSMSerror, Color.GREEN, lIon.toString());
+            if (lIon.getType() == PeptideFragmentIon.AH2O_ION) {
+                lAnno = new DefaultSpectrumAnnotation(lIon.theoreticMass, iMSMSerror, Color.GREEN, lIon.getIonType() + lIon.getNeutralLoss() + lIon.getNumber());
             }
-            if (lIon.getFragmentIonType() == FragmentIonType.NH3_a) {
-                lAnno = new DefaultSpectrumAnnotation(lIon.getMass(), iMSMSerror, Color.GREEN, lIon.toString());
+            if (lIon.getType() == PeptideFragmentIon.ANH3_ION) {
+                lAnno = new DefaultSpectrumAnnotation(lIon.theoreticMass, iMSMSerror, Color.GREEN, lIon.getIonType() + lIon.getNeutralLoss() + lIon.getNumber());
             }
-            if (lIon.getFragmentIonType() == FragmentIonType.b) {
-                lAnno = new DefaultSpectrumAnnotation(lIon.getMass(), iMSMSerror, Color.BLUE, lIon.toString());
+            if (lIon.getType() == PeptideFragmentIon.B_ION) {
+                lAnno = new DefaultSpectrumAnnotation(lIon.theoreticMass, iMSMSerror, Color.BLUE, lIon.getIonType() + lIon.getNeutralLoss() + lIon.getNumber());
             }
-            if (lIon.getFragmentIonType() == FragmentIonType.H2O_b) {
-                lAnno = new DefaultSpectrumAnnotation(lIon.getMass(), iMSMSerror, Color.GREEN, lIon.toString());
+            if (lIon.getType() == PeptideFragmentIon.BH2O_ION) {
+                lAnno = new DefaultSpectrumAnnotation(lIon.theoreticMass, iMSMSerror, Color.GREEN, lIon.getIonType() + lIon.getNeutralLoss() + lIon.getNumber());
             }
-            if (lIon.getFragmentIonType() == FragmentIonType.NH3_b) {
-                lAnno = new DefaultSpectrumAnnotation(lIon.getMass(), iMSMSerror, Color.GREEN, lIon.toString());
+            if (lIon.getType() == PeptideFragmentIon.BNH3_ION) {
+                lAnno = new DefaultSpectrumAnnotation(lIon.theoreticMass, iMSMSerror, Color.GREEN, lIon.getIonType() + lIon.getNeutralLoss() + lIon.getNumber());
             }
-            if (lIon.getFragmentIonType() == FragmentIonType.c) {
-                lAnno = new DefaultSpectrumAnnotation(lIon.getMass(), iMSMSerror, Color.BLUE, lIon.toString());
+            if (lIon.getType() == PeptideFragmentIon.C_ION) {
+                lAnno = new DefaultSpectrumAnnotation(lIon.theoreticMass, iMSMSerror, Color.BLUE, lIon.getIonType() + lIon.getNeutralLoss() + lIon.getNumber());
             }
-            if (lIon.getFragmentIonType() == FragmentIonType.H2O_c) {
-                lAnno = new DefaultSpectrumAnnotation(lIon.getMass(), iMSMSerror, Color.GREEN, lIon.toString());
+            if (lIon.getType() == PeptideFragmentIon.X_ION) {
+                lAnno = new DefaultSpectrumAnnotation(lIon.theoreticMass, iMSMSerror, Color.BLACK, lIon.getIonType() + lIon.getNeutralLoss() + lIon.getNumber());
             }
-            if (lIon.getFragmentIonType() == FragmentIonType.NH3_c) {
-                lAnno = new DefaultSpectrumAnnotation(lIon.getMass(), iMSMSerror, Color.GREEN, lIon.toString());
+            if (lIon.getType() == PeptideFragmentIon.Y_ION) {
+                lAnno = new DefaultSpectrumAnnotation(lIon.theoreticMass, iMSMSerror, Color.BLACK, lIon.getIonType() + lIon.getNeutralLoss() + lIon.getNumber());
             }
-            if (lIon.getFragmentIonType() == FragmentIonType.x) {
-                lAnno = new DefaultSpectrumAnnotation(lIon.getMass(), iMSMSerror, Color.BLACK, lIon.toString());
+            if (lIon.getType() == PeptideFragmentIon.YH2O_ION) {
+                lAnno = new DefaultSpectrumAnnotation(lIon.theoreticMass, iMSMSerror, Color.GREEN, lIon.getIonType() + lIon.getNeutralLoss() + lIon.getNumber());
             }
-            if (lIon.getFragmentIonType() == FragmentIonType.H2O_x) {
-                lAnno = new DefaultSpectrumAnnotation(lIon.getMass(), iMSMSerror, Color.GREEN, lIon.toString());
+            if (lIon.getType() == PeptideFragmentIon.YNH3_ION) {
+                lAnno = new DefaultSpectrumAnnotation(lIon.theoreticMass, iMSMSerror, Color.GREEN, lIon.getIonType() + lIon.getNeutralLoss() + lIon.getNumber());
             }
-            if (lIon.getFragmentIonType() == FragmentIonType.NH3_x) {
-                lAnno = new DefaultSpectrumAnnotation(lIon.getMass(), iMSMSerror, Color.GREEN, lIon.toString());
-            }
-            if (lIon.getFragmentIonType() == FragmentIonType.y) {
-                lAnno = new DefaultSpectrumAnnotation(lIon.getMass(), iMSMSerror, Color.BLACK, lIon.toString());
-            }
-            if (lIon.getFragmentIonType() == FragmentIonType.H2O_y) {
-                lAnno = new DefaultSpectrumAnnotation(lIon.getMass(), iMSMSerror, Color.GREEN, lIon.toString());
-            }
-            if (lIon.getFragmentIonType() == FragmentIonType.NH3_y) {
-                lAnno = new DefaultSpectrumAnnotation(lIon.getMass(), iMSMSerror, Color.GREEN, lIon.toString());
-            }
-            if (lIon.getFragmentIonType() == FragmentIonType.z) {
-                lAnno = new DefaultSpectrumAnnotation(lIon.getMass(), iMSMSerror, Color.BLACK, lIon.toString());
-            }
-            if (lIon.getFragmentIonType() == FragmentIonType.H2O_z) {
-                lAnno = new DefaultSpectrumAnnotation(lIon.getMass(), iMSMSerror, Color.GREEN, lIon.toString());
-            }
-            if (lIon.getFragmentIonType() == FragmentIonType.NH3_z) {
-                lAnno = new DefaultSpectrumAnnotation(lIon.getMass(), iMSMSerror, Color.GREEN, lIon.toString());
+            if (lIon.getType() == PeptideFragmentIon.Z_ION) {
+                lAnno = new DefaultSpectrumAnnotation(lIon.theoreticMass, iMSMSerror, Color.BLACK, lIon.getIonType() + lIon.getNeutralLoss() + lIon.getNumber());
             }
 
             if (lAnno != null) {
@@ -1631,7 +1794,13 @@ public class Thermo_msf_parserGUI extends JFrame {
         // and clear the peptide sequence coverage details
         proteinSequenceCoverageJEditorPane.setText("");
 
-        String lCleanProteinSequence = lProtein.getSequence();
+        String lCleanProteinSequence = null;
+        try {
+            lCleanProteinSequence = lProtein.getSequence();
+        } catch (SQLException e) {
+            System.err.println("Protein sequence not found");
+            //e.printStackTrace();  
+        }
 
         int selectedPeptideStart = -1;
         int selectedPeptideEnd = -1;
@@ -1794,7 +1963,7 @@ public class Thermo_msf_parserGUI extends JFrame {
 
         // Condition if one row is selected.
         if (row != -1) {
-            iSelectedPeptide = (Peptide) jtablePeptides.getValueAt(row, 2);
+            iSelectedPeptide = (Peptide) jtablePeptides.getValueAt(row, 3);
 
             //update the protein list
             iDisplayedProteins.removeAllElements();
@@ -1810,241 +1979,352 @@ public class Thermo_msf_parserGUI extends JFrame {
 
 
             try {
-                //do the MSMS
-                Vector<Peak> lPeaks = iSelectedPeptide.getParentSpectrum().getMSMSPeaks();
-                double[] lMzValues = new double[lPeaks.size()];
-                double[] lIntensityValues = new double[lPeaks.size()];
-                for (int i = 0; i < lPeaks.size(); i++) {
-                    lMzValues[i] = lPeaks.get(i).getX();
-                    lIntensityValues[i] = lPeaks.get(i).getY();
-                }
+                if (msmsCheckBox.isSelected()) {
 
-                // Empty the spectrum panel.
-                while (this.jpanMSMSLeft.getComponents().length > 0) {
-                    this.jpanMSMSLeft.remove(0);
-                }
-
-                // Updating the spectrum panel
-                iMSMSspectrumPanel = new SpectrumPanel(
-                        lMzValues,
-                        lIntensityValues,
-                        iSelectedPeptide.getParentSpectrum().getMz(),
-                        iSelectedPeptide.getParentSpectrum().getSpectrumTitle(),
-                        String.valueOf(iSelectedPeptide.getParentSpectrum().getCharge()),
-                        50, true, false);
-
-                this.jpanMSMSLeft.add(iMSMSspectrumPanel);
-                this.jpanMSMSLeft.validate();
-                this.jpanMSMSLeft.repaint();
-                this.setSpectrumMSMSAnnotations(iSelectedPeptide);
-
-
-                //do the MS
-                Vector<Peak> lMSPeaks = iSelectedPeptide.getParentSpectrum().getMSPeaks();
-                double[] lMSMzValues = new double[lMSPeaks.size()];
-                double[] lMSIntensityValues = new double[lMSPeaks.size()];
-                Vector<DefaultSpectrumAnnotation> lMSAnnotations = new Vector<DefaultSpectrumAnnotation>();
-                double lMinMZvalue = Double.MAX_VALUE;
-                double lMaxMZvalue = Double.MIN_VALUE;
-                for (int i = 0; i < lMSPeaks.size(); i++) {
-                    lMSMzValues[i] = lMSPeaks.get(i).getX();
-                    if (lMSMzValues[i] > lMaxMZvalue) {
-                        lMaxMZvalue = lMSMzValues[i];
+                    //do the MSMS
+                    if (jtabpanLower.indexOfTab("MS/MS spectrum") == -1) {
+                        jtabpanLower.add("MS/MS spectrum", jpanMSMS);
                     }
-                    if (lMSMzValues[i] < lMinMZvalue) {
-                        lMinMZvalue = lMSMzValues[i];
+                    Vector<Peak> lPeaks = iSelectedPeptide.getParentSpectrum().getMSMSPeaks();
+                    double[] lMzValues = new double[lPeaks.size()];
+                    double[] lIntensityValues = new double[lPeaks.size()];
+                    for (int i = 0; i < lPeaks.size(); i++) {
+                        lMzValues[i] = lPeaks.get(i).getX();
+                        lIntensityValues[i] = lPeaks.get(i).getY();
                     }
-                    lMSIntensityValues[i] = lMSPeaks.get(i).getY();
-                    if (lMSPeaks.get(i).getZ() != 0) {
-                        lMSAnnotations.add(new DefaultSpectrumAnnotation(lMSPeaks.get(i).getX(), 0.001, Color.BLACK, lMSPeaks.get(i).getX() + "(Z = " + lMSPeaks.get(i).getZ() + ")"));
+
+                    // Empty the spectrum panel.
+                    while (this.jpanMSMSLeft.getComponents().length > 0) {
+                        this.jpanMSMSLeft.remove(0);
                     }
+
+                    // Updating the spectrum panel
+                    iMSMSspectrumPanel = new SpectrumPanel(
+                            lMzValues,
+                            lIntensityValues,
+                            iSelectedPeptide.getParentSpectrum().getMz(),
+                            iSelectedPeptide.getParentSpectrum().getSpectrumTitle(),
+                            String.valueOf(iSelectedPeptide.getParentSpectrum().getCharge()),
+                            50, false, false, false);
+
+                    this.jpanMSMSLeft.add(iMSMSspectrumPanel);
+                    this.jpanMSMSLeft.validate();
+                    this.jpanMSMSLeft.repaint();
+                    this.setSpectrumMSMSAnnotations(iSelectedPeptide);
+                } else {
+                    jtabpanLower.remove(jpanMSMS);
+                    // Empty the spectrum panel.
+                    while (this.jpanMSMSLeft.getComponents().length > 0) {
+                        this.jpanMSMSLeft.remove(0);
+                    }
+                    this.jpanMSMSLeft.validate();
+                    this.jpanMSMSLeft.repaint();
                 }
 
-                // Empty the spectrum panel.
-                while (this.jpanMS.getComponents().length > 0) {
-                    this.jpanMS.remove(0);
-                }
-
-                // Updating the spectrum panel
-                iMSspectrumPanel = new SpectrumPanel(
-                        lMSMzValues,
-                        lMSIntensityValues,
-                        iSelectedPeptide.getParentSpectrum().getMz(),
-                        "",
-                        String.valueOf(iSelectedPeptide.getParentSpectrum().getCharge()),
-                        50, true, false);
-                iMSspectrumPanel.rescale(lMinMZvalue, lMaxMZvalue);
-                iMSspectrumPanel.setProfileMode(false);
-                iMSspectrumPanel.setAnnotations(lMSAnnotations);
-                iMSspectrumPanel.setXAxisStartAtZero(false);
-
-                this.jpanMS.add(iMSspectrumPanel);
-                this.jpanMS.validate();
-                this.jpanMS.repaint();
-
-
-                //add the chromatograms
-                try {
-                    jtabChromatogram.removeAll();
-
-                    Vector<Chromatogram> lChros = iSelectedPeptide.getParentSpectrum().getParser().getChromatograms();
-                    for (int c = 0; c < lChros.size(); c++) {
-                        Chromatogram lChro = lChros.get(c);
-                        if (lChro.getFileId() == iSelectedPeptide.getParentSpectrum().getFileId()) {
-                            Vector<Chromatogram.Point> lPoints = lChro.getPoints();
-
-                            double[] lXvalues = new double[lPoints.size()];
-                            double[] lYvalues = new double[lPoints.size()];
-
-                            double lMaxY = 0.0;
-                            for (int p = 0; p < lPoints.size(); p++) {
-                                if (lPoints.get(p).getY() != 0.0) {
-                                    lXvalues[p] = lPoints.get(p).getT();
-                                    lYvalues[p] = lPoints.get(p).getY();
-                                    if (lPoints.get(p).getY() > lMaxY) {
-                                        lMaxY = lPoints.get(p).getY();
-                                    }
-                                }
-                            }
-
-                            // create the chromatogram
-                            ChromatogramPanel chromatogramPanel = new ChromatogramPanel(
-                                    lXvalues, lYvalues, "Time (minutes)", "Intensity");
-                            chromatogramPanel.setMaxPadding(65);
-                            double[] lXAnno = new double[]{iSelectedPeptide.getParentSpectrum().getRetentionTime()};
-                            double[] lYAnno = new double[]{lMaxY};
-                            chromatogramPanel.addAdditionalDataset(lXAnno, lYAnno, Color.GREEN, Color.GREEN);
-
-
-                            String lTitle = iSelectedPeptide.getParentSpectrum().getParser().getRawfileNameByFileId(lChro.getFileId());
-                            lTitle = lTitle + " - " + lChro.getTraceType();
-                            jtabChromatogram.add(lTitle, chromatogramPanel);
-                            // remove the default chromatogram panel border, given that our
-                            // chromatogram panel already has a border
-                            chromatogramPanel.setBorder(null);
-
-                            // add the chromatogram panel to the frame
-                            chromatogramPanel.validate();
-                            chromatogramPanel.repaint();
+                if (msCheckBox.isSelected()) {
+                    //do the MS
+                    if (jtabpanLower.indexOfTab("MS spectrum") == -1) {
+                        jtabpanLower.add("MS spectrum", jpanMSHolder);
+                    }
+                    Vector<Peak> lMSPeaks = iSelectedPeptide.getParentSpectrum().getMSPeaks();
+                    double[] lMSMzValues = new double[lMSPeaks.size()];
+                    double[] lMSIntensityValues = new double[lMSPeaks.size()];
+                    Vector<DefaultSpectrumAnnotation> lMSAnnotations = new Vector<DefaultSpectrumAnnotation>();
+                    double lMinMZvalue = Double.MAX_VALUE;
+                    double lMaxMZvalue = Double.MIN_VALUE;
+                    for (int i = 0; i < lMSPeaks.size(); i++) {
+                        lMSMzValues[i] = lMSPeaks.get(i).getX();
+                        if (lMSMzValues[i] > lMaxMZvalue) {
+                            lMaxMZvalue = lMSMzValues[i];
+                        }
+                        if (lMSMzValues[i] < lMinMZvalue) {
+                            lMinMZvalue = lMSMzValues[i];
+                        }
+                        lMSIntensityValues[i] = lMSPeaks.get(i).getY();
+                        if (lMSPeaks.get(i).getZ() != 0) {
+                            lMSAnnotations.add(new DefaultSpectrumAnnotation(lMSPeaks.get(i).getX(), 0.001, Color.BLACK, lMSPeaks.get(i).getX() + "(Z = " + lMSPeaks.get(i).getZ() + ")"));
                         }
                     }
 
+                    // Empty the spectrum panel.
+                    while (this.jpanMS.getComponents().length > 0) {
+                        this.jpanMS.remove(0);
+                    }
 
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    // Updating the spectrum panel
+                    iMSspectrumPanel = new SpectrumPanel(
+                            lMSMzValues,
+                            lMSIntensityValues,
+                            iSelectedPeptide.getParentSpectrum().getMz(),
+                            "",
+                            String.valueOf(iSelectedPeptide.getParentSpectrum().getCharge()),
+                            50, false, false, false);
+                    iMSspectrumPanel.rescale(lMinMZvalue, lMaxMZvalue);
+                    iMSspectrumPanel.setProfileMode(false);
+                    iMSspectrumPanel.setAnnotations(lMSAnnotations);
+                    iMSspectrumPanel.setXAxisStartAtZero(false);
+                    Peak lFragmentedPeak = iSelectedPeptide.getParentSpectrum().getFragmentedMsPeak();
+                    double lDistance = (lMaxMZvalue - lMinMZvalue) / 50.0;
+                    iMSspectrumPanel.addReferenceAreaXAxis(new ReferenceArea("Fragmented peak", lFragmentedPeak.getX() - lDistance, lFragmentedPeak.getX() + lDistance, Color.blue, 0.1f, false, true));
+
+                    this.jpanMS.add(iMSspectrumPanel);
+                    this.jpanMS.validate();
+                    this.jpanMS.repaint();
+                } else {
+                    jtabpanLower.remove(jpanMSHolder);
+                    // Empty the spectrum panel.
+                    while (this.jpanMS.getComponents().length > 0) {
+                        this.jpanMS.remove(0);
+                    }
+                    this.jpanMS.validate();
+                    this.jpanMS.repaint();
                 }
 
+                if (chromatogramCheckBox.isSelected()) {
 
-                try {
-                    if (iSelectedPeptide.getParentSpectrum().getQuanResult() != null) {
-
-                        jtabpanLower.add("Quantification spectrum", jpanQuantificationSpectrumHolder);
-
-                        QuanResult lQuan = iSelectedPeptide.getParentSpectrum().getQuanResult();
-                        //get the quan events
-                        Vector<Event> lQuanEvents = new Vector<Event>();
-                        Vector<Integer> lQuanEventsIds = new Vector<Integer>();
-                        Vector<Vector<Event>> lQuanEventsByPattern = new Vector<Vector<Event>>();
-                        for (int i = 0; i < lQuan.getIsotopePatterns().size(); i++) {
-                            Vector<Event> lIsotopePatternEvents = lQuan.getIsotopePatterns().get(i).getEvents(iSelectedPeptide.getParentSpectrum().getConnection());
-                            lQuanEventsByPattern.add(lIsotopePatternEvents);
-                            for (int j = 0; j < lIsotopePatternEvents.size(); j++) {
-                                lQuanEvents.add(lIsotopePatternEvents.get(j));
-                                lQuanEventsIds.add(lIsotopePatternEvents.get(j).getEventId());
-                            }
+                    //add the chromatograms
+                    try {
+                        jtabChromatogram.removeAll();
+                        if (jtabpanLower.indexOfTab("Chromatogram") == -1) {
+                            jtabpanLower.add("Chromatogram", jtabChromatogram);
                         }
+                        Vector<Chromatogram> lChros = iSelectedPeptide.getParentSpectrum().getParser().getChromatograms();
+                        for (int c = 0; c < lChros.size(); c++) {
+                            Chromatogram lChro = lChros.get(c);
+                            if (lChro.getFileId() == iSelectedPeptide.getParentSpectrum().getFileId()) {
+                                Vector<Chromatogram.Point> lPoints = lChro.getPoints();
 
-                        //get the min and max retention and mass
-                        double lMinMass = Double.MAX_VALUE;
-                        double lMinRT = Double.MAX_VALUE;
-                        double lMaxMass = Double.MIN_VALUE;
-                        double lMaxRT = Double.MIN_VALUE;
+                                double[] lXvalues = new double[lPoints.size()];
+                                double[] lYvalues = new double[lPoints.size()];
 
-                        for (int i = 0; i < lQuanEvents.size(); i++) {
-                            if (lMinMass > lQuanEvents.get(i).getMass()) {
-                                lMinMass = lQuanEvents.get(i).getMass();
-                            }
-                            if (lMaxMass < lQuanEvents.get(i).getMass()) {
-                                lMaxMass = lQuanEvents.get(i).getMass();
-                            }
-                            if (lMinRT > lQuanEvents.get(i).getRetentionTime()) {
-                                lMinRT = lQuanEvents.get(i).getRetentionTime();
-                            }
-                            if (lMaxRT < lQuanEvents.get(i).getRetentionTime()) {
-                                lMaxRT = lQuanEvents.get(i).getRetentionTime();
-                            }
-                        }
-                        //calculate the borders
-                        double lMassDiff = Math.abs(lMaxMass - lMinMass);
-                        lMinMass = lMinMass - (lMassDiff / 3.0);
-                        lMaxMass = lMaxMass + (lMassDiff / 3.0);
-                        lMinRT = lMinRT - 0.5;
-                        lMaxRT = lMaxRT + 0.5;
-
-                        Vector<Event> lBackgroundEvents = Event.getEventByRetentionTimeLimitMassLimitAndFileIdExcludingIds(lMinRT, lMaxRT, lMinMass, lMaxMass, lQuanEventsIds, iSelectedPeptide.getParentSpectrum().getFileId(), iSelectedPeptide.getParentSpectrum().getConnection());
-
-
-                        double[] lQuanMzValues = new double[lBackgroundEvents.size()];
-                        double[] lQuanIntensityValues = new double[lBackgroundEvents.size()];
-
-                        for (int i = 0; i < lBackgroundEvents.size(); i++) {
-                            lQuanMzValues[i] = lBackgroundEvents.get(i).getMass();
-                            lQuanIntensityValues[i] = lBackgroundEvents.get(i).getIntensity();
-                        }
-
-
-                        // Empty the spectrum panel.
-                        while (this.jpanQuantitationSpectrum.getComponents().length > 0) {
-                            this.jpanQuantitationSpectrum.remove(0);
-                        }
-
-                        // Updating the spectrum panel
-                        iQuantificationSpectrumPanel = new SpectrumPanel(
-                                lQuanMzValues,
-                                lQuanIntensityValues,
-                                iSelectedPeptide.getParentSpectrum().getMz() / (double) iSelectedPeptide.getParentSpectrum().getCharge(),
-                                "RT: " + lMinRT + " - " + lMaxRT,
-                                String.valueOf(iSelectedPeptide.getParentSpectrum().getCharge()),
-                                50, true, true);
-                        iQuantificationSpectrumPanel.rescale(lMinMass, lMaxMass);
-                        iQuantificationSpectrumPanel.setProfileMode(false);
-                        iQuantificationSpectrumPanel.setXAxisStartAtZero(false);
-                        Vector<DefaultSpectrumAnnotation> lQuanAnnotations = new Vector<DefaultSpectrumAnnotation>();
-                        for (int i = 0; i < lQuan.getIsotopePatterns().size(); i++) {
-                            double[] lQuanPatternMzValues = new double[lQuanEventsByPattern.get(i).size()];
-                            double[] lQuanPatternIntensityValues = new double[lQuanEventsByPattern.get(i).size()];
-                            for (int j = 0; j < lQuanEventsByPattern.get(i).size(); j++) {
-                                lQuanPatternMzValues[j] = lQuanEventsByPattern.get(i).get(j).getMass();
-                                lQuanPatternIntensityValues[j] = lQuanEventsByPattern.get(i).get(j).getIntensity();
-                                for (int k = 0; k < lQuan.getIsotopePatterns().get(i).getEventAnnotations().size(); k++) {
-                                    if (lQuanEventsByPattern.get(i).get(j).getEventId() == lQuan.getIsotopePatterns().get(i).getEventAnnotations().get(k).getEventId()) {
-                                        if (lQuan.getIsotopePatterns().get(i).getEventAnnotations().get(k).getQuanChannelId() != -1) {
-                                            lQuanAnnotations.add(new DefaultSpectrumAnnotation(lQuanEventsByPattern.get(i).get(j).getMass(), 0.000000000000000000000001, Color.BLACK, "" + iSelectedPeptide.getParentSpectrum().getParser().getQuanChannelNameById(lQuan.getIsotopePatterns().get(i).getEventAnnotations().get(k).getQuanChannelId())));
+                                double lMaxY = 0.0;
+                                for (int p = 0; p < lPoints.size(); p++) {
+                                    if (lPoints.get(p).getY() > 0.0) {
+                                        lXvalues[p] = lPoints.get(p).getT();
+                                        lYvalues[p] = lPoints.get(p).getY();
+                                        if (lPoints.get(p).getY() > lMaxY) {
+                                            lMaxY = lPoints.get(p).getY();
                                         }
                                     }
                                 }
+
+                                // create the chromatogram
+                                ChromatogramPanel chromatogramPanel = new ChromatogramPanel(
+                                        lXvalues, lYvalues, "Time (minutes)", "Intensity");
+                                chromatogramPanel.setMaxPadding(65);
+
+                                double lAreaDistance = chromatogramPanel.getMaxXAxisValue() / 500.0;
+                                if (iSelectedProtein != null) {
+                                    for (int p = 0; p < iSelectedProtein.getPeptides().size(); p++) {
+                                        Peptide lPeptide = iSelectedProtein.getPeptides().get(p);
+                                        int lConfidenceLevel = lPeptide.getConfidenceLevel();
+                                        boolean lUse = false;
+                                        if (chbHighConfident.isSelected() && lConfidenceLevel == 3) {
+                                            lUse = true;
+                                        }
+                                        if (chbMediumConfident.isSelected() && lConfidenceLevel == 2) {
+                                            lUse = true;
+                                        }
+                                        if (chbLowConfidence.isSelected() && lConfidenceLevel == 1) {
+                                            lUse = true;
+                                        }
+                                        if (onlyHighestScoringCheckBox.isSelected()) {
+                                            if (!lPeptide.getParentSpectrum().isHighestScoring(lPeptide, iMajorScoreType)) {
+                                                lUse = false;
+                                            }
+                                        }
+                                        if (onlyLowestScoringCheckBox.isSelected()) {
+                                            if (!lPeptide.getParentSpectrum().isLowestScoring(lPeptide, iMajorScoreType)) {
+                                                lUse = false;
+                                            }
+                                        }
+
+                                        if (lUse) {
+                                            if (lPeptide.getParentSpectrum().getParser().getFileName().equalsIgnoreCase(iSelectedPeptide.getParentSpectrum().getParser().getFileName()) && lPeptide.getParentSpectrum().getFileId() == iSelectedPeptide.getParentSpectrum().getFileId()) {
+                                                chromatogramPanel.addReferenceAreaXAxis(new ReferenceArea(String.valueOf(iSelectedProtein.getPeptides().get(p).getParentSpectrum().getFirstScan()), iSelectedProtein.getPeptides().get(p).getParentSpectrum().getRetentionTime() - lAreaDistance, iSelectedProtein.getPeptides().get(p).getParentSpectrum().getRetentionTime() + lAreaDistance, Color.blue, 0.1f, false, false));
+                                            } else {
+                                                chromatogramPanel.addReferenceAreaXAxis(new ReferenceArea(String.valueOf(iSelectedProtein.getPeptides().get(p).getParentSpectrum().getFirstScan()), iSelectedProtein.getPeptides().get(p).getParentSpectrum().getRetentionTime() - lAreaDistance, iSelectedProtein.getPeptides().get(p).getParentSpectrum().getRetentionTime() + lAreaDistance, Color.green, 0.1f, false, false));
+                                            }
+                                        }
+
+                                    }
+                                }
+                                chromatogramPanel.addReferenceAreaXAxis(new ReferenceArea(String.valueOf(iSelectedPeptide.getParentSpectrum().getFirstScan()), iSelectedPeptide.getParentSpectrum().getRetentionTime() - lAreaDistance, iSelectedPeptide.getParentSpectrum().getRetentionTime() + lAreaDistance, Color.red, 0.8f, true, false));
+
+
+                                //chromatogramPanel.setMiniature(true);
+
+                                String lTitle = iSelectedPeptide.getParentSpectrum().getParser().getRawfileNameByFileId(lChro.getFileId());
+                                lTitle = lTitle + " - " + lChro.getTraceType();
+                                jtabChromatogram.add(lTitle, chromatogramPanel);
+                                // remove the default chromatogram panel border, given that our
+                                // chromatogram panel already has a border
+                                chromatogramPanel.setBorder(null);
+
+                                // add the chromatogram panel to the frame
+                                chromatogramPanel.validate();
+                                chromatogramPanel.repaint();
                             }
-                            iQuantificationSpectrumPanel.addAdditionalDataset(lQuanPatternMzValues, lQuanPatternIntensityValues, Color.GREEN, Color.GREEN);
                         }
 
-                        iQuantificationSpectrumPanel.setAnnotations(lQuanAnnotations);
 
-                        this.jpanQuantitationSpectrum.add(iQuantificationSpectrumPanel);
-                        this.jpanQuantitationSpectrum.validate();
-                        this.jpanQuantitationSpectrum.repaint();
-
-
-                    } else {
-                        jtabpanLower.remove(jpanQuantificationSpectrumHolder);
-                        // Empty the spectrum panel.
-                        while (this.jpanQuantitationSpectrum.getComponents().length > 0) {
-                            this.jpanQuantitationSpectrum.remove(0);
-                        }
-                        this.jpanQuantitationSpectrum.validate();
-                        this.jpanQuantitationSpectrum.repaint();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                } catch (SQLException e) {
-                    e.printStackTrace();
+                } else {
+                    jtabpanLower.remove(jtabChromatogram);
+                    jtabChromatogram.removeAll();
+                }
+
+                if (quantCheckBox.isSelected()) {
+
+                    try {
+                        if (iSelectedPeptide.getParentSpectrum().getQuanResult() != null) {
+
+                            jtabpanLower.add("Quantification spectrum", jpanQuantificationSpectrumHolder);
+
+                            QuanResult lQuan = iSelectedPeptide.getParentSpectrum().getQuanResult();
+                            //get the quan events
+                            Vector<Event> lQuanEvents = new Vector<Event>();
+                            Vector<Integer> lQuanEventsIds = new Vector<Integer>();
+                            Vector<Vector<Event>> lQuanEventsByPattern = new Vector<Vector<Event>>();
+                            for (int i = 0; i < lQuan.getIsotopePatterns().size(); i++) {
+                                Vector<Event> lIsotopePatternEvents = lQuan.getIsotopePatterns().get(i).getEventsWithQuanResult(iSelectedPeptide.getParentSpectrum().getConnection());
+                                lQuanEventsByPattern.add(lIsotopePatternEvents);
+                                for (int j = 0; j < lIsotopePatternEvents.size(); j++) {
+                                    lQuanEvents.add(lIsotopePatternEvents.get(j));
+                                    lQuanEventsIds.add(lIsotopePatternEvents.get(j).getEventId());
+                                }
+                            }
+
+                            //get the quan events
+                            Vector<Vector<Event>> lQuanEventsByPatternWithoutQuanChannel = new Vector<Vector<Event>>();
+                            for (int i = 0; i < lQuan.getIsotopePatterns().size(); i++) {
+                                Vector<Event> lIsotopePatternEvents = lQuan.getIsotopePatterns().get(i).getEventsWithoutQuanResult(iSelectedPeptide.getParentSpectrum().getConnection());
+                                lQuanEventsByPatternWithoutQuanChannel.add(lIsotopePatternEvents);
+                                for (int j = 0; j < lIsotopePatternEvents.size(); j++) {
+                                    lQuanEvents.add(lIsotopePatternEvents.get(j));
+                                    lQuanEventsIds.add(lIsotopePatternEvents.get(j).getEventId());
+                                }
+                            }
+
+                            //get the min and max retention and mass
+                            double lMinMass = Double.MAX_VALUE;
+                            double lMinRT = Double.MAX_VALUE;
+                            double lMaxMass = Double.MIN_VALUE;
+                            double lMaxRT = Double.MIN_VALUE;
+
+                            for (int i = 0; i < lQuanEvents.size(); i++) {
+                                if (lMinMass > lQuanEvents.get(i).getMass()) {
+                                    lMinMass = lQuanEvents.get(i).getMass();
+                                }
+                                if (lMaxMass < lQuanEvents.get(i).getMass()) {
+                                    lMaxMass = lQuanEvents.get(i).getMass();
+                                }
+                                if (lMinRT > lQuanEvents.get(i).getRetentionTime()) {
+                                    lMinRT = lQuanEvents.get(i).getRetentionTime();
+                                }
+                                if (lMaxRT < lQuanEvents.get(i).getRetentionTime()) {
+                                    lMaxRT = lQuanEvents.get(i).getRetentionTime();
+                                }
+                            }
+                            //calculate the borders
+                            double lMassDiff = Math.abs(lMaxMass - lMinMass);
+                            if (lMassDiff == 0) {
+                                lMassDiff = 15.0;
+                            }
+                            lMinMass = lMinMass - (lMassDiff / 3.0);
+                            lMaxMass = lMaxMass + (lMassDiff / 3.0);
+                            lMinRT = lMinRT - 0.5;
+                            lMaxRT = lMaxRT + 0.5;
+
+                            Vector<Event> lBackgroundEvents = Event.getEventByRetentionTimeLimitMassLimitAndFileIdExcludingIds(lMinRT, lMaxRT, lMinMass, lMaxMass, lQuanEventsIds, iSelectedPeptide.getParentSpectrum().getFileId(), iSelectedPeptide.getParentSpectrum().getConnection());
+
+
+                            double[] lQuanMzValues = new double[lBackgroundEvents.size()];
+                            double[] lQuanIntensityValues = new double[lBackgroundEvents.size()];
+
+                            for (int i = 0; i < lBackgroundEvents.size(); i++) {
+                                lQuanMzValues[i] = lBackgroundEvents.get(i).getMass();
+                                lQuanIntensityValues[i] = lBackgroundEvents.get(i).getIntensity();
+                            }
+
+
+                            // Empty the spectrum panel.
+                            while (this.jpanQuantitationSpectrum.getComponents().length > 0) {
+                                this.jpanQuantitationSpectrum.remove(0);
+                            }
+
+                            // Updating the spectrum panel
+                            iQuantificationSpectrumPanel = new SpectrumPanel(
+                                    lQuanMzValues,
+                                    lQuanIntensityValues,
+                                    iSelectedPeptide.getParentSpectrum().getMz() / (double) iSelectedPeptide.getParentSpectrum().getCharge(),
+                                    "RT: " + lMinRT + " - " + lMaxRT,
+                                    String.valueOf(iSelectedPeptide.getParentSpectrum().getCharge()),
+                                    50, true, true, false);
+                            iQuantificationSpectrumPanel.rescale(lMinMass, lMaxMass);
+                            iQuantificationSpectrumPanel.setProfileMode(false);
+                            iQuantificationSpectrumPanel.setXAxisStartAtZero(false);
+                            Vector<DefaultSpectrumAnnotation> lQuanAnnotations = new Vector<DefaultSpectrumAnnotation>();
+                            for (int i = 0; i < lQuan.getIsotopePatterns().size(); i++) {
+                                double[] lQuanPatternMzValues = new double[lQuanEventsByPattern.get(i).size()];
+                                double[] lQuanPatternIntensityValues = new double[lQuanEventsByPattern.get(i).size()];
+                                for (int j = 0; j < lQuanEventsByPattern.get(i).size(); j++) {
+                                    lQuanPatternMzValues[j] = lQuanEventsByPattern.get(i).get(j).getMass();
+                                    lQuanPatternIntensityValues[j] = lQuanEventsByPattern.get(i).get(j).getIntensity();
+                                    for (int k = 0; k < lQuan.getIsotopePatterns().get(i).getEventAnnotations().size(); k++) {
+                                        if (lQuanEventsByPattern.get(i).get(j).getEventId() == lQuan.getIsotopePatterns().get(i).getEventAnnotations().get(k).getEventId()) {
+                                            if (lQuan.getIsotopePatterns().get(i).getEventAnnotations().get(k).getQuanChannelId() != -1) {
+                                                lQuanAnnotations.add(new DefaultSpectrumAnnotation(lQuanEventsByPattern.get(i).get(j).getMass(), 0.000000000000000000000001, Color.BLACK, "" + iSelectedPeptide.getParentSpectrum().getParser().getQuanChannelNameById(lQuan.getIsotopePatterns().get(i).getEventAnnotations().get(k).getQuanChannelId())));
+                                            }
+                                        }
+                                    }
+                                }
+                                if (lQuanPatternMzValues.length > 0) {
+                                    iQuantificationSpectrumPanel.addAdditionalDataset(lQuanPatternMzValues, lQuanPatternIntensityValues, Color.GREEN, Color.GREEN);
+                                }
+                            }
+
+                            for (int i = 0; i < lQuan.getIsotopePatterns().size(); i++) {
+                                double[] lQuanPatternMzValues = new double[lQuanEventsByPatternWithoutQuanChannel.get(i).size()];
+                                double[] lQuanPatternIntensityValues = new double[lQuanEventsByPatternWithoutQuanChannel.get(i).size()];
+                                for (int j = 0; j < lQuanEventsByPatternWithoutQuanChannel.get(i).size(); j++) {
+                                    lQuanPatternMzValues[j] = lQuanEventsByPatternWithoutQuanChannel.get(i).get(j).getMass();
+                                    lQuanPatternIntensityValues[j] = lQuanEventsByPatternWithoutQuanChannel.get(i).get(j).getIntensity();
+                                }
+                                if (lQuanPatternMzValues.length > 0) {
+                                    iQuantificationSpectrumPanel.addAdditionalDataset(lQuanPatternMzValues, lQuanPatternIntensityValues, Color.BLUE, Color.BLUE);
+                                }
+                            }
+
+                            iQuantificationSpectrumPanel.setAnnotations(lQuanAnnotations);
+
+                            this.jpanQuantitationSpectrum.add(iQuantificationSpectrumPanel);
+                            this.jpanQuantitationSpectrum.validate();
+                            this.jpanQuantitationSpectrum.repaint();
+
+
+                        } else {
+                            jtabpanLower.remove(jpanQuantificationSpectrumHolder);
+                            // Empty the spectrum panel.
+                            while (this.jpanQuantitationSpectrum.getComponents().length > 0) {
+                                this.jpanQuantitationSpectrum.remove(0);
+                            }
+                            this.jpanQuantitationSpectrum.validate();
+                            this.jpanQuantitationSpectrum.repaint();
+                        }
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    jtabpanLower.remove(jpanQuantificationSpectrumHolder);
+                    // Empty the spectrum panel.
+                    while (this.jpanQuantitationSpectrum.getComponents().length > 0) {
+                        this.jpanQuantitationSpectrum.remove(0);
+                    }
+                    this.jpanQuantitationSpectrum.validate();
+                    this.jpanQuantitationSpectrum.repaint();
                 }
 
 
@@ -2054,6 +2334,8 @@ public class Thermo_msf_parserGUI extends JFrame {
                 }
 
             } catch (IOException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 

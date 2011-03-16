@@ -1,5 +1,10 @@
 package com.compomics.thermo_msf_parser.msf;
 
+import com.compomics.thermo_msf_parser.Parser;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -48,6 +53,10 @@ public class Protein {
      * The peptides linked to this protein
      */
     private Vector<Peptide> iPeptides = new Vector<Peptide>();
+    /**
+     * The msf file parser
+     */
+    private Parser iParser;
 
 
     public Protein(int iProteinId, String iSequence) {
@@ -55,11 +64,28 @@ public class Protein {
         this.iSequence = iSequence;
     }
 
+    public Protein(int anInt, Parser lParser) {
+        this.iProteinId = anInt;
+        this.iParser = lParser;
+    }
+
     public int getProteinId() {
         return iProteinId;
     }
 
-    public String getSequence() {
+    public String getSequence() throws SQLException {
+        if(iSequence ==  null){
+            ResultSet rs;
+            Statement stat = iParser.getConnection().createStatement();
+            rs = stat.executeQuery("select * from Proteins where ProteinID = " + iProteinId);
+            String lSequence = null;
+            while (rs.next()) {
+                    lSequence = rs.getString("Sequence");
+                }
+                rs.close();
+                stat.close();
+            return lSequence;
+        }
         return iSequence;
     }
 

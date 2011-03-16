@@ -115,4 +115,12 @@ public class ProcessingNode {
     public void addProcessingNodeParameter(ProcessingNodeParameter lNodeParameter) {
         iProcessingNodeParameters.add(lNodeParameter);
     }
+
+    /**
+     * To string methods gives the processing node id
+     * @return The processing node id as a string
+     */
+    public String toString(){
+        return String.valueOf(iProcessingNodeId);
+    }
 }

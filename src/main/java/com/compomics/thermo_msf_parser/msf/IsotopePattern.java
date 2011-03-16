@@ -96,6 +96,38 @@ public class IsotopePattern {
         return Event.getEventByIds(lIds, lConn);
     }
 
+    /**
+     * Getter for the events with a quan result linked to the event annotations
+     * @param lConn A connection to the msf file
+     * @return Vector with the events linked to the attached
+     * @throws SQLException An exception is thrown whenever there is a problem with the connection to the msf file
+     */
+    public Vector<Event> getEventsWithQuanResult(Connection lConn) throws SQLException {
+        Vector<Integer> lIds = new Vector<Integer>();
+        for(int i = 0; i<iEventAnnotations.size(); i++){
+            if(iEventAnnotations.get(i).getQuanResultId() != -1){
+                lIds.add(iEventAnnotations.get(i).getEventId());
+            }
+        }
+        return Event.getEventByIds(lIds, lConn);
+    }
+
+    /**
+     * Getter for the events without a quan result linked to the event annotations
+     * @param lConn A connection to the msf file
+     * @return Vector with the events linked to the attached
+     * @throws SQLException An exception is thrown whenever there is a problem with the connection to the msf file
+     */
+    public Vector<Event> getEventsWithoutQuanResult(Connection lConn) throws SQLException {
+        Vector<Integer> lIds = new Vector<Integer>();
+        for(int i = 0; i<iEventAnnotations.size(); i++){
+            if(iEventAnnotations.get(i).getQuanChannelId() == -1){
+                lIds.add(iEventAnnotations.get(i).getEventId());
+            }
+        }
+        return Event.getEventByIds(lIds, lConn);
+    }
+
 
     /**
      * This method will add an event annotation to this class
