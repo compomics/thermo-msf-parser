@@ -7,6 +7,7 @@ import com.compomics.thermo_msf_parser.msf.proteinsorter.ProteinSorterByAccessio
 import com.compomics.thermo_msf_parser.msf.proteinsorter.ProteinSorterByNumberOfPeptides;
 import com.compomics.util.Util;
 import com.compomics.util.experiment.biology.ions.PeptideFragmentIon;
+import com.compomics.util.gui.protein.ProteinSequencePane;
 import com.compomics.util.gui.spectrum.ChromatogramPanel;
 import com.compomics.util.gui.spectrum.DefaultSpectrumAnnotation;
 import com.compomics.util.gui.spectrum.ReferenceArea;
@@ -210,7 +211,7 @@ public class Thermo_msf_parserGUI extends JFrame {
                             proteinList.updateUI();
                             ((DefaultTableModel) jtablePeptides.getModel()).setNumRows(0);
                             //jtablePeptides.removeRowSelectionInterval(0, jtablePeptides.getRowCount());
-                            sequenceCoverageJLabel.setText("Protein coverage: ");
+                            sequenceCoverageJLabel.setText("Protein Coverage: ");
                             proteinSequenceCoverageJEditorPane.setText("");
                             iSelectedPeptide = null;
                             iSelectedProtein = null;
@@ -474,13 +475,10 @@ public class Thermo_msf_parserGUI extends JFrame {
         // Install the menu bar in the frame
         this.setJMenuBar(menuBar);
         //create JFrame parameters
-        this.setTitle("Thermo msf parser GUI");
+        this.setTitle("Thermo MSF Parser GUI");
         this.setContentPane(jpanContent);
-        Toolkit tk = Toolkit.getDefaultToolkit();
-        int xSize = ((int) tk.getScreenSize().getWidth());
-        int ySize = ((int) tk.getScreenSize().getHeight());
-        this.setSize(xSize, ySize);
-        this.setLocation(0, 0);
+        setLocationRelativeTo(null);
+        this.setExtendedState(MAXIMIZED_BOTH);
         this.setVisible(true);
 
 
@@ -1128,7 +1126,7 @@ public class Thermo_msf_parserGUI extends JFrame {
         jpanContent.add(panel1, gbc);
         showAllPeptidesButton = new JButton();
         showAllPeptidesButton.setMinimumSize(new Dimension(150, 25));
-        showAllPeptidesButton.setText("Show all");
+        showAllPeptidesButton.setText("Show All");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -1307,7 +1305,7 @@ public class Thermo_msf_parserGUI extends JFrame {
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         jpanProtein.add(jpanProteinLeft, gbc);
-        jpanProteinLeft.setBorder(BorderFactory.createTitledBorder("Protein coverage"));
+        jpanProteinLeft.setBorder(BorderFactory.createTitledBorder("Protein Coverage"));
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -1326,7 +1324,7 @@ public class Thermo_msf_parserGUI extends JFrame {
         jpanProteinLeft.add(sequenceCoverageJLabel, gbc);
         final JPanel panel4 = new JPanel();
         panel4.setLayout(new GridBagLayout());
-        jtabpanSpectrum.addTab("Processing nodes", panel4);
+        jtabpanSpectrum.addTab("Processing Nodes", panel4);
         processingNodeTabbedPane = new JTabbedPane();
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -1352,7 +1350,7 @@ public class Thermo_msf_parserGUI extends JFrame {
         panel6.add(jscollPeptides, gbc);
         jscollPeptides.setViewportView(jtablePeptides);
         final JLabel label1 = new JLabel();
-        label1.setText("Peptide confidence level: ");
+        label1.setText("Peptide Confidence Level: ");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -1392,21 +1390,21 @@ public class Thermo_msf_parserGUI extends JFrame {
         gbc.insets = new Insets(5, 5, 5, 5);
         panel6.add(chbLowConfidence, gbc);
         final JLabel label2 = new JLabel();
-        label2.setText("Peptide spectrum match: ");
+        label2.setText("Peptide Spectrum Match: ");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel6.add(label2, gbc);
-        onlyHighestScoringRadioButton.setText("Only highest scoring");
+        onlyHighestScoringRadioButton.setText("Only Highest Scoring");
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
         gbc.gridy = 2;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel6.add(onlyHighestScoringRadioButton, gbc);
-        onlyLowestScoringRadioButton.setText("Only lowest scoring");
+        onlyLowestScoringRadioButton.setText("Only Lowest Scoring");
         gbc = new GridBagConstraints();
         gbc.gridx = 2;
         gbc.gridy = 2;
@@ -1422,7 +1420,7 @@ public class Thermo_msf_parserGUI extends JFrame {
         gbc.insets = new Insets(5, 5, 5, 5);
         panel6.add(allRadioButton, gbc);
         final JLabel label3 = new JLabel();
-        label3.setText("Load spectrum: ");
+        label3.setText("Load Spectrum: ");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 3;
@@ -2087,78 +2085,12 @@ public class Thermo_msf_parserGUI extends JFrame {
             }
         }
 
-        String sequenceTable = "", currentCellSequence = "";
-        boolean selectedPeptide = false, coveredPeptide = false;
-        double sequenceCoverage = 0;
+        // format and display the protein sequence coverage
+        double sequenceCoverage = ProteinSequencePane.formatProteinSequence(proteinSequenceCoverageJEditorPane, lCleanProteinSequence, selectedPeptideStart, selectedPeptideEnd, coverage);
 
-        // iterate the coverage table and create the formatted sequence string
-        for (int i = 1; i < coverage.length; i++) {
-
-            // add indices per 50 residues
-            if (i % 50 == 1 || i == 1) {
-                sequenceTable += "</tr><tr><td height='20'><font size=2><a name=\"" + i + ".\"></a>" + i + ".</td>";
-
-                int currentCharIndex = i;
-
-                while (currentCharIndex + 10 < lCleanProteinSequence.length() && currentCharIndex + 10 < (i + 50)) {
-                    sequenceTable += "<td height='20'><font size=2><a name=\""
-                            + (currentCharIndex + 10) + ".\"></a>" + (currentCharIndex + 10) + ".</td>";
-                    currentCharIndex += 10;
-                }
-
-                sequenceTable += "</tr><tr>";
-            }
-
-            // check if the current residues is covered
-            if (coverage[i] > 0) {
-                sequenceCoverage++;
-                coveredPeptide = true;
-            } else {
-                coveredPeptide = false;
-            }
-
-            // check if the current residue is contained in the selected peptide
-            if (i == selectedPeptideStart) {
-                selectedPeptide = true;
-            } else if (i == selectedPeptideEnd + 1) {
-                selectedPeptide = false;
-            }
-
-            // highlight the covered and selected peptides
-            if (selectedPeptide) {
-                currentCellSequence += "<font color=red>" + lCleanProteinSequence.charAt(i - 1) + "</font>";
-            } else if (coveredPeptide) {
-                currentCellSequence += "<font color=blue>" + lCleanProteinSequence.charAt(i - 1) + "</font>";
-            } else {
-                currentCellSequence += "<font color=black>" + lCleanProteinSequence.charAt(i - 1) + "</font>";
-            }
-
-            // add the sequence to the formatted sequence
-            if (i % 10 == 0) {
-                sequenceTable += "<td><tt>" + currentCellSequence + "</tt></td>";
-                currentCellSequence = "";
-            }
-        }
-
-        // add remaining tags and complete the formatted sequence
-        sequenceTable += "<td><tt>" + currentCellSequence + "</tt></td></table><font color=black>";
-        String formattedSequence = "<html><body><table cellspacing='2'>" + sequenceTable + "</html></body>";
-
-        // calculte and display the percent sequence coverage
-        sequenceCoverageJLabel.setText("Protein coverage: " + Util.roundDouble(sequenceCoverage / lCleanProteinSequence.length(), 2) + "%");
-
-        // display the formatted sequence
-        proteinSequenceCoverageJEditorPane.setText(formattedSequence);
-        proteinSequenceCoverageJEditorPane.updateUI();
-
-        // make sure that the currently selected peptide is visible
-        if (selectedPeptideStart != -1) {
-            proteinSequenceCoverageJEditorPane.scrollToReference((selectedPeptideStart - selectedPeptideStart % 10 + 1) + ".");
-        } else {
-            proteinSequenceCoverageJEditorPane.setCaretPosition(0);
-        }
+        // display the percent sequence coverage
+        sequenceCoverageJLabel.setText("Protein Coverage: " + Util.roundDouble(sequenceCoverage, 2) + "%");
     }
-
 
     /**
      * Update the tables based on the spectrum selected.
@@ -2769,7 +2701,21 @@ public class Thermo_msf_parserGUI extends JFrame {
         proteinSequenceCoverageJEditorPane.setPreferredSize(new Dimension(22, 22));
         proteinCoverageJScrollPane.setViewportView(proteinSequenceCoverageJEditorPane);
 
+        proteinSequenceCoverageJEditorPane.addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                proteinSequenceCoverageJEditorPaneResized(evt);
+            }
+        });
+    }
 
+    /**
+     * Makes sure that the sequence coverage area is rescaled to fit the new size
+     * of the frame.
+     *
+     * @param evt
+     */
+    private void proteinSequenceCoverageJEditorPaneResized(java.awt.event.ComponentEvent evt) {
+        // @TODO: reformat the sequence coverage pane to make optimal use of the new width
     }
 
 

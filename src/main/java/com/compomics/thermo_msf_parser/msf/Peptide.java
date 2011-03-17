@@ -113,6 +113,7 @@ public class Peptide {
      * @param iTotalIonsCount The total ion count
      * @param iMatchedIonsCount The matched ion count
      * @param iAnnotation The annotation
+     * @param iProcessingNodeNumber
      * @param iAminoAcids The amino acids found in the msf file
      */
     public Peptide(int iPeptideId, int iSpectrumId, int iConfidenceLevel, String iSequence, int iTotalIonsCount, int iMatchedIonsCount, String iAnnotation, int iProcessingNodeNumber, Vector<AminoAcid> iAminoAcids) {
@@ -502,56 +503,43 @@ public class Peptide {
 
                 // Create an instance for each fragment ion
 
-                Charge lCharge = new Charge(1,charge);
+                Charge lCharge = new Charge(Charge.PLUS, charge);
                 //B Ion
-                PeptideFragmentIon lIon = new PeptideFragmentIon(PeptideFragmentIon.B_ION, i + 1, (bMass + charge * lHydrogenMass) / charge);
-                lIon.setCharge(lCharge);
+                PeptideFragmentIon lIon = new PeptideFragmentIon(PeptideFragmentIon.B_ION, i + 1, (bMass + charge * lHydrogenMass) / charge, lCharge);
                 iTheoreticalFragmentIons.add(lIon);
                 //BNH3 Ion
-                lIon = new PeptideFragmentIon(PeptideFragmentIon.BNH3_ION, i + 1, (bMass - lNitrogenMass - 3 * lHydrogenMass + charge * lHydrogenMass) / charge);
-                lIon.setCharge(lCharge);
                 iTheoreticalFragmentIons.add(lIon);
                 //BH2O Ion
-                lIon = new PeptideFragmentIon(PeptideFragmentIon.BH2O_ION, i + 1, (bMass - lOxygenMass - 2 * lHydrogenMass + charge * lHydrogenMass) / charge);
-                lIon.setCharge(lCharge);
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.BH2O_ION, i + 1, (bMass - lOxygenMass - 2 * lHydrogenMass + charge * lHydrogenMass) / charge, lCharge);
                 iTheoreticalFragmentIons.add(lIon);
                 //A Ion
-                lIon = new PeptideFragmentIon(PeptideFragmentIon.A_ION, i + 1, (bMass - lOxygenMass - lCarbonMass + charge * lHydrogenMass) / charge);
-                lIon.setCharge(lCharge);
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.A_ION, i + 1, (bMass - lOxygenMass - lCarbonMass + charge * lHydrogenMass) / charge, lCharge);
                 iTheoreticalFragmentIons.add(lIon);
                 //ANH3 Ion
-                lIon = new PeptideFragmentIon(PeptideFragmentIon.ANH3_ION, i + 1, (bMass - lOxygenMass - lCarbonMass - lNitrogenMass - 3 * lHydrogenMass + charge * lHydrogenMass) / charge);
-                lIon.setCharge(lCharge);
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.ANH3_ION, i + 1, (bMass - lOxygenMass - lCarbonMass - lNitrogenMass - 3 * lHydrogenMass + charge * lHydrogenMass) / charge, lCharge);
                 iTheoreticalFragmentIons.add(lIon);
                 //AH2O Ion
-                lIon = new PeptideFragmentIon(PeptideFragmentIon.AH2O_ION, i + 1, (bMass - 2 * lOxygenMass - lCarbonMass - 2 * lHydrogenMass + charge * lHydrogenMass) / charge);
-                lIon.setCharge(lCharge);
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.AH2O_ION, i + 1, (bMass - 2 * lOxygenMass - lCarbonMass - 2 * lHydrogenMass + charge * lHydrogenMass) / charge, lCharge);
                 iTheoreticalFragmentIons.add(lIon);
                 //C Ion
-                lIon = new PeptideFragmentIon(PeptideFragmentIon.C_ION, i + 1, (bMass + lNitrogenMass + 3 * lHydrogenMass + charge * lHydrogenMass) / charge);
-                lIon.setCharge(lCharge);
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.C_ION, i + 1, (bMass + lNitrogenMass + 3 * lHydrogenMass + charge * lHydrogenMass) / charge, lCharge);
                 iTheoreticalFragmentIons.add(lIon);
 
                 // Create an instance of the fragment y ion
                 //Y Ion
-                lIon = new PeptideFragmentIon(PeptideFragmentIon.Y_ION, i + 1, (yMass + charge * lHydrogenMass) / charge);
-                lIon.setCharge(lCharge);
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.Y_ION, i + 1, (yMass + charge * lHydrogenMass) / charge, lCharge);
                 iTheoreticalFragmentIons.add(lIon);
                 //YNH3 Ion
-                lIon = new PeptideFragmentIon(PeptideFragmentIon.YNH3_ION, i + 1, (yMass - lNitrogenMass - 3 * lHydrogenMass + charge * lHydrogenMass) / charge);
-                lIon.setCharge(lCharge);
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.YNH3_ION, i + 1, (yMass - lNitrogenMass - 3 * lHydrogenMass + charge * lHydrogenMass) / charge, lCharge);
                 iTheoreticalFragmentIons.add(lIon);
                 //YH2O Ion
-                lIon = new PeptideFragmentIon(PeptideFragmentIon.YH2O_ION, i + 1, (yMass - 2 * lHydrogenMass - lOxygenMass + charge * lHydrogenMass) / charge);
-                lIon.setCharge(lCharge);
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.YH2O_ION, i + 1, (yMass - 2 * lHydrogenMass - lOxygenMass + charge * lHydrogenMass) / charge, lCharge);
                 iTheoreticalFragmentIons.add(lIon);
                 //X Ion
-                lIon = new PeptideFragmentIon(PeptideFragmentIon.X_ION, i + 1, (yMass + lCarbonMass + lOxygenMass - 2 * lHydrogenMass + charge * lHydrogenMass) / charge);
-                lIon.setCharge(lCharge);
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.X_ION, i + 1, (yMass + lCarbonMass + lOxygenMass - 2 * lHydrogenMass + charge * lHydrogenMass) / charge, lCharge);
                 iTheoreticalFragmentIons.add(lIon);
                 //Z Ion
-                lIon = new PeptideFragmentIon(PeptideFragmentIon.Z_ION, i + 1, (yMass - lNitrogenMass - 2 * lHydrogenMass + charge * lHydrogenMass) / charge);
-                lIon.setCharge(lCharge);
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.Z_ION, i + 1, (yMass - lNitrogenMass - 2 * lHydrogenMass + charge * lHydrogenMass) / charge, lCharge);
                 iTheoreticalFragmentIons.add(lIon);
 
             }
