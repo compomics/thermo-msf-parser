@@ -15,8 +15,17 @@ import java.util.Comparator;
  * This will sort proteins alphabetically 
  */
 public class ProteinSorterByAccession implements Comparator<Protein> {
+    private boolean iAtoZ;
+
+    public ProteinSorterByAccession(boolean lAtoZ){
+        this.iAtoZ = lAtoZ;
+    }
     public int compare(Protein o1, Protein o2) {
-        return o1.toString().compareTo(o2.toString());
+        if(iAtoZ){
+            return o1.toString().compareTo(o2.toString());
+        } else {
+            return o1.toString().compareTo(o2.toString()) * -1;
+        }
     }
 }
 

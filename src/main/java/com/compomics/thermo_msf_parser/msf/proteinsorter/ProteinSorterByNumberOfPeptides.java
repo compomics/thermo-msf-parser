@@ -15,12 +15,28 @@ import java.util.Comparator;
  * This will sort proteins based on the number of peptides
  */
 public class ProteinSorterByNumberOfPeptides implements Comparator<Protein> {
+
+    private boolean i1to20;
+
+    public ProteinSorterByNumberOfPeptides(boolean l1to20){
+        this.i1to20 = l1to20;
+    }
+
     public int compare(Protein o1, Protein o2) {
-        if(o2.getPeptides().size() - o1.getPeptides().size() > 0){
-            return 1;
-        }
-        if(o2.getPeptides().size() - o1.getPeptides().size() < 0){
-            return -1;
+        if(i1to20){
+            if(o2.getPeptides().size() - o1.getPeptides().size() > 0){
+                return 1;
+            }
+            if(o2.getPeptides().size() - o1.getPeptides().size() < 0){
+                return -1;
+            }
+        } else {
+            if(o2.getPeptides().size() - o1.getPeptides().size() > 0){
+                return -1;
+            }
+            if(o2.getPeptides().size() - o1.getPeptides().size() < 0){
+                return 1;
+            }
         }
         return 0;
     }
