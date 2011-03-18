@@ -25,7 +25,7 @@
               <text value="Show all"/>
             </properties>
           </component>
-          <splitpane id="ab849">
+          <splitpane id="ab849" binding="split1">
             <constraints>
               <grid row="0" column="1" row-span="2" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
                 <preferred-size width="200" height="200"/>
@@ -39,7 +39,7 @@
             </properties>
             <border type="none"/>
             <children>
-              <splitpane id="63645">
+              <splitpane id="63645" binding="split2">
                 <constraints>
                   <splitpane position="right"/>
                 </constraints>
@@ -66,7 +66,7 @@
                         <children>
                           <grid id="4a30a" layout-manager="GridBagLayout">
                             <constraints>
-                              <tabbedpane title="No chromatogram loaded"/>
+                              <tabbedpane title="No Chromatogram Loaded"/>
                             </constraints>
                             <properties/>
                             <border type="none"/>
@@ -275,7 +275,7 @@
                               <gridbag weightx="1.0" weighty="1.0"/>
                             </constraints>
                             <properties/>
-                            <border type="none" title="Protein coverage"/>
+                            <border type="none" title="Protein Coverage"/>
                             <children>
                               <scrollpane id="66e73" binding="proteinCoverageJScrollPane" custom-create="true">
                                 <constraints>
@@ -301,7 +301,7 @@
                       </grid>
                       <grid id="c2e25" layout-manager="GridBagLayout">
                         <constraints>
-                          <tabbedpane title="Processing nodes"/>
+                          <tabbedpane title="Processing Nodes"/>
                         </constraints>
                         <properties/>
                         <border type="none"/>
@@ -318,7 +318,7 @@
                             <children>
                               <grid id="1bf16" layout-manager="GridBagLayout">
                                 <constraints>
-                                  <tabbedpane title="Nothing loaded"/>
+                                  <tabbedpane title="Nothing Loaded"/>
                                 </constraints>
                                 <properties/>
                                 <border type="none"/>
@@ -359,7 +359,7 @@
                       <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
                     </constraints>
                     <properties>
-                      <text value="Peptide confidence level: "/>
+                      <text value="Peptide Confidence Level: "/>
                     </properties>
                   </component>
                   <component id="ed93a" class="javax.swing.JCheckBox" binding="chbHighConfident" custom-create="true">
@@ -406,7 +406,7 @@
                       <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
                     </constraints>
                     <properties>
-                      <text value="Peptide spectrum match: "/>
+                      <text value="Peptide Spectrum Match: "/>
                     </properties>
                   </component>
                   <component id="486fb" class="javax.swing.JRadioButton" binding="onlyHighestScoringRadioButton" custom-create="true" default-binding="true">
@@ -415,7 +415,7 @@
                       <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
                     </constraints>
                     <properties>
-                      <text value="Only highest scoring"/>
+                      <text value="Only Highest Scoring"/>
                     </properties>
                   </component>
                   <component id="3cd91" class="javax.swing.JRadioButton" binding="onlyLowestScoringRadioButton" custom-create="true" default-binding="true">
@@ -424,7 +424,7 @@
                       <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
                     </constraints>
                     <properties>
-                      <text value="Only lowest scoring"/>
+                      <text value="Only Lowest Scoring"/>
                     </properties>
                   </component>
                   <component id="efb5d" class="javax.swing.JRadioButton" binding="allRadioButton" custom-create="true" default-binding="true">
@@ -443,7 +443,7 @@
                       <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
                     </constraints>
                     <properties>
-                      <text value="Load spectrum: "/>
+                      <text value="Load Spectrum: "/>
                     </properties>
                   </component>
                   <component id="931ed" class="javax.swing.JCheckBox" binding="chromatogramCheckBox" default-binding="true">

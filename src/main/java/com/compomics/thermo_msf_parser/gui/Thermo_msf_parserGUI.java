@@ -79,6 +79,8 @@ public class Thermo_msf_parserGUI extends JFrame {
     private JRadioButton onlyHighestScoringRadioButton;
     private JRadioButton onlyLowestScoringRadioButton;
     private JRadioButton allRadioButton;
+    private JSplitPane split1;
+    private JSplitPane split2;
     private JEditorPane proteinSequenceCoverageJEditorPane;
     private SpectrumPanel iMSMSspectrumPanel;
     private SpectrumPanel iMSspectrumPanel;
@@ -171,131 +173,20 @@ public class Thermo_msf_parserGUI extends JFrame {
         final JMenuItem lOpenItem = new JMenuItem("Open");
         lOpenItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                //open a new thread to parse the files found by the file chooser
-                com.compomics.util.sun.SwingWorker lParser = new com.compomics.util.sun.SwingWorker() {
-                    public Boolean construct() {
-                        try {
-
-
-                            setGuiElementsResponsive(false);
-                            if (jtabpanLower.indexOfTab("Chromatogram") > -1) {
-                                jtabpanLower.remove(jtabChromatogram);
-                                jtabChromatogram.validate();
-                                jtabChromatogram.repaint();
-                            }
-                            if (jtabpanLower.indexOfTab("Quantification Spectrum") > -1) {
-                                jtabpanLower.remove(jpanQuantificationSpectrumHolder);
-                                jpanQuantificationSpectrumHolder.validate();
-                                jpanQuantificationSpectrumHolder.repaint();
-                            }
-                            if (jtabpanLower.indexOfTab("MS/MS Spectrum") > -1) {
-                                jtabpanLower.remove(jpanMSMS);
-                                jpanMSMS.validate();
-                                jpanMSMS.repaint();
-                            }
-                            if (jtabpanLower.indexOfTab("MS Spectrum") > -1) {
-                                jtabpanLower.remove(jpanMSHolder);
-                                jpanMSHolder.validate();
-                                jpanMSHolder.repaint();
-                            }
-                            iProteins.removeAllElements();
-                            iParsedMsfs = new Vector<Parser>();
-                            iDisplayedProteins.removeAllElements();
-                            iMergedPeptidesScores = null;
-                            iMergedCustomPeptideData = null;
-                            iMergedCustomSpectrumData = null;
-                            iMergedRatioTypes = null;
-                            iMsfFileLocations.removeAllElements();
-
-
-                            proteinList.updateUI();
-                            ((DefaultTableModel) jtablePeptides.getModel()).setNumRows(0);
-                            //jtablePeptides.removeRowSelectionInterval(0, jtablePeptides.getRowCount());
-                            sequenceCoverageJLabel.setText("Protein Coverage: ");
-                            proteinSequenceCoverageJEditorPane.setText("");
-                            iSelectedPeptide = null;
-                            iSelectedProtein = null;
-
-                            //open file chooser
-                            JFileChooser fc = new JFileChooser();
-                            fc.setMultiSelectionEnabled(true);
-                            //create the file filter to choose
-                            FileFilter lFilter = new MsfFileFilter();
-                            fc.setFileFilter(lFilter);
-                            fc.showOpenDialog(getFrame());
-                            File[] lFiles = fc.getSelectedFiles();
-                            for (int i = 0; i < lFiles.length; i++) {
-                                iMsfFileLocations.add(lFiles[i].getAbsolutePath());
-                            }
-                            if (lFiles.length > 1) {
-                                JOptionPane.showMessageDialog(getFrame(), "The workflow of the different msf files that are loaded must be the same.\nUnexpected crashes can occur if files with different workflows are loaded!", "Info", JOptionPane.INFORMATION_MESSAGE);
-                            }
-
-                            progressBar.setVisible(true);
-                            progressBar.setStringPainted(true);
-                            progressBar.setMaximum(iMsfFileLocations.size() + 1);
-                            //parse the msf files
-                            for (int i = 0; i < iMsfFileLocations.size(); i++) {
-                                try {
-                                    progressBar.setValue(i + 1);
-                                    progressBar.setString("Parsing: " + iMsfFileLocations.get(i));
-                                    //progressBar.updateUI();
-                                    iParsedMsfs.add(new Parser(iMsfFileLocations.get(i), true));
-                                } catch (SQLException e) {
-                                    e.printStackTrace();
-                                    iParsedMsfs.add(null);
-                                } catch (ClassNotFoundException e) {
-                                    e.printStackTrace();
-                                    iParsedMsfs.add(null);
-                                }
-                            }
-
-
-                        } catch (Exception e1) {
-                            e1.printStackTrace();
-                            progressBar.setVisible(false);
-                            JOptionPane.showMessageDialog(new JFrame(), "There was a problem loading your data!", "Problem loading", JOptionPane.ERROR_MESSAGE);
-                            return false;
-                        }
-
-
-                        progressBar.setIndeterminate(true);
-                        progressBar.setString("Collecting all peptide and protein information");
-                        iSelectedProtein = null;
-                        proteinSequenceCoverageJEditorPane.setText("");
-                        sequenceCoverageJLabel.setText("");
-                        createPeptideTable(null);
-                        iDisplayedProteins.removeAllElements();
-                        for (int i = 0; i < iProteins.size(); i++) {
-                            iDisplayedProteins.add(iProteins.get(i));
-                        }
-                        filterDisplayedProteins();
-                        proteinList.updateUI();
-                        progressBar.setIndeterminate(false);
-                        progressBar.setVisible(false);
-                        progressBar.setString("");
-                        progressBar.setStringPainted(false);
-
-
-                        return true;
-                    }
-
-                    public void finished() {
-                        //give a message to the user that everything is loaded
-
-                        setGuiElementsResponsive(true);
-                        JOptionPane.showMessageDialog(new JFrame(), "All data was loaded", "Info", JOptionPane.INFORMATION_MESSAGE);
-                    }
-
-                };
-                lParser.start();
-
+                loadData(true);
             }
         }
         );
         final JMenuItem lCloseItem = new JMenuItem("Close");
         lCloseItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                for (int i = 0; i < iParsedMsfs.size(); i++) {
+                    try {
+                        iParsedMsfs.get(i).getConnection().close();
+                    } catch (SQLException se) {
+                        se.printStackTrace();
+                    }
+                }
                 System.exit(0);
             }
         }
@@ -306,8 +197,6 @@ public class Thermo_msf_parserGUI extends JFrame {
         item.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Export peptides csv");
-                //check if we can export anything
-
                 //open file chooser
                 final String lPath;
                 JFileChooser fc = new JFileChooser();
@@ -379,7 +268,6 @@ public class Thermo_msf_parserGUI extends JFrame {
         lItemMgf.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Export spectra mgf");
-
                 //open file chooser
                 final String lPath;
                 JFileChooser fc = new JFileChooser();
@@ -405,15 +293,12 @@ public class Thermo_msf_parserGUI extends JFrame {
                             for (int i = 0; i < iParsedMsfs.size(); i++) {
                                 lTotalSpecrtra = lTotalSpecrtra + iParsedMsfs.get(i).getSpectra().size();
                             }
-
                             progressBar.setMaximum(lTotalSpecrtra + 1);
                             progressBar.setValue(0);
                             progressBar.setString("Writting all spectra to " + lPath);
                             progressBar.setStringPainted(true);
                             progressBar.setVisible(true);
-                            //progressBar.updateUI();
                             BufferedWriter out = new BufferedWriter(new FileWriter(lPath));
-
 
                             for (int i = 0; i < iParsedMsfs.size(); i++) {
                                 for (int j = 0; j < iParsedMsfs.get(i).getSpectra().size(); j++) {
@@ -436,12 +321,8 @@ public class Thermo_msf_parserGUI extends JFrame {
 
                                     out.write(lSpectrumLine);
                                     progressBar.setValue(progressBar.getValue() + 1);
-                                    //progressBar.updateUI();
                                 }
-
-
                             }
-
                             out.flush();
                             out.close();
                         } catch (Exception e1) {
@@ -449,8 +330,6 @@ public class Thermo_msf_parserGUI extends JFrame {
                             progressBar.setVisible(false);
                             JOptionPane.showMessageDialog(new JFrame(), "There was a problem saving your data!", "Problem saving", JOptionPane.ERROR_MESSAGE);
                         }
-
-
                         return true;
                     }
 
@@ -458,9 +337,7 @@ public class Thermo_msf_parserGUI extends JFrame {
                         JOptionPane.showMessageDialog(new JFrame(), "Saving done", "Info", JOptionPane.INFORMATION_MESSAGE);
                         progressBar.setVisible(false);
                         progressBar.setStringPainted(false);
-                        //progressBar.updateUI();
                     }
-
                 };
                 lMgfSaver.start();
                 progressBar.setString("");
@@ -468,25 +345,116 @@ public class Thermo_msf_parserGUI extends JFrame {
 
             }
         }
-
         );
 
 
+        //add the menuitems to the menu
+        lFileMenu.add(lOpenItem);
+        lFileMenu.add(lCloseItem);
+        lExportMenu.add(item);
+        lExportMenu.add(lItemMgf);
+
         // Install the menu bar in the frame
         this.setJMenuBar(menuBar);
+
         //create JFrame parameters
         this.setTitle("Thermo MSF Parser GUI");
         this.setContentPane(jpanContent);
-        setLocationRelativeTo(null);
+        this.setLocationRelativeTo(null);
         this.setExtendedState(MAXIMIZED_BOTH);
         this.setVisible(true);
+        this.update(this.getGraphics());
+        split1.setDividerLocation(split1.getHeight() / 2);
+        split2.setDividerLocation(split2.getWidth() / 2);
+        addComponentListener(new ComponentAdapter() {
+            public void componentResized(ComponentEvent evt) {
+                split1.setDividerLocation(split1.getHeight() / 2);
+                split2.setDividerLocation(split2.getWidth() / 2);
+            }
+        });
 
+        //add action listeners
+        showAllPeptidesButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                iSelectedProtein = null;
+                proteinSequenceCoverageJEditorPane.setText("");
+                sequenceCoverageJLabel.setText("");
+                createPeptideTable(null);
+                iDisplayedProteins.removeAllElements();
+                for (int i = 0; i < iProteins.size(); i++) {
+                    iDisplayedProteins.add(iProteins.get(i));
+                }
+                filterDisplayedProteins();
+                proteinList.updateUI();
+            }
+        }
+        );
 
+        jbuttonAlphabeticalSort.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (jbuttonAlphabeticalSort.getText().startsWith("A")) {
+                    Collections.sort(iDisplayedProteins, new ProteinSorterByAccession(true));
+                    filterDisplayedProteins();
+                    jbuttonAlphabeticalSort.setText("Z -> A");
+                    proteinList.updateUI();
+                } else {
+                    Collections.sort(iDisplayedProteins, new ProteinSorterByAccession(false));
+                    filterDisplayedProteins();
+                    jbuttonAlphabeticalSort.setText("A -> Z");
+                    proteinList.updateUI();
+                }
+            }
+        }
+        );
+        jbuttonNumberSort.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (jbuttonNumberSort.getText().startsWith("1")) {
+                    Collections.sort(iDisplayedProteins, new ProteinSorterByNumberOfPeptides(true));
+                    filterDisplayedProteins();
+                    jbuttonNumberSort.setText("20 -> 1");
+                    proteinList.updateUI();
+                } else {
+                    Collections.sort(iDisplayedProteins, new ProteinSorterByNumberOfPeptides(false));
+                    filterDisplayedProteins();
+                    jbuttonNumberSort.setText("1 -> 20");
+                    proteinList.updateUI();
+                }
+            }
+        }
+        );
+        ActionListener chbChangeActionListener = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                createPeptideTable(iSelectedProtein);
+                if (iSelectedProtein != null) {
+                    formatProteinSequence(iSelectedProtein);
+                }
+                filterDisplayedProteins();
+                proteinList.updateUI();
+
+            }
+        };
+        ActionListener spectrumViewChange = new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                peptidesTableMouseClicked(null);
+
+            }
+        };
+
+        chbHighConfident.addActionListener(chbChangeActionListener);
+        chbMediumConfident.addActionListener(chbChangeActionListener);
+        chbLowConfidence.addActionListener(chbChangeActionListener);
+        allRadioButton.addActionListener(chbChangeActionListener);
+        onlyHighestScoringRadioButton.addActionListener(chbChangeActionListener);
+        onlyLowestScoringRadioButton.addActionListener(chbChangeActionListener);
+        chromatogramCheckBox.addActionListener(spectrumViewChange);
+        msCheckBox.addActionListener(spectrumViewChange);
+        msmsCheckBox.addActionListener(spectrumViewChange);
+        quantCheckBox.addActionListener(spectrumViewChange);
+
+        progressBar.setVisible(false);
         //add a closing window listener
         addWindowListener(new WindowAdapter() {
-            public void windowClosing
-                    (WindowEvent
-                            evt) {
+            public void windowClosing(WindowEvent evt) {
                 for (int i = 0; i < iParsedMsfs.size(); i++) {
                     try {
                         iParsedMsfs.get(i).getConnection().close();
@@ -494,33 +462,90 @@ public class Thermo_msf_parserGUI extends JFrame {
                         e.printStackTrace();
                     }
                 }
-
                 System.exit(0);
-
             }
         }
-
         );
 
 
-        progressBar.setVisible(false);
+        //load data
+        loadData(false);
+    }
 
-
+    public void loadData(boolean lReopen) {
+        final boolean lReOpen = lReopen;
         //open a new thread to parse the files found by the file chooser
         com.compomics.util.sun.SwingWorker lParser = new com.compomics.util.sun.SwingWorker() {
+            boolean lLoaded = false;
+
             public Boolean construct() {
                 try {
                     setGuiElementsResponsive(false);
+
+                    if (lReOpen) {
+
+                        for (int i = 0; i < iParsedMsfs.size(); i++) {
+                            try {
+                                iParsedMsfs.get(i).getConnection().close();
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        if (jtabpanLower.indexOfTab("Chromatogram") > -1) {
+                            jtabpanLower.remove(jtabChromatogram);
+                            jtabChromatogram.validate();
+                            jtabChromatogram.repaint();
+                        }
+                        if (jtabpanLower.indexOfTab("Quantification Spectrum") > -1) {
+                            jtabpanLower.remove(jpanQuantificationSpectrumHolder);
+                            jpanQuantificationSpectrumHolder.validate();
+                            jpanQuantificationSpectrumHolder.repaint();
+                        }
+                        if (jtabpanLower.indexOfTab("MS/MS Spectrum") > -1) {
+                            jtabpanLower.remove(jpanMSMS);
+                            jpanMSMS.validate();
+                            jpanMSMS.repaint();
+                        }
+                        if (jtabpanLower.indexOfTab("MS Spectrum") > -1) {
+                            jtabpanLower.remove(jpanMSHolder);
+                            jpanMSHolder.validate();
+                            jpanMSHolder.repaint();
+                        }
+                        iProteins.removeAllElements();
+                        iParsedMsfs = new Vector<Parser>();
+                        iDisplayedProteins.removeAllElements();
+                        iMergedPeptidesScores = null;
+                        iMergedCustomPeptideData = null;
+                        iMergedCustomSpectrumData = null;
+                        iMergedRatioTypes = null;
+                        iMsfFileLocations.removeAllElements();
+
+                        proteinList.updateUI();
+                        ((DefaultTableModel) jtablePeptides.getModel()).setNumRows(0);
+                        //jtablePeptides.removeRowSelectionInterval(0, jtablePeptides.getRowCount());
+                        sequenceCoverageJLabel.setText("Protein Coverage: ");
+                        proteinSequenceCoverageJEditorPane.setText("");
+                        iSelectedPeptide = null;
+                        iSelectedProtein = null;
+                    }
+
                     //open file chooser
                     JFileChooser fc = new JFileChooser();
                     fc.setMultiSelectionEnabled(true);
                     //create the file filter to choose
                     FileFilter lFilter = new MsfFileFilter();
                     fc.setFileFilter(lFilter);
-                    fc.showOpenDialog(getFrame());
-                    File[] lFiles = fc.getSelectedFiles();
-                    for (int i = 0; i < lFiles.length; i++) {
-                        iMsfFileLocations.add(lFiles[i].getAbsolutePath());
+                    int returnVal = fc.showOpenDialog(getFrame());
+                    File[] lFiles = null;
+                    if (returnVal == JFileChooser.APPROVE_OPTION) {
+                        lFiles = fc.getSelectedFiles();
+                        for (int i = 0; i < lFiles.length; i++) {
+                            iMsfFileLocations.add(lFiles[i].getAbsolutePath());
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(new JFrame(), "Open command cancelled by user.", "Info", JOptionPane.INFORMATION_MESSAGE);
+                        return true;
                     }
                     if (lFiles.length > 1) {
                         JOptionPane.showMessageDialog(getFrame(), "The workflow of the differnt msf files that are loaded must be the same.\nUnexpected crashes can occur if files with different workflows are loaded!", "Info", JOptionPane.INFORMATION_MESSAGE);
@@ -545,201 +570,116 @@ public class Thermo_msf_parserGUI extends JFrame {
                         }
                     }
 
+                    //load processing nodes
+                    processingNodeTabbedPane.removeAll();
+                    for (int i = 0; i < iParsedMsfs.get(0).getProcessingNodes().size(); i++) {
+                        ProcessingNode lNode = iParsedMsfs.get(0).getProcessingNodes().get(i);
+                        String lTitle = lNode.getProcessingNodeNumber() + " " + lNode.getFriendlyName();
+
+                        //create holders for the different columns
+                        Vector<String> lTableColumnsTitleVector = new Vector<String>();
+                        Vector<Boolean> lTableColumnsEditableVector = new Vector<Boolean>();
+                        Vector<Class> lTableColumnsClassVector = new Vector<Class>();
+                        Vector<Object[]> lElements = new Vector<Object[]>();
+                        for (int j = 0; j < lNode.getProcessingNodeParameters().size(); j++) {
+                            Object[] lInfo = new Object[2];
+                            lInfo[0] = lNode.getProcessingNodeParameters().get(j).getFriendlyName();
+                            lInfo[1] = lNode.getProcessingNodeParameters().get(j).getValueDisplayString();
+                            lElements.add(lInfo);
+                        }
+
+                        //add different columns to the holders
+                        lTableColumnsTitleVector.add("Title");
+                        lTableColumnsEditableVector.add(false);
+                        lTableColumnsClassVector.add(String.class);
+                        lTableColumnsTitleVector.add("Value");
+                        lTableColumnsEditableVector.add(false);
+                        lTableColumnsClassVector.add(String.class);
+
+                        //create the arrays for the table model
+                        String[] lTableColumnsTitle = new String[lTableColumnsTitleVector.size()];
+                        lTableColumnsTitleVector.toArray(lTableColumnsTitle);
+                        final Boolean[] lTableColumnsEditable = new Boolean[lTableColumnsEditableVector.size()];
+                        lTableColumnsEditableVector.toArray(lTableColumnsEditable);
+                        final Class[] lTableColumnsClass = new Class[lTableColumnsClassVector.size()];
+                        lTableColumnsClassVector.toArray(lTableColumnsClass);
+                        final Object[][] ls = new Object[lElements.size()][];
+                        lElements.toArray(ls);
+
+                        //create the table model
+                        DefaultTableModel jtablePeptideModel = new DefaultTableModel(
+                                ls,
+                                lTableColumnsTitle) {
+
+                            Class[] types = lTableColumnsClass;
+                            Boolean[] canEdit = lTableColumnsEditable;
+
+                            @Override
+                            public Class getColumnClass(int columnIndex) {
+                                return types[columnIndex];
+                            }
+
+                            @Override
+                            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                                return canEdit[columnIndex];
+                            }
+                        };
+
+                        JTable lTable = new JTable();
+                        lTable.setModel(jtablePeptideModel);
+                        JScrollPane lScrollPanel = new JScrollPane();
+                        lScrollPanel.setViewportView(lTable);
+
+                        GridBagConstraints gbc = new GridBagConstraints();
+                        gbc.gridx = 0;
+                        gbc.gridy = 0;
+                        gbc.gridwidth = 4;
+                        gbc.weightx = 1.0;
+                        gbc.weighty = 1.0;
+                        gbc.fill = GridBagConstraints.BOTH;
+                        //lPanel.add(lScrollPanel, gbc);
+                        //lPanel.setBackground(Color.BLACK);
+                        processingNodeTabbedPane.add(lTitle, lScrollPanel);
+
+                    }
+
+                    progressBar.setIndeterminate(true);
+                    progressBar.setString("Collecting all peptide and protein information");
+                    iSelectedProtein = null;
+                    proteinSequenceCoverageJEditorPane.setText("");
+                    sequenceCoverageJLabel.setText("");
+                    createPeptideTable(null);
+                    iDisplayedProteins.removeAllElements();
+                    for (int i = 0; i < iProteins.size(); i++) {
+                        iDisplayedProteins.add(iProteins.get(i));
+                    }
+                    filterDisplayedProteins();
+                    proteinList.updateUI();
+                    progressBar.setIndeterminate(false);
+                    progressBar.setVisible(false);
+                    progressBar.setString("");
+                    progressBar.setStringPainted(false);
+                    lLoaded = true;
 
                 } catch (Exception e1) {
+                    lLoaded = false;
                     e1.printStackTrace();
                     progressBar.setVisible(false);
-                    JOptionPane.showMessageDialog(new JFrame(), "There was a problem saving your data!", "Problem saving", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(new JFrame(), "There was a problem loading your data!", "Problem loading", JOptionPane.ERROR_MESSAGE);
                 }
-
-
-                //add the menuitems to the menu
-                //add the menuitems to the menu
-                lFileMenu.add(lOpenItem);
-                lFileMenu.add(lCloseItem);
-                lExportMenu.add(item);
-                lExportMenu.add(lItemMgf);
-
-                //add action listeners
-                showAllPeptidesButton.addActionListener(new
-
-                        ActionListener() {
-                            public void actionPerformed
-                                    (ActionEvent
-                                            e) {
-                                iSelectedProtein = null;
-                                proteinSequenceCoverageJEditorPane.setText("");
-                                sequenceCoverageJLabel.setText("");
-                                createPeptideTable(null);
-                                iDisplayedProteins.removeAllElements();
-                                for (int i = 0; i < iProteins.size(); i++) {
-                                    iDisplayedProteins.add(iProteins.get(i));
-                                }
-                                filterDisplayedProteins();
-                                proteinList.updateUI();
-                            }
-                        }
-
-                );
-                jtabpanLower.remove(jpanQuantificationSpectrumHolder);
-
-                jbuttonAlphabeticalSort.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        if (jbuttonAlphabeticalSort.getText().startsWith("A")) {
-                            Collections.sort(iDisplayedProteins, new ProteinSorterByAccession(true));
-                            filterDisplayedProteins();
-                            jbuttonAlphabeticalSort.setText("Z -> A");
-                            proteinList.updateUI();
-                        } else {
-                            Collections.sort(iDisplayedProteins, new ProteinSorterByAccession(false));
-                            filterDisplayedProteins();
-                            jbuttonAlphabeticalSort.setText("A -> Z");
-                            proteinList.updateUI();
-                        }
-                    }
-                }
-
-                );
-                jbuttonNumberSort.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        if (jbuttonNumberSort.getText().startsWith("1")) {
-                            Collections.sort(iDisplayedProteins, new ProteinSorterByNumberOfPeptides(true));
-                            filterDisplayedProteins();
-                            jbuttonNumberSort.setText("20 -> 1");
-                            proteinList.updateUI();
-                        } else {
-                            Collections.sort(iDisplayedProteins, new ProteinSorterByNumberOfPeptides(false));
-                            filterDisplayedProteins();
-                            jbuttonNumberSort.setText("1 -> 20");
-                            proteinList.updateUI();
-                        }
-                    }
-                }
-
-                );
-                ActionListener chbChangeActionListener = new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        createPeptideTable(iSelectedProtein);
-                        if (iSelectedProtein != null) {
-                            formatProteinSequence(iSelectedProtein);
-                        }
-                        filterDisplayedProteins();
-                        proteinList.updateUI();
-
-                    }
-                };
-                chbHighConfident.addActionListener(chbChangeActionListener);
-                chbMediumConfident.addActionListener(chbChangeActionListener);
-                chbLowConfidence.addActionListener(chbChangeActionListener);
-                allRadioButton.addActionListener(chbChangeActionListener);
-                onlyHighestScoringRadioButton.addActionListener(chbChangeActionListener);
-                onlyLowestScoringRadioButton.addActionListener(chbChangeActionListener);
-
-                //load processing nodes
-                processingNodeTabbedPane.removeAll();
-                for (int i = 0; i < iParsedMsfs.get(0).getProcessingNodes().size(); i++) {
-                    ProcessingNode lNode = iParsedMsfs.get(0).getProcessingNodes().get(i);
-                    String lTitle = lNode.getProcessingNodeNumber() + " " + lNode.getFriendlyName();
-                    //JPanel lPanel = new JPanel();
-
-                    //create holders for the different columns
-                    Vector<String> lTableColumnsTitleVector = new Vector<String>();
-                    Vector<Boolean> lTableColumnsEditableVector = new Vector<Boolean>();
-                    Vector<Class> lTableColumnsClassVector = new Vector<Class>();
-                    Vector<Object[]> lElements = new Vector<Object[]>();
-                    for (int j = 0; j < lNode.getProcessingNodeParameters().size(); j++) {
-                        Object[] lInfo = new Object[2];
-                        lInfo[0] = lNode.getProcessingNodeParameters().get(j).getFriendlyName();
-                        lInfo[1] = lNode.getProcessingNodeParameters().get(j).getValueDisplayString();
-                        lElements.add(lInfo);
-                    }
-
-                    //add different columns to the holders
-                    lTableColumnsTitleVector.add("Title");
-                    lTableColumnsEditableVector.add(false);
-                    lTableColumnsClassVector.add(String.class);
-                    lTableColumnsTitleVector.add("Value");
-                    lTableColumnsEditableVector.add(false);
-                    lTableColumnsClassVector.add(String.class);
-
-                    //create the arrays for the table model
-                    String[] lTableColumnsTitle = new String[lTableColumnsTitleVector.size()];
-                    lTableColumnsTitleVector.toArray(lTableColumnsTitle);
-                    final Boolean[] lTableColumnsEditable = new Boolean[lTableColumnsEditableVector.size()];
-                    lTableColumnsEditableVector.toArray(lTableColumnsEditable);
-                    final Class[] lTableColumnsClass = new Class[lTableColumnsClassVector.size()];
-                    lTableColumnsClassVector.toArray(lTableColumnsClass);
-                    final Object[][] ls = new Object[lElements.size()][];
-                    lElements.toArray(ls);
-
-                    //create the table model
-                    DefaultTableModel jtablePeptideModel = new DefaultTableModel(
-                            ls,
-                            lTableColumnsTitle) {
-
-                        Class[] types = lTableColumnsClass;
-                        Boolean[] canEdit = lTableColumnsEditable;
-
-                        @Override
-                        public Class getColumnClass(int columnIndex) {
-                            return types[columnIndex];
-                        }
-
-                        @Override
-                        public boolean isCellEditable(int rowIndex, int columnIndex) {
-                            return canEdit[columnIndex];
-                        }
-                    };
-
-                    JTable lTable = new JTable();
-                    lTable.setModel(jtablePeptideModel);
-                    JScrollPane lScrollPanel = new JScrollPane();
-                    lScrollPanel.setViewportView(lTable);
-
-                    GridBagConstraints gbc = new GridBagConstraints();
-                    gbc.gridx = 0;
-                    gbc.gridy = 0;
-                    gbc.gridwidth = 4;
-                    gbc.weightx = 1.0;
-                    gbc.weighty = 1.0;
-                    gbc.fill = GridBagConstraints.BOTH;
-                    //lPanel.add(lScrollPanel, gbc);
-                    //lPanel.setBackground(Color.BLACK);
-                    processingNodeTabbedPane.add(lTitle, lScrollPanel);
-
-                }
-
-                progressBar.setIndeterminate(true);
-                progressBar.setString("Collecting all peptide and protein information");
-                iSelectedProtein = null;
-                proteinSequenceCoverageJEditorPane.setText("");
-                sequenceCoverageJLabel.setText("");
-                createPeptideTable(null);
-                iDisplayedProteins.removeAllElements();
-                for (int i = 0; i < iProteins.size(); i++) {
-                    iDisplayedProteins.add(iProteins.get(i));
-                }
-                filterDisplayedProteins();
-                proteinList.updateUI();
-                progressBar.setIndeterminate(false);
-                progressBar.setVisible(false);
-                progressBar.setString("");
-                progressBar.setStringPainted(false);
-
-
                 return true;
             }
 
             public void finished() {
-                //give a message to the user that everything is loaded
                 setGuiElementsResponsive(true);
-                JOptionPane.showMessageDialog(new JFrame(), "All data was loaded", "Info", JOptionPane.INFORMATION_MESSAGE);
+                if (lLoaded) {
+                    //give a message to the user that everything is loaded
+                    JOptionPane.showMessageDialog(new JFrame(), "All data was loaded", "Info", JOptionPane.INFORMATION_MESSAGE);
+                }
             }
 
         };
         lParser.start();
-
-
     }
 
     public void setGuiElementsResponsive(boolean lResponsive) {
@@ -1126,17 +1066,17 @@ public class Thermo_msf_parserGUI extends JFrame {
         jpanContent.add(panel1, gbc);
         showAllPeptidesButton = new JButton();
         showAllPeptidesButton.setMinimumSize(new Dimension(150, 25));
-        showAllPeptidesButton.setText("Show All");
+        showAllPeptidesButton.setText("Show all");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
         panel1.add(showAllPeptidesButton, gbc);
-        final JSplitPane splitPane1 = new JSplitPane();
-        splitPane1.setDividerLocation(510);
-        splitPane1.setOneTouchExpandable(true);
-        splitPane1.setOrientation(0);
+        split1 = new JSplitPane();
+        split1.setDividerLocation(510);
+        split1.setOneTouchExpandable(true);
+        split1.setOrientation(0);
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
         gbc.gridy = 0;
@@ -1144,18 +1084,18 @@ public class Thermo_msf_parserGUI extends JFrame {
         gbc.weightx = 1.0;
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
-        panel1.add(splitPane1, gbc);
-        final JSplitPane splitPane2 = new JSplitPane();
-        splitPane2.setDividerLocation(700);
-        splitPane1.setRightComponent(splitPane2);
+        panel1.add(split1, gbc);
+        split2 = new JSplitPane();
+        split2.setDividerLocation(700);
+        split1.setRightComponent(split2);
         jtabpanLower = new JTabbedPane();
-        splitPane2.setLeftComponent(jtabpanLower);
+        split2.setLeftComponent(jtabpanLower);
         jtabChromatogram = new JTabbedPane();
         jtabChromatogram.setBackground(new Color(-3407770));
         jtabpanLower.addTab("Chromatogram", jtabChromatogram);
         final JPanel panel2 = new JPanel();
         panel2.setLayout(new GridBagLayout());
-        jtabChromatogram.addTab("No chromatogram loaded", panel2);
+        jtabChromatogram.addTab("No Chromatogram Loaded", panel2);
         jpanMSHolder = new JPanel();
         jpanMSHolder.setLayout(new GridBagLayout());
         jtabpanLower.addTab("MS Spectrum", jpanMSHolder);
@@ -1292,7 +1232,7 @@ public class Thermo_msf_parserGUI extends JFrame {
         gbc.insets = new Insets(5, 5, 5, 5);
         panel3.add(txtMSMSerror, gbc);
         jtabpanSpectrum = new JTabbedPane();
-        splitPane2.setRightComponent(jtabpanSpectrum);
+        split2.setRightComponent(jtabpanSpectrum);
         jpanProtein = new JPanel();
         jpanProtein.setLayout(new GridBagLayout());
         jtabpanSpectrum.addTab("Protein", jpanProtein);
@@ -1335,10 +1275,10 @@ public class Thermo_msf_parserGUI extends JFrame {
         panel4.add(processingNodeTabbedPane, gbc);
         final JPanel panel5 = new JPanel();
         panel5.setLayout(new GridBagLayout());
-        processingNodeTabbedPane.addTab("Nothing loaded", panel5);
+        processingNodeTabbedPane.addTab("Nothing Loaded", panel5);
         final JPanel panel6 = new JPanel();
         panel6.setLayout(new GridBagLayout());
-        splitPane1.setLeftComponent(panel6);
+        split1.setLeftComponent(panel6);
         panel6.setBorder(BorderFactory.createTitledBorder(null, "Peptides", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.ABOVE_TOP));
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -2009,7 +1949,7 @@ public class Thermo_msf_parserGUI extends JFrame {
         } catch (SQLException e) {
             System.out.println("Protein sequence not found");
             return;
-            //e.printStackTrace();  
+            //e.printStackTrace();
         }
 
         int selectedPeptideStart = -1;
@@ -2525,7 +2465,6 @@ public class Thermo_msf_parserGUI extends JFrame {
         txtMSMSerror.setText("0.5");
         txtMSMSerror.setToolTipText("The MS/MS fragmentation error (in Da)");
         txtMSMSerror.addActionListener(new ActionListener() {
-
             public void actionPerformed(ActionEvent evt) {
                 changeMSMSerror();
             }
@@ -2546,7 +2485,6 @@ public class Thermo_msf_parserGUI extends JFrame {
         aIonsJCheckBox.setMinimumSize(new Dimension(39, 23));
         aIonsJCheckBox.setPreferredSize(new Dimension(39, 23));
         aIonsJCheckBox.addActionListener(new ActionListener() {
-
             public void actionPerformed(ActionEvent evt) {
                 ionsJCheckBoxActionPerformed();
             }
@@ -2559,7 +2497,6 @@ public class Thermo_msf_parserGUI extends JFrame {
         bIonsJCheckBox.setMinimumSize(new Dimension(39, 23));
         bIonsJCheckBox.setPreferredSize(new Dimension(39, 23));
         bIonsJCheckBox.addActionListener(new ActionListener() {
-
             public void actionPerformed(ActionEvent evt) {
                 ionsJCheckBoxActionPerformed();
             }
@@ -2572,7 +2509,6 @@ public class Thermo_msf_parserGUI extends JFrame {
         cIonsJCheckBox.setMinimumSize(new Dimension(39, 23));
         cIonsJCheckBox.setPreferredSize(new Dimension(39, 23));
         cIonsJCheckBox.addActionListener(new ActionListener() {
-
             public void actionPerformed(ActionEvent evt) {
                 ionsJCheckBoxActionPerformed();
             }
@@ -2585,7 +2521,6 @@ public class Thermo_msf_parserGUI extends JFrame {
         yIonsJCheckBox.setMinimumSize(new Dimension(39, 23));
         yIonsJCheckBox.setPreferredSize(new Dimension(39, 23));
         yIonsJCheckBox.addActionListener(new ActionListener() {
-
             public void actionPerformed(ActionEvent evt) {
                 ionsJCheckBoxActionPerformed();
             }
@@ -2598,7 +2533,6 @@ public class Thermo_msf_parserGUI extends JFrame {
         xIonsJCheckBox.setMinimumSize(new Dimension(39, 23));
         xIonsJCheckBox.setPreferredSize(new Dimension(39, 23));
         xIonsJCheckBox.addActionListener(new ActionListener() {
-
             public void actionPerformed(ActionEvent evt) {
                 ionsJCheckBoxActionPerformed();
             }
@@ -2611,7 +2545,6 @@ public class Thermo_msf_parserGUI extends JFrame {
         zIonsJCheckBox.setMinimumSize(new Dimension(39, 23));
         zIonsJCheckBox.setPreferredSize(new Dimension(39, 23));
         zIonsJCheckBox.addActionListener(new ActionListener() {
-
             public void actionPerformed(ActionEvent evt) {
                 ionsJCheckBoxActionPerformed();
             }
@@ -2624,7 +2557,6 @@ public class Thermo_msf_parserGUI extends JFrame {
         chargeOneJCheckBox.setMinimumSize(new Dimension(39, 23));
         chargeOneJCheckBox.setPreferredSize(new Dimension(39, 23));
         chargeOneJCheckBox.addActionListener(new ActionListener() {
-
             public void actionPerformed(ActionEvent evt) {
                 ionsJCheckBoxActionPerformed();
             }
@@ -2637,7 +2569,6 @@ public class Thermo_msf_parserGUI extends JFrame {
         chargeTwoJCheckBox.setMinimumSize(new Dimension(39, 23));
         chargeTwoJCheckBox.setPreferredSize(new Dimension(39, 23));
         chargeTwoJCheckBox.addActionListener(new ActionListener() {
-
             public void actionPerformed(ActionEvent evt) {
                 ionsJCheckBoxActionPerformed();
             }
@@ -2647,7 +2578,6 @@ public class Thermo_msf_parserGUI extends JFrame {
         chargeOverTwoJCheckBox.setText(">2");
         chargeOverTwoJCheckBox.setToolTipText("Show ions with charge >2");
         chargeOverTwoJCheckBox.addActionListener(new ActionListener() {
-
             public void actionPerformed(ActionEvent evt) {
                 ionsJCheckBoxActionPerformed();
             }
@@ -2660,7 +2590,6 @@ public class Thermo_msf_parserGUI extends JFrame {
         nh3IonsJCheckBox.setMinimumSize(new Dimension(39, 23));
         nh3IonsJCheckBox.setPreferredSize(new Dimension(39, 23));
         nh3IonsJCheckBox.addActionListener(new ActionListener() {
-
             public void actionPerformed(ActionEvent evt) {
                 ionsJCheckBoxActionPerformed();
             }
@@ -2673,7 +2602,6 @@ public class Thermo_msf_parserGUI extends JFrame {
         h2oIonsJCheckBox.setMinimumSize(new Dimension(39, 23));
         h2oIonsJCheckBox.setPreferredSize(new Dimension(39, 23));
         h2oIonsJCheckBox.addActionListener(new ActionListener() {
-
             public void actionPerformed(ActionEvent evt) {
                 ionsJCheckBoxActionPerformed();
             }
@@ -2701,8 +2629,8 @@ public class Thermo_msf_parserGUI extends JFrame {
         proteinSequenceCoverageJEditorPane.setPreferredSize(new Dimension(22, 22));
         proteinCoverageJScrollPane.setViewportView(proteinSequenceCoverageJEditorPane);
 
-        proteinSequenceCoverageJEditorPane.addComponentListener(new java.awt.event.ComponentAdapter() {
-            public void componentResized(java.awt.event.ComponentEvent evt) {
+        proteinCoverageJScrollPane.addComponentListener(new ComponentAdapter() {
+            public void componentResized(ComponentEvent evt) {
                 proteinSequenceCoverageJEditorPaneResized(evt);
             }
         });
@@ -2714,7 +2642,10 @@ public class Thermo_msf_parserGUI extends JFrame {
      *
      * @param evt
      */
-    private void proteinSequenceCoverageJEditorPaneResized(java.awt.event.ComponentEvent evt) {
+    private void proteinSequenceCoverageJEditorPaneResized(ComponentEvent evt) {
+        if (iSelectedProtein != null) {
+            formatProteinSequence(iSelectedProtein);
+        }
         // @TODO: reformat the sequence coverage pane to make optimal use of the new width
     }
 
