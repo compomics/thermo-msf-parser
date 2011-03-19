@@ -13,6 +13,7 @@ import com.compomics.util.gui.spectrum.DefaultSpectrumAnnotation;
 import com.compomics.util.gui.spectrum.ReferenceArea;
 import com.compomics.util.gui.spectrum.SpectrumPanel;
 import com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel;
+import no.uib.jsparklines.renderers.JSparklinesIntegerColorTableCellRenderer;
 import no.uib.jsparklines.renderers.JSparklinesBarChartTableCellRenderer;
 import no.uib.jsparklines.renderers.util.GradientColorCoding;
 import org.jfree.chart.plot.PlotOrientation;
@@ -627,6 +628,7 @@ public class Thermo_msf_parserGUI extends JFrame {
 
                         JTable lTable = new JTable();
                         lTable.setModel(jtablePeptideModel);
+                        lTable.getTableHeader().setReorderingAllowed(false);
                         JScrollPane lScrollPanel = new JScrollPane();
                         lScrollPanel.setViewportView(lTable);
 
@@ -788,7 +790,7 @@ public class Thermo_msf_parserGUI extends JFrame {
         Vector<Object[]> lPeptidesVector = new Vector<Object[]>();
 
         //add different columns to the holders
-        lPeptideTableColumnsTitleVector.add("Confidence Level");
+        lPeptideTableColumnsTitleVector.add(" ");
         lPeptideTableColumnsEditableVector.add(false);
         lPeptideTableColumnsClassVector.add(Integer.class);
 
@@ -821,7 +823,7 @@ public class Thermo_msf_parserGUI extends JFrame {
         }
 
 
-        lPeptideTableColumnsTitleVector.add("Matched ions / Total ions");
+        lPeptideTableColumnsTitleVector.add("Matched Ions / Total Ions");
         lPeptideTableColumnsEditableVector.add(false);
         lPeptideTableColumnsClassVector.add(String.class);
 
@@ -929,10 +931,20 @@ public class Thermo_msf_parserGUI extends JFrame {
         jtablePeptides = new JTable();
         jtablePeptides.setModel(jtablePeptideModel);
         jtablePeptides.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        jtablePeptides.getTableHeader().setReorderingAllowed(false);
+
+        // set up the confidence color map
+        HashMap<Integer, Color> confidenceColorMap = new HashMap<Integer, Color>();
+        confidenceColorMap.put(1, new Color(255, 51, 51)); // low
+        confidenceColorMap.put(2, Color.ORANGE); // medium
+        confidenceColorMap.put(3, new Color(110, 196, 97)); // high
 
         //set some cell renderers
-        jtablePeptides.getColumn("Confidence Level").setCellRenderer(new ConfidenceLevelTableCellRenderer());
+        jtablePeptides.getColumn(" ").setCellRenderer(new JSparklinesIntegerColorTableCellRenderer(Color.LIGHT_GRAY, confidenceColorMap));
         jtablePeptides.getColumn("Processing Node").setCellRenderer(new ProcessingNodeRenderer());
+
+        // set the maximum width for the confidence column
+        jtablePeptides.getColumn(" ").setMaxWidth(40);
 
         double lLowRT = Double.MAX_VALUE;
         double lHighRT = Double.MIN_VALUE;
@@ -1476,27 +1488,6 @@ public class Thermo_msf_parserGUI extends JFrame {
         return jpanContent;
     }
 
-    /**
-     * This is a cell renderer that will set the background color of a cell by the confidence level (an int)
-     */
-    public class ConfidenceLevelTableCellRenderer extends DefaultTableCellRenderer {
-        public Component getTableCellRendererComponent(JTable table, Object obj, boolean isSelected, boolean hasFocus, int row, int column) {
-            Component cell = super.getTableCellRendererComponent(table, "", isSelected, hasFocus, row, column);
-            Integer lValue = (Integer) obj;
-            if (lValue == 1) {
-                cell.setBackground(Color.RED);
-            }
-            if (lValue == 2) {
-                cell.setBackground(Color.ORANGE);
-            }
-            if (lValue == 3) {
-                cell.setBackground(Color.GREEN);
-            }
-            return cell;
-        }
-    }
-
-
     public class ProcessingNodeRenderer extends DefaultTableCellRenderer {
         public Component getTableCellRendererComponent(JTable table, Object lProcessingNodeObject, boolean isSelected, boolean hasFocus, int row, int column) {
             ProcessingNode lProcessingNode = (ProcessingNode) lProcessingNodeObject;
@@ -1936,6 +1927,8 @@ public class Thermo_msf_parserGUI extends JFrame {
      * Formats the protein sequence such that both the covered parts of the sequence
      * and the peptide selected in the peptide table is highlighted.
      * This code is based on the compomics utilities sample code
+     *
+     * @param lProtein
      */
     public void formatProteinSequence(Protein lProtein) {
 
