@@ -1,7 +1,6 @@
 package com.compomics.thermo_msf_parser;
 
 import com.compomics.thermo_msf_parser.msf.*;
-import org.apache.commons.collections.keyvalue.MultiKey;
 
 import java.sql.*;
 import java.util.Collection;
@@ -185,6 +184,7 @@ public class Parser {
     /**
      * This will parse the thermo msf file
      * @param iMsfFileLocation A String with the location of the msf file
+     * @param iLowMemory
      * @throws ClassNotFoundException This is thrown when the sqlite library cannot be found
      * @throws java.sql.SQLException This is thrown when there is a problem extracting the data from the thermo msf file
      */
