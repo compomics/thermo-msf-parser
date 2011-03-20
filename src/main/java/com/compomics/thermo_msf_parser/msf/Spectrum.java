@@ -226,7 +226,7 @@ public class Spectrum {
     /**
      * This method will unzip the zipped xml byte array
      * @return A string with the spectrum xml
-     * @throws IOException An exception is thrown when there is a problem with the connection to the msf file
+     * @throws Exception  An exception is thrown when there is a problem with the connection to the msf file
      */
     public String getUnzippedSpectrumXml() throws Exception {
             byte[] lZippedSpectrumXml = iZippedSpectrumXml;
@@ -267,7 +267,7 @@ public class Spectrum {
     /**
      * This method will give a vector with the MS/MS peaks found in the spectrum xml
      * @return vector with the MS/MS peaks found in the spectrum xml
-     * @throws IOException An exception is thrown when there is a problem with the connection to the msf file
+     * @throws Exception An exception is thrown when there is a problem with the connection to the msf file
      */
     public Vector<Peak> getMSMSPeaks() throws Exception {
         String lXml = getUnzippedSpectrumXml();
@@ -285,7 +285,7 @@ public class Spectrum {
     /**
      * This method will give a vector with the MS peaks found in the spectrum xml
      * @return vector with the MS peaks found in the spectrum xml
-     * @throws IOException An exception is thrown when there is a problem with the connection to the msf file
+     * @throws Exception An exception is thrown when there is a problem with the connection to the msf file
      */
     public Vector<Peak> getMSPeaks() throws Exception {
         String lXml = getUnzippedSpectrumXml();
@@ -303,7 +303,7 @@ public class Spectrum {
     /**
      * This method will give the MS peak that is used for the fragmentation
      * @return peak (MS) that is used for the fragmentation
-     * @throws IOException An exception is thrown when there is a problem with the connection to the msf file
+     * @throws Exception An exception is thrown when there is a problem with the connection to the msf file
      */
     public Peak getFragmentedMsPeak() throws Exception {
         String lXml = getUnzippedSpectrumXml();
