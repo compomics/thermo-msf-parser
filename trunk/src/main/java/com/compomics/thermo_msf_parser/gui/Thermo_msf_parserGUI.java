@@ -1828,42 +1828,42 @@ public class Thermo_msf_parserGUI extends JFrame {
      * @return Vector with the annotations
      */
     public Vector<DefaultSpectrumAnnotation> addIonAnnotationByCharge(Vector<DefaultSpectrumAnnotation> lAnnotations, int lCharge, Peptide lPeptide) {
-        Vector<Integer> lIonTypes = new Vector<Integer>();
+        Vector<PeptideFragmentIon.PeptideFragmentIonType> lIonTypes = new Vector<PeptideFragmentIon.PeptideFragmentIonType>();
         if (aIonsJCheckBox.isSelected()) {
-            lIonTypes.add(PeptideFragmentIon.A_ION);
+            lIonTypes.add(PeptideFragmentIon.PeptideFragmentIonType.A_ION);
             if (nh3IonsJCheckBox.isSelected()) {
-                lIonTypes.add(PeptideFragmentIon.ANH3_ION);
+                lIonTypes.add(PeptideFragmentIon.PeptideFragmentIonType.ANH3_ION);
             }
             if (h2oIonsJCheckBox.isSelected()) {
-                lIonTypes.add(PeptideFragmentIon.AH2O_ION);
+                lIonTypes.add(PeptideFragmentIon.PeptideFragmentIonType.AH2O_ION);
             }
         }
         if (bIonsJCheckBox.isSelected()) {
-            lIonTypes.add(PeptideFragmentIon.B_ION);
+            lIonTypes.add(PeptideFragmentIon.PeptideFragmentIonType.B_ION);
             if (nh3IonsJCheckBox.isSelected()) {
-                lIonTypes.add(PeptideFragmentIon.BNH3_ION);
+                lIonTypes.add(PeptideFragmentIon.PeptideFragmentIonType.BNH3_ION);
             }
             if (h2oIonsJCheckBox.isSelected()) {
-                lIonTypes.add(PeptideFragmentIon.BH2O_ION);
+                lIonTypes.add(PeptideFragmentIon.PeptideFragmentIonType.BH2O_ION);
             }
         }
         if (cIonsJCheckBox.isSelected()) {
-            lIonTypes.add(PeptideFragmentIon.C_ION);
+            lIonTypes.add(PeptideFragmentIon.PeptideFragmentIonType.C_ION);
         }
         if (xIonsJCheckBox.isSelected()) {
-            lIonTypes.add(PeptideFragmentIon.X_ION);
+            lIonTypes.add(PeptideFragmentIon.PeptideFragmentIonType.X_ION);
         }
         if (yIonsJCheckBox.isSelected()) {
-            lIonTypes.add(PeptideFragmentIon.Y_ION);
+            lIonTypes.add(PeptideFragmentIon.PeptideFragmentIonType.Y_ION);
             if (nh3IonsJCheckBox.isSelected()) {
-                lIonTypes.add(PeptideFragmentIon.YNH3_ION);
+                lIonTypes.add(PeptideFragmentIon.PeptideFragmentIonType.YNH3_ION);
             }
             if (h2oIonsJCheckBox.isSelected()) {
-                lIonTypes.add(PeptideFragmentIon.YH2O_ION);
+                lIonTypes.add(PeptideFragmentIon.PeptideFragmentIonType.YH2O_ION);
             }
         }
         if (zIonsJCheckBox.isSelected()) {
-            lIonTypes.add(PeptideFragmentIon.Z_ION);
+            lIonTypes.add(PeptideFragmentIon.PeptideFragmentIonType.Z_ION);
         }
 
         Vector<PeptideFragmentIon> lFragmentIons = lPeptide.getFragmentIonsByTypeAndCharge(lCharge, lIonTypes);
@@ -1871,40 +1871,40 @@ public class Thermo_msf_parserGUI extends JFrame {
         for (int i = 0; i < lFragmentIons.size(); i++) {
             DefaultSpectrumAnnotation lAnno = null;
             PeptideFragmentIon lIon = lFragmentIons.get(i);
-            if (lIon.getType() == PeptideFragmentIon.A_ION) {
+            if (lIon.getType() == PeptideFragmentIon.PeptideFragmentIonType.A_ION) {
                 lAnno = new DefaultSpectrumAnnotation(lIon.theoreticMass, iMSMSerror, Color.BLUE, lIon.getIonType() + lIon.getNeutralLoss() + lIon.getNumber());
             }
-            if (lIon.getType() == PeptideFragmentIon.AH2O_ION) {
+            if (lIon.getType() == PeptideFragmentIon.PeptideFragmentIonType.AH2O_ION) {
                 lAnno = new DefaultSpectrumAnnotation(lIon.theoreticMass, iMSMSerror, Color.GREEN, lIon.getIonType() + lIon.getNeutralLoss() + lIon.getNumber());
             }
-            if (lIon.getType() == PeptideFragmentIon.ANH3_ION) {
+            if (lIon.getType() == PeptideFragmentIon.PeptideFragmentIonType.ANH3_ION) {
                 lAnno = new DefaultSpectrumAnnotation(lIon.theoreticMass, iMSMSerror, Color.GREEN, lIon.getIonType() + lIon.getNeutralLoss() + lIon.getNumber());
             }
-            if (lIon.getType() == PeptideFragmentIon.B_ION) {
+            if (lIon.getType() == PeptideFragmentIon.PeptideFragmentIonType.B_ION) {
                 lAnno = new DefaultSpectrumAnnotation(lIon.theoreticMass, iMSMSerror, Color.BLUE, lIon.getIonType() + lIon.getNeutralLoss() + lIon.getNumber());
             }
-            if (lIon.getType() == PeptideFragmentIon.BH2O_ION) {
+            if (lIon.getType() == PeptideFragmentIon.PeptideFragmentIonType.BH2O_ION) {
                 lAnno = new DefaultSpectrumAnnotation(lIon.theoreticMass, iMSMSerror, Color.GREEN, lIon.getIonType() + lIon.getNeutralLoss() + lIon.getNumber());
             }
-            if (lIon.getType() == PeptideFragmentIon.BNH3_ION) {
+            if (lIon.getType() == PeptideFragmentIon.PeptideFragmentIonType.BNH3_ION) {
                 lAnno = new DefaultSpectrumAnnotation(lIon.theoreticMass, iMSMSerror, Color.GREEN, lIon.getIonType() + lIon.getNeutralLoss() + lIon.getNumber());
             }
-            if (lIon.getType() == PeptideFragmentIon.C_ION) {
+            if (lIon.getType() == PeptideFragmentIon.PeptideFragmentIonType.C_ION) {
                 lAnno = new DefaultSpectrumAnnotation(lIon.theoreticMass, iMSMSerror, Color.BLUE, lIon.getIonType() + lIon.getNeutralLoss() + lIon.getNumber());
             }
-            if (lIon.getType() == PeptideFragmentIon.X_ION) {
+            if (lIon.getType() == PeptideFragmentIon.PeptideFragmentIonType.X_ION) {
                 lAnno = new DefaultSpectrumAnnotation(lIon.theoreticMass, iMSMSerror, Color.BLACK, lIon.getIonType() + lIon.getNeutralLoss() + lIon.getNumber());
             }
-            if (lIon.getType() == PeptideFragmentIon.Y_ION) {
+            if (lIon.getType() == PeptideFragmentIon.PeptideFragmentIonType.Y_ION) {
                 lAnno = new DefaultSpectrumAnnotation(lIon.theoreticMass, iMSMSerror, Color.BLACK, lIon.getIonType() + lIon.getNeutralLoss() + lIon.getNumber());
             }
-            if (lIon.getType() == PeptideFragmentIon.YH2O_ION) {
+            if (lIon.getType() == PeptideFragmentIon.PeptideFragmentIonType.YH2O_ION) {
                 lAnno = new DefaultSpectrumAnnotation(lIon.theoreticMass, iMSMSerror, Color.GREEN, lIon.getIonType() + lIon.getNeutralLoss() + lIon.getNumber());
             }
-            if (lIon.getType() == PeptideFragmentIon.YNH3_ION) {
+            if (lIon.getType() == PeptideFragmentIon.PeptideFragmentIonType.YNH3_ION) {
                 lAnno = new DefaultSpectrumAnnotation(lIon.theoreticMass, iMSMSerror, Color.GREEN, lIon.getIonType() + lIon.getNeutralLoss() + lIon.getNumber());
             }
-            if (lIon.getType() == PeptideFragmentIon.Z_ION) {
+            if (lIon.getType() == PeptideFragmentIon.PeptideFragmentIonType.Z_ION) {
                 lAnno = new DefaultSpectrumAnnotation(lIon.theoreticMass, iMSMSerror, Color.BLACK, lIon.getIonType() + lIon.getNeutralLoss() + lIon.getNumber());
             }
 
