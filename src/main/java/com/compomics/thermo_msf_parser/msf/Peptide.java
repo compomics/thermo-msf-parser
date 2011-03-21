@@ -1,7 +1,6 @@
 package com.compomics.thermo_msf_parser.msf;
 
 import com.compomics.util.experiment.biology.ions.PeptideFragmentIon;
-import com.compomics.util.experiment.massspectrometry.Charge;
 
 import java.util.HashMap;
 import java.util.Vector;
@@ -503,43 +502,55 @@ public class Peptide {
 
                 // Create an instance for each fragment ion
 
-                Charge lCharge = new Charge(Charge.PLUS, charge);
                 //B Ion
-                PeptideFragmentIon lIon = new PeptideFragmentIon(PeptideFragmentIon.B_ION, i + 1, (bMass + charge * lHydrogenMass) / charge, lCharge);
+                PeptideFragmentIon lIon = new PeptideFragmentIon(PeptideFragmentIon.PeptideFragmentIonType.B_ION, i + 1, (bMass + charge * lHydrogenMass) / charge);
+                lIon.addUrParam(new com.compomics.thermo_msf_parser.gui.Charge(charge));
                 iTheoreticalFragmentIons.add(lIon);
                 //BNH3 Ion
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.PeptideFragmentIonType.BNH3_ION, i + 1, (bMass - lOxygenMass - 2 * - lNitrogenMass - 3 * lHydrogenMass + charge * lHydrogenMass) / charge);
+                lIon.addUrParam(new com.compomics.thermo_msf_parser.gui.Charge(charge));
                 iTheoreticalFragmentIons.add(lIon);
                 //BH2O Ion
-                lIon = new PeptideFragmentIon(PeptideFragmentIon.BH2O_ION, i + 1, (bMass - lOxygenMass - 2 * lHydrogenMass + charge * lHydrogenMass) / charge, lCharge);
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.PeptideFragmentIonType.BH2O_ION, i + 1, (bMass - lOxygenMass - 2 * lHydrogenMass + charge * lHydrogenMass) / charge);
+                lIon.addUrParam(new com.compomics.thermo_msf_parser.gui.Charge(charge));
                 iTheoreticalFragmentIons.add(lIon);
                 //A Ion
-                lIon = new PeptideFragmentIon(PeptideFragmentIon.A_ION, i + 1, (bMass - lOxygenMass - lCarbonMass + charge * lHydrogenMass) / charge, lCharge);
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.PeptideFragmentIonType.A_ION, i + 1, (bMass - lOxygenMass - lCarbonMass + charge * lHydrogenMass) / charge);
+                lIon.addUrParam(new com.compomics.thermo_msf_parser.gui.Charge(charge));
                 iTheoreticalFragmentIons.add(lIon);
                 //ANH3 Ion
-                lIon = new PeptideFragmentIon(PeptideFragmentIon.ANH3_ION, i + 1, (bMass - lOxygenMass - lCarbonMass - lNitrogenMass - 3 * lHydrogenMass + charge * lHydrogenMass) / charge, lCharge);
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.PeptideFragmentIonType.ANH3_ION, i + 1, (bMass - lOxygenMass - lCarbonMass - lNitrogenMass - 3 * lHydrogenMass + charge * lHydrogenMass) / charge);
+                lIon.addUrParam(new com.compomics.thermo_msf_parser.gui.Charge(charge));
                 iTheoreticalFragmentIons.add(lIon);
                 //AH2O Ion
-                lIon = new PeptideFragmentIon(PeptideFragmentIon.AH2O_ION, i + 1, (bMass - 2 * lOxygenMass - lCarbonMass - 2 * lHydrogenMass + charge * lHydrogenMass) / charge, lCharge);
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.PeptideFragmentIonType.AH2O_ION, i + 1, (bMass - 2 * lOxygenMass - lCarbonMass - 2 * lHydrogenMass + charge * lHydrogenMass) / charge);
+                lIon.addUrParam(new com.compomics.thermo_msf_parser.gui.Charge(charge));
                 iTheoreticalFragmentIons.add(lIon);
                 //C Ion
-                lIon = new PeptideFragmentIon(PeptideFragmentIon.C_ION, i + 1, (bMass + lNitrogenMass + 3 * lHydrogenMass + charge * lHydrogenMass) / charge, lCharge);
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.PeptideFragmentIonType.C_ION, i + 1, (bMass + lNitrogenMass + 3 * lHydrogenMass + charge * lHydrogenMass) / charge);
+                lIon.addUrParam(new com.compomics.thermo_msf_parser.gui.Charge(charge));
                 iTheoreticalFragmentIons.add(lIon);
 
                 // Create an instance of the fragment y ion
                 //Y Ion
-                lIon = new PeptideFragmentIon(PeptideFragmentIon.Y_ION, i + 1, (yMass + charge * lHydrogenMass) / charge, lCharge);
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.PeptideFragmentIonType.Y_ION, i + 1, (yMass + charge * lHydrogenMass) / charge);
+                lIon.addUrParam(new com.compomics.thermo_msf_parser.gui.Charge(charge));
                 iTheoreticalFragmentIons.add(lIon);
                 //YNH3 Ion
-                lIon = new PeptideFragmentIon(PeptideFragmentIon.YNH3_ION, i + 1, (yMass - lNitrogenMass - 3 * lHydrogenMass + charge * lHydrogenMass) / charge, lCharge);
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.PeptideFragmentIonType.YNH3_ION, i + 1, (yMass - lNitrogenMass - 3 * lHydrogenMass + charge * lHydrogenMass) / charge);
+                lIon.addUrParam(new com.compomics.thermo_msf_parser.gui.Charge(charge));
                 iTheoreticalFragmentIons.add(lIon);
                 //YH2O Ion
-                lIon = new PeptideFragmentIon(PeptideFragmentIon.YH2O_ION, i + 1, (yMass - 2 * lHydrogenMass - lOxygenMass + charge * lHydrogenMass) / charge, lCharge);
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.PeptideFragmentIonType.YH2O_ION, i + 1, (yMass - 2 * lHydrogenMass - lOxygenMass + charge * lHydrogenMass) / charge);
+                lIon.addUrParam(new com.compomics.thermo_msf_parser.gui.Charge(charge));
                 iTheoreticalFragmentIons.add(lIon);
                 //X Ion
-                lIon = new PeptideFragmentIon(PeptideFragmentIon.X_ION, i + 1, (yMass + lCarbonMass + lOxygenMass - 2 * lHydrogenMass + charge * lHydrogenMass) / charge, lCharge);
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.PeptideFragmentIonType.X_ION, i + 1, (yMass + lCarbonMass + lOxygenMass - 2 * lHydrogenMass + charge * lHydrogenMass) / charge);
+                lIon.addUrParam(new com.compomics.thermo_msf_parser.gui.Charge(charge));
                 iTheoreticalFragmentIons.add(lIon);
                 //Z Ion
-                lIon = new PeptideFragmentIon(PeptideFragmentIon.Z_ION, i + 1, (yMass - lNitrogenMass - 2 * lHydrogenMass + charge * lHydrogenMass) / charge, lCharge);
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.PeptideFragmentIonType.Z_ION, i + 1, (yMass - lNitrogenMass - 2 * lHydrogenMass + charge * lHydrogenMass) / charge);
+                lIon.addUrParam(new com.compomics.thermo_msf_parser.gui.Charge(charge));
                 iTheoreticalFragmentIons.add(lIon);
 
             }
@@ -552,14 +563,14 @@ public class Peptide {
      * @param lTypes The typs of fragment ions wanted
      * @return Vector with the requested fragment ions
      */
-    public Vector<PeptideFragmentIon> getFragmentIonsByTypeAndCharge(int lCharge, Vector<Integer> lTypes){
+    public Vector<PeptideFragmentIon> getFragmentIonsByTypeAndCharge(int lCharge, Vector<PeptideFragmentIon.PeptideFragmentIonType> lTypes){
         if(iTheoreticalFragmentIons == null){
             this.calculateFragmentions(getParentSpectrum().getCharge());
         }
         Vector<PeptideFragmentIon> lResult = new Vector<PeptideFragmentIon>();
 
         for(int i = 0; i<iTheoreticalFragmentIons.size(); i ++){
-            if(iTheoreticalFragmentIons.get(i).getCharge().value == lCharge){
+            if(((com.compomics.thermo_msf_parser.gui.Charge) iTheoreticalFragmentIons.get(i).getUrParam(new com.compomics.thermo_msf_parser.gui.Charge())).getCharge() == lCharge){
                 boolean lPass = false;
                 for(int t = 0; t<lTypes.size(); t ++){
                     if(iTheoreticalFragmentIons.get(i).getType() == lTypes.get(t)){
