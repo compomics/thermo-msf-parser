@@ -84,6 +84,7 @@ public class Protein {
                 }
                 rs.close();
                 stat.close();
+            iSequence = lSequence;
             return lSequence;
         }
         return iSequence;
@@ -146,6 +147,10 @@ public class Protein {
 
     public String toString(){
         return iUtilAccession;
+    }
+
+    public Parser getParser() {
+        return iParser;
     }
 }
 

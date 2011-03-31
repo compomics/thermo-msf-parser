@@ -63,4 +63,32 @@ public class WorkflowInfo {
     public void setMsfVersionInfo(MsfVersionInfo msfVersionInfo) {
         this.iMsfVersionInfo = msfVersionInfo;
     }
+
+    public String getWorkflowName() {
+        return iWorkflowName;
+    }
+
+    public String getWorkflowDescription() {
+        return iWorkflowDescription;
+    }
+
+    public String getWorkflowUser() {
+        return iWorkflowUser;
+    }
+
+    public String getWorkflowTemplate() {
+        return iWorkflowTemplate;
+    }
+
+    public String getWorkflowMachineName() {
+        return iWorkflowMachineName;
+    }
+
+    public Vector<WorkflowMessage> getWorkflowMessages() {
+        return iWorkflowMessages;
+    }
+
+    public MsfVersionInfo getMsfVersionInfo() {
+        return iMsfVersionInfo;
+    }
 }
