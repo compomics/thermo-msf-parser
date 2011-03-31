@@ -118,7 +118,9 @@ public class Chromatogram {
             in.close();
             out.flush();
             out.close();
+            lZippedFile.delete();
             iUnzippedChromatogramXml = lStream.toString();
+            lStream.close();
         }
         return iUnzippedChromatogramXml;
     }

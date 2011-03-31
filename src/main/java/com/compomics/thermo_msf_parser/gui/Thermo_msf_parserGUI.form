@@ -33,7 +33,7 @@
               <gridbag weightx="1.0" weighty="1.0"/>
             </constraints>
             <properties>
-              <dividerLocation value="510"/>
+              <dividerLocation value="310"/>
               <oneTouchExpandable value="true"/>
               <orientation value="0"/>
             </properties>
@@ -44,7 +44,7 @@
                   <splitpane position="right"/>
                 </constraints>
                 <properties>
-                  <dividerLocation value="700"/>
+                  <dividerLocation value="676"/>
                 </properties>
                 <border type="none"/>
                 <children>
@@ -128,12 +128,33 @@
                           </grid>
                           <grid id="81e9a" layout-manager="GridBagLayout">
                             <constraints>
-                              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                              <grid row="1" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                               <gridbag weightx="0.0" weighty="0.0"/>
                             </constraints>
                             <properties/>
                             <border type="none"/>
                             <children>
+                              <component id="c3277" class="javax.swing.JCheckBox" binding="cIonsJCheckBox" custom-create="true">
+                                <constraints>
+                                  <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                                </constraints>
+                                <properties/>
+                              </component>
+                              <component id="918f7" class="javax.swing.JCheckBox" binding="zIonsJCheckBox" custom-create="true">
+                                <constraints>
+                                  <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                                </constraints>
+                                <properties/>
+                              </component>
+                              <component id="ebea6" class="javax.swing.JCheckBox" binding="chargeOverTwoJCheckBox" custom-create="true">
+                                <constraints>
+                                  <grid row="0" column="10" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                                </constraints>
+                                <properties/>
+                              </component>
                               <component id="d859e" class="javax.swing.JCheckBox" binding="aIonsJCheckBox" custom-create="true">
                                 <constraints>
                                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
@@ -143,103 +164,56 @@
                               </component>
                               <component id="da5c" class="javax.swing.JCheckBox" binding="bIonsJCheckBox" custom-create="true">
                                 <constraints>
-                                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
-                                </constraints>
-                                <properties/>
-                              </component>
-                              <component id="c3277" class="javax.swing.JCheckBox" binding="cIonsJCheckBox" custom-create="true">
-                                <constraints>
-                                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                                   <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
                                 </constraints>
                                 <properties/>
                               </component>
                               <component id="4f485" class="javax.swing.JCheckBox" binding="xIonsJCheckBox" custom-create="true">
                                 <constraints>
-                                  <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                  <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                                   <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
                                 </constraints>
                                 <properties/>
                               </component>
                               <component id="4d3e5" class="javax.swing.JCheckBox" binding="yIonsJCheckBox" custom-create="true">
                                 <constraints>
-                                  <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
-                                </constraints>
-                                <properties/>
-                              </component>
-                              <component id="918f7" class="javax.swing.JCheckBox" binding="zIonsJCheckBox" custom-create="true">
-                                <constraints>
-                                  <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                  <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                                   <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
                                 </constraints>
                                 <properties/>
                               </component>
                               <component id="dec3a" class="javax.swing.JCheckBox" binding="chargeOneJCheckBox" custom-create="true">
                                 <constraints>
-                                  <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                  <grid row="0" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                                   <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
                                 </constraints>
                                 <properties/>
                               </component>
                               <component id="f5b69" class="javax.swing.JCheckBox" binding="chargeTwoJCheckBox" custom-create="true">
                                 <constraints>
-                                  <grid row="9" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                  <grid row="0" column="9" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                                   <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
-                                </constraints>
-                                <properties/>
-                              </component>
-                              <component id="ebea6" class="javax.swing.JCheckBox" binding="chargeOverTwoJCheckBox" custom-create="true">
-                                <constraints>
-                                  <grid row="10" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
-                                </constraints>
-                                <properties/>
-                              </component>
-                              <component id="da4e" class="javax.swing.JSeparator">
-                                <constraints>
-                                  <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
-                                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
-                                </constraints>
-                                <properties/>
-                              </component>
-                              <component id="ad4d6" class="javax.swing.JSeparator">
-                                <constraints>
-                                  <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
-                                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
-                                </constraints>
-                                <properties/>
-                              </component>
-                              <component id="26499" class="javax.swing.JSeparator">
-                                <constraints>
-                                  <grid row="11" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
-                                  <gridbag weightx="0.0" weighty="0.0"/>
                                 </constraints>
                                 <properties/>
                               </component>
                               <component id="78529" class="javax.swing.JCheckBox" binding="nh3IonsJCheckBox" custom-create="true">
                                 <constraints>
-                                  <grid row="12" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                  <grid row="0" column="21" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                                   <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
                                 </constraints>
-                                <properties>
-                                  <minimumSize width="70" height="22"/>
-                                  <text value="NH3"/>
-                                </properties>
+                                <properties/>
                               </component>
                               <component id="6a2cf" class="javax.swing.JCheckBox" binding="h2oIonsJCheckBox" custom-create="true">
                                 <constraints>
-                                  <grid row="13" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                  <grid row="0" column="22" row-span="1" col-span="10" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                                   <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
                                 </constraints>
-                                <properties>
-                                  <text value="H20"/>
-                                </properties>
+                                <properties/>
                               </component>
                               <component id="91cbe" class="javax.swing.JTextField" binding="txtMSMSerror" custom-create="true">
                                 <constraints>
-                                  <grid row="14" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                                  <grid row="0" column="32" row-span="1" col-span="10" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                                     <preferred-size width="150" height="-1"/>
                                   </grid>
                                   <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
@@ -249,6 +223,39 @@
                                   <toolTipText value="The MS/MS fragmentation error (in Da)"/>
                                 </properties>
                               </component>
+                              <component id="8affd" class="javax.swing.JSeparator">
+                                <constraints>
+                                  <grid row="0" column="7" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                                </constraints>
+                                <properties>
+                                  <orientation value="1"/>
+                                </properties>
+                              </component>
+                              <component id="acd3a" class="javax.swing.JSeparator">
+                                <constraints>
+                                  <grid row="0" column="11" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                                </constraints>
+                                <properties>
+                                  <orientation value="1"/>
+                                </properties>
+                              </component>
+                              <component id="2d98d" class="javax.swing.JSeparator">
+                                <constraints>
+                                  <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                                </constraints>
+                                <properties>
+                                  <orientation value="1"/>
+                                </properties>
+                              </component>
+                              <hspacer id="ac827">
+                                <constraints>
+                                  <grid row="0" column="42" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                                  <gridbag weightx="1.0" weighty="0.0"/>
+                                </constraints>
+                              </hspacer>
                             </children>
                           </grid>
                         </children>
@@ -341,7 +348,7 @@
                 <children>
                   <scrollpane id="6e6d7" binding="jscollPeptides" custom-create="true">
                     <constraints>
-                      <grid row="0" column="0" row-span="1" col-span="5" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                      <grid row="0" column="0" row-span="1" col-span="6" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
                       <gridbag weightx="1.0" weighty="1.0"/>
                     </constraints>
                     <properties/>
@@ -487,7 +494,7 @@
                   </component>
                   <component id="5cb58" class="javax.swing.JCheckBox" binding="msmsCheckBox">
                     <constraints>
-                      <grid row="3" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                      <grid row="3" column="4" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                       <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
                     </constraints>
                     <properties>
@@ -496,6 +503,33 @@
                       <preferredSize width="130" height="22"/>
                       <selected value="true"/>
                       <text value="MS/MS"/>
+                    </properties>
+                  </component>
+                  <component id="10c2b" class="javax.swing.JLabel">
+                    <constraints>
+                      <grid row="1" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                      <gridbag top="5" left="5" bottom="5" right="0" weightx="0.0" weighty="0.0"/>
+                    </constraints>
+                    <properties>
+                      <text value="Full Peptide Information: "/>
+                    </properties>
+                  </component>
+                  <component id="19fd0" class="javax.swing.JCheckBox" binding="peptideInformationChb">
+                    <constraints>
+                      <grid row="1" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                      <gridbag weightx="0.0" weighty="0.0"/>
+                    </constraints>
+                    <properties>
+                      <text value=""/>
+                    </properties>
+                  </component>
+                  <component id="bce83" class="javax.swing.JButton" binding="startRoverButton" default-binding="true">
+                    <constraints>
+                      <grid row="2" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                      <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                    </constraints>
+                    <properties>
+                      <text value="Start Rover"/>
                     </properties>
                   </component>
                 </children>
@@ -545,7 +579,7 @@
                   <maximumSize width="80" height="25"/>
                   <minimumSize width="80" height="25"/>
                   <preferredSize width="80" height="25"/>
-                  <text value="1 -&gt; 20"/>
+                  <text value="20 -&gt; 1"/>
                 </properties>
               </component>
             </children>

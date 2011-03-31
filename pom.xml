@@ -10,7 +10,7 @@
 
     <!-- Set the version number for the whole project -->
     <properties>
-        <version.number>0.2.4</version.number>
+        <version.number>0.3</version.number>
     </properties>
 
     <!-- Licence -->
@@ -30,6 +30,7 @@
                 <directory>src/main/resources/</directory>
                 <includes>
                     <include>thermo_msf_parser.properties</include>
+                    <include>icon.png</include>
                 </includes>
                 <filtering>true</filtering>
             </resource>
@@ -257,6 +258,12 @@
             <groupId>com.compomics</groupId>
             <artifactId>utilities</artifactId>
             <version>3.0.52</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.compomics</groupId>
+            <artifactId>rover</artifactId>
+            <version>2.3</version>
             <type>jar</type>
         </dependency>
 

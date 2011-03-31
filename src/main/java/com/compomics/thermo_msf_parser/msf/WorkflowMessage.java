@@ -51,4 +51,28 @@ public class WorkflowMessage {
         this.iMessageKind = iMessageKind;
         this.iMessage = iMessage;
     }
+
+    public int getMessageId() {
+        return iMessageId;
+    }
+
+    public int getProcessingNodeId() {
+        return iProcessingNodeId;
+    }
+
+    public int getProcessingNodeNumber() {
+        return iProcessingNodeNumber;
+    }
+
+    public int getTime() {
+        return iTime;
+    }
+
+    public int getMessageKind() {
+        return iMessageKind;
+    }
+
+    public String getMessage() {
+        return iMessage;
+    }
 }

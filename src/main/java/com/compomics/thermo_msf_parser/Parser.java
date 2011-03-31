@@ -179,7 +179,7 @@ public class Parser {
     /**
      * The file location of this msf file
      */
-    private String iFileName;
+    private String iFilePath;
 
     /**
      * This will parse the thermo msf file
@@ -190,7 +190,7 @@ public class Parser {
      */
     public Parser(String iMsfFileLocation, boolean iLowMemory) throws SQLException, ClassNotFoundException {
 
-        iFileName = iMsfFileLocation;
+        iFilePath = iMsfFileLocation;
         //create the connection to the msf file
         Class.forName("org.sqlite.JDBC");
         iConnection = DriverManager.getConnection("jdbc:sqlite:" + iMsfFileLocation);
@@ -1035,7 +1035,12 @@ public class Parser {
         return iProcessingNodes;
     }
 
-    public String getFileName() {
-        return iFileName;
+    public String getFilePath() {
+        return iFilePath;
+    }
+
+    public String getFileName(){
+        String lSub = iFilePath.substring(iFilePath.lastIndexOf(System.getProperties().getProperty("file.separator"))+1);
+        return lSub;
     }
 }
