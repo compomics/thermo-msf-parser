@@ -29,6 +29,14 @@ public class Parser {
      */
     private Vector<AminoAcid> iAminoAcids = new Vector<AminoAcid>();
     /**
+     * The neutral losses
+     */
+    private Vector<NeutralLoss> iNeutralLosses = new Vector<NeutralLoss>();
+    /**
+     * A map with the neutrallossid as key and the neutralloss as value
+     */
+    private HashMap<Integer, NeutralLoss> iNeutralLossesMap = new HashMap<Integer, NeutralLoss>();
+    /**
      * A map with the aminoacidid as key and the aminoacid as value
      */
     private HashMap<Integer, AminoAcid> iAminoAcidsMap = new HashMap<Integer, AminoAcid>();
@@ -125,6 +133,10 @@ public class Parser {
      */
     private Vector<CustomDataField> iPeptideUsedCustomDataFields = new Vector<CustomDataField>();
     /**
+     * This holds the field ids used for the peptides_decoys
+     */
+    private Vector<CustomDataField> iPeptideDecoyUsedCustomDataFields = new Vector<CustomDataField>();
+    /**
      * This holds the field ids used for the proteins
      */
     private Vector<CustomDataField> iProteinUsedCustomDataFields = new Vector<CustomDataField>();
@@ -132,6 +144,10 @@ public class Parser {
      * This holds the field ids used for the spectra
      */
     private Vector<CustomDataField> iSpectrumUsedCustomDataFields = new Vector<CustomDataField>();
+    /**
+     * This holds the field ids used for the processing node
+     */
+    private Vector<CustomDataField> iProcessingNodeUsedCustomDataFields = new Vector<CustomDataField>();
     /**
      * The workflow info
      */
@@ -180,6 +196,10 @@ public class Parser {
      * The file location of this msf file
      */
     private String iFilePath;
+    /**
+     * The version of the msf file
+     */
+    private MsfVersion iMsfVersion;
 
     /**
      * This will parse the thermo msf file
@@ -198,6 +218,16 @@ public class Parser {
         ResultSet rs;
         this.iLowMemory = iLowMemory;
 
+        //get the msf version
+        rs = stat.executeQuery("select * from SchemaInfo");
+        while (rs.next()) {
+            String lVersion = rs.getString("SoftwareVersion");
+            if(lVersion.startsWith("1.2")){
+                iMsfVersion = MsfVersion.VERSION1_2;
+            } else if(lVersion.startsWith("1.3")){
+                iMsfVersion = MsfVersion.VERSION1_3;
+            }
+        }
 
         //get all the aminoacids
         rs = stat.executeQuery("select * from AminoAcids");
@@ -220,6 +250,38 @@ public class Parser {
             int lAaId = rs.getInt("AminoAcidID");
             if(iAminoAcidsMap.get(lAaId) != null && iModificationsMap.get(lModId) != null){
                 iModificationsMap.get(lModId).addAminoAcid(iAminoAcidsMap.get(lAaId));
+                if(iMsfVersion == MsfVersion.VERSION1_3){
+                    iModificationsMap.get(lModId).addClassificationForAminoAcid(rs.getInt("Classification"));
+                }
+            }
+
+        }
+        if(iMsfVersion == MsfVersion.VERSION1_3){
+            //get the neutral losses
+            rs = stat.executeQuery("select * from AminoAcidModificationsNeutralLosses");
+            while (rs.next()) {
+                NeutralLoss lLoss = new NeutralLoss(rs.getInt("NeutralLossID"), rs.getString("Name"), rs.getDouble("MonoisotopicMass"), rs.getDouble("AverageMass"));
+                iNeutralLosses.add(lLoss);
+                iNeutralLossesMap.put(lLoss.getNeutralLossId(),lLoss);
+            }
+
+            //add the amino acid to the neutral losses
+            rs = stat.executeQuery("select * from AminoAcidModificationsAminoAcidsNL");
+            while (rs.next()) {
+                int lAaId = rs.getInt("AminoAcidID");
+                int lNlId = rs.getInt("NeutralLossID");
+                if(iAminoAcidsMap.get(lAaId) != null && iNeutralLossesMap.get(lNlId) != null){
+                    iNeutralLossesMap.get(lNlId).addAminoAcid(iAminoAcidsMap.get(lAaId));
+                }
+            }
+            //now add the neutral losses to the modification
+            rs = stat.executeQuery("select * from AminoAcidModificationsAminoAcidsNL");
+            while (rs.next()) {
+                int lModId = rs.getInt("AminoAcidModificationID");
+                int lNlId = rs.getInt("NeutralLossID");
+                if(iModificationsMap.get(lModId) != null && iNeutralLossesMap.get(lNlId) != null){
+                    iModificationsMap.get(lModId).addNeutralLoss(iNeutralLossesMap.get(lNlId));
+                }
             }
         }
 
@@ -243,6 +305,10 @@ public class Parser {
         rs = stat.executeQuery("select * from Peptides as p");
         while (rs.next()) {
             Peptide lPeptide = new Peptide(rs.getInt("PeptideID"), rs.getInt("SpectrumID"), rs.getInt("ConfidenceLevel"), rs.getString("Sequence"), rs.getInt("TotalIonsCount"), rs.getInt("MatchedIonsCount"), rs.getString("Annotation"), rs.getInt("ProcessingNodeNumber"), iAminoAcids);
+            if(iMsfVersion ==  MsfVersion.VERSION1_3){
+                lPeptide.setMissedCleavage(rs.getInt("MissedCleavages"));
+                lPeptide.setUniquePeptideSequenceId(rs.getInt("UniquePeptideSequenceID"));
+            }
             iPeptides.add(lPeptide);
             iPeptidesMap.put(lPeptide.getPeptideId(), lPeptide);
         }
@@ -251,9 +317,28 @@ public class Parser {
         rs = stat.executeQuery("select * from Peptides_decoy as p");
         while (rs.next()) {
             Peptide lPeptide = new Peptide(rs.getInt("PeptideID"), rs.getInt("SpectrumID"), rs.getInt("ConfidenceLevel"), rs.getString("Sequence"), rs.getInt("TotalIonsCount"), rs.getInt("MatchedIonsCount"), "", rs.getInt("ProcessingNodeNumber"), iAminoAcids);
+            if(iMsfVersion ==  MsfVersion.VERSION1_3){
+                lPeptide.setMissedCleavage(rs.getInt("MissedCleavages"));
+                lPeptide.setUniquePeptideSequenceId(rs.getInt("UniquePeptideSequenceID"));
+                lPeptide.setAnnotation(rs.getString("Annotation"));
+            }
             iPeptidesDecoy.add(lPeptide);
             iPeptidesDecoyMap.put(lPeptide.getPeptideId(), lPeptide);
         }
+        if(iMsfVersion == MsfVersion.VERSION1_3){
+            //add the processing node Custom data fields
+            rs = stat.executeQuery("select * from CustomDataPeptides_Decoy");
+            while (rs.next()) {
+                if(iPeptidesDecoyMap.get(rs.getInt("PeptideID")) != null){
+                    iPeptidesDecoyMap.get(rs.getInt("PeptideID")).addCustomDataField(rs.getInt("FieldID"),rs.getString("FieldValue"));
+                }
+            }
+            rs = stat.executeQuery("select fieldid from CustomDataPeptides_Decoy group by fieldid");
+            while (rs.next()) {
+                iPeptideDecoyUsedCustomDataFields.add(iCustomDataFieldsMap.get(rs.getInt("FieldID")));
+            }
+        }
+
         //get the score types
         rs = stat.executeQuery("select * from ProcessingNodeScores");
         while (rs.next()) {
@@ -392,6 +477,9 @@ public class Parser {
             Protein lProtein = null;
             if(iLowMemory){
                 lProtein = new Protein(rs.getInt("ProteinID"), this);
+                if(iMsfVersion == MsfVersion.VERSION1_3){
+                    lProtein.setMasterProtein(rs.getInt("IsMasterProtein"));
+                }
             } else {
                 lProtein = new Protein(rs.getInt("ProteinID"), rs.getString("Sequence"));
             }
@@ -409,7 +497,41 @@ public class Parser {
         rs = stat.executeQuery("select  * from  ProteinScores ");
         while (rs.next()) {
             if(iProteinsMap.get(rs.getInt("ProteinID")) != null){
-                iProteinsMap.get(rs.getInt("ProteinID")).setScore(rs.getDouble("ProteinScore"));
+                iProteinsMap.get(rs.getInt("ProteinID")).addScore(rs.getDouble("ProteinScore"), rs.getInt("ProcessingNodeNumber"), rs.getDouble("Coverage"));
+            }
+        }
+
+        if(iMsfVersion == MsfVersion.VERSION1_3){
+            //add the protein group to the protein
+            rs = stat.executeQuery("select  * from  ProteinsProteinGroups");
+            while (rs.next()) {
+                if(iProteinsMap.get(rs.getInt("ProteinID")) != null){
+                    iProteinsMap.get(rs.getInt("ProteinID")).setProteinGroupId(rs.getInt("ProteinGroupID"));
+                }
+            }
+
+            rs = stat.executeQuery("select  * from  PtmAnnotationData");
+            while (rs.next()) {
+                Protein.PtmAnnotation lAnno = new Protein.PtmAnnotation(rs.getInt("PtmUnimodID"), rs.getInt("Position"));
+                if(iProteinsMap.get(rs.getInt("ProteinID")) != null){
+                    iProteinsMap.get(rs.getInt("ProteinID")).addPtmAnnotation(lAnno);
+                }
+            }
+
+            //add the custom data fields to the proteins
+            rs = stat.executeQuery("select  * from  CustomDataProteins_Decoy ");
+            while (rs.next()) {
+                if(iProteinsMap.get(rs.getInt("ProteinID")) != null){
+                    iProteinsMap.get(rs.getInt("ProteinID")).addDecoyCustomDataField(rs.getInt("FieldID"),rs.getString("FieldValue"));
+                }
+            }
+
+            //add the decoy score to the protein
+            rs = stat.executeQuery("select  * from  ProteinScores_Decoy");
+            while (rs.next()) {
+                if(iProteinsMap.get(rs.getInt("ProteinID")) != null){
+                    iProteinsMap.get(rs.getInt("ProteinID")).addDecoyScore(rs.getDouble("ProteinScore"), rs.getInt("ProcessingNodeNumber"), rs.getDouble("Coverage"));
+                }
             }
         }
 
@@ -495,6 +617,21 @@ public class Parser {
             iProcessingNodes.add(lNode);
             iProcessingNodesMap.put(lNode.getProcessingNodeNumber(),lNode);
         }
+
+        if(iMsfVersion == MsfVersion.VERSION1_3){
+            //add the processing node Custom data fields
+            rs = stat.executeQuery("select * from CustomDataProcessingNodes");
+            while (rs.next()) {
+                if(iProcessingNodesMap.get(rs.getInt("ProcessingNodeNumber")) != null){
+                    iProcessingNodesMap.get(rs.getInt("ProcessingNodeNumber")).addCustomDataField(rs.getInt("FieldID"),rs.getString("FieldValue"));
+                }
+            }
+            rs = stat.executeQuery("select fieldid from CustomDataProcessingNodes group by fieldid");
+            while (rs.next()) {
+                iProcessingNodeUsedCustomDataFields.add(iCustomDataFieldsMap.get(rs.getInt("FieldID")));
+            }
+        }
+
         //add the processing node parameters to the processing node
         rs = stat.executeQuery("select * from ProcessingNodeParameters");
         while (rs.next()) {
@@ -504,24 +641,27 @@ public class Parser {
                 iProcessingNodesMap.get(lNodeParameter.getProcessingNodeNumber()).addProcessingNodeParameter(lNodeParameter);
             }
         }
-        //get the filters
-        rs = stat.executeQuery("select * from ResultFilterSet");
-        while (rs.next()) {
-            String lXml = rs.getString("ResultFilterSet");
-            String[] lXmlLines = lXml.split("\n");
-            String lFilterSetName = lXml.substring(lXml.indexOf("\"", lXml.indexOf("FilterSetName")) + 1,lXml.indexOf("\"", lXml.indexOf("\"", lXml.indexOf("FilterSetName")) + 1));
-            Vector<String> lFilterLines = new Vector<String>();
-            for(int i = 0; i<lXmlLines.length; i ++){
-                String lLine = lXmlLines[i].trim();
-                if(lLine.startsWith("<FilterInfo ")){
-                    lFilterLines.add(lLine);
-                }
-                if(lLine.startsWith("<Parameter ")){
-                    lFilterLines.add(lLine);
-                }
-                if(lLine.startsWith("</FilterInfo>")){
-                    iFilter.add(new Filter(lFilterSetName,lFilterLines));
-                    lFilterLines.removeAllElements();
+        if(iMsfVersion == MsfVersion.VERSION1_2){
+
+            //get the filters
+            rs = stat.executeQuery("select * from ResultFilterSet");
+            while (rs.next()) {
+                String lXml = rs.getString("ResultFilterSet");
+                String[] lXmlLines = lXml.split("\n");
+                String lFilterSetName = lXml.substring(lXml.indexOf("\"", lXml.indexOf("FilterSetName")) + 1,lXml.indexOf("\"", lXml.indexOf("\"", lXml.indexOf("FilterSetName")) + 1));
+                Vector<String> lFilterLines = new Vector<String>();
+                for(int i = 0; i<lXmlLines.length; i ++){
+                    String lLine = lXmlLines[i].trim();
+                    if(lLine.startsWith("<FilterInfo ")){
+                        lFilterLines.add(lLine);
+                    }
+                    if(lLine.startsWith("<Parameter ")){
+                        lFilterLines.add(lLine);
+                    }
+                    if(lLine.startsWith("</FilterInfo>")){
+                        iFilter.add(new Filter(lFilterSetName,lFilterLines));
+                        lFilterLines.removeAllElements();
+                    }
                 }
             }
         }
@@ -616,6 +756,18 @@ public class Parser {
             if(iPeptidesMap.get(rs.getInt("PeptideID")) != null){
                 if(iProteinsMap.get(rs.getInt("ProteinId")) != null){
                     iPeptidesMap.get(rs.getInt("PeptideID")).addProtein(iProteinsMap.get(rs.getInt("ProteinId")));
+                }
+            }
+        }
+
+        if(iMsfVersion == MsfVersion.VERSION1_3){
+            //add the proteins to the peptides
+            rs = stat.executeQuery("select * from  PeptidesProteins_Decoy");
+            while (rs.next()) {
+                if(iPeptidesDecoyMap.get(rs.getInt("PeptideID")) != null){
+                    if(iProteinsMap.get(rs.getInt("ProteinId")) != null){
+                        iPeptidesDecoyMap.get(rs.getInt("PeptideID")).addDecoyProtein(iProteinsMap.get(rs.getInt("ProteinId")));
+                    }
                 }
             }
         }

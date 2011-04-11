@@ -102,7 +102,16 @@ public class Peptide {
      * The processing node number
      */
     private int iProcessingNodeNumber;
-
+    /**
+     * Int that indicates if this peptide has a missed cleavage
+     * WORKS ONLY FROM PROTEOME DISCOVERER VERSION 1.3
+     */
+    private int iMissedCleavage;
+    /**
+     * The unique peptide sequence id
+     * WORKS ONLY FROM PROTEOME DISCOVERER VERSION 1.3
+     */
+    private int iUniquePeptideSequenceId;
     /**
      * Constructor for the peptide
      * @param iPeptideId The peptide id
@@ -592,5 +601,30 @@ public class Peptide {
      */
     public String toString(){
         return iSequence;
+    }
+
+    public void setMissedCleavage(int aMissedCleavage) {
+        this.iMissedCleavage = aMissedCleavage;
+    }
+
+    public void setUniquePeptideSequenceId(int aUniquePeptideSequenceId) {
+        this.iUniquePeptideSequenceId = aUniquePeptideSequenceId;
+    }
+
+    public int getMissedCleavage() {
+        return iMissedCleavage;
+    }
+
+    public int getUniquePeptideSequenceId() {
+        return iUniquePeptideSequenceId;
+    }
+
+    public void addDecoyProtein(Protein aProtein) {
+        iPeptideProteins.add(aProtein);
+        aProtein.addDecoyPeptide(this);
+    }
+
+    public void setAnnotation(String aAnnotation) {
+        this.iAnnotation = aAnnotation;
     }
 }

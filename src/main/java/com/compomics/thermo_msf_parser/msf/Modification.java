@@ -58,6 +58,16 @@ public class Modification {
      * The amino acids linked to this modification
      */
     private Vector<AminoAcid> iAttachedAminoAcids = new Vector<AminoAcid>();
+    /**
+     * The neutral losses attached to this amino acid
+     * Only works for Thermo Proteome Discoverer version 1.3
+     */
+    private Vector<NeutralLoss> iAttachedNeutralLosses = new Vector<NeutralLoss>();
+    /**
+     * The classification for the amino acid
+     * Only works for Thermo Proteome Discoverer version 1.3
+     */
+    private Vector<Integer> iAttachedClassifications = new Vector<Integer>();
 
     /**
      * The Modification constructor
@@ -91,7 +101,10 @@ public class Modification {
     public void addAminoAcid(AminoAcid lAa){
         this.iAttachedAminoAcids.add(lAa);
     }
-    
+
+    public void addNeutralLoss(NeutralLoss aNeutralLoss){
+        this.iAttachedNeutralLosses.add(aNeutralLoss);
+    }
     
     //getters
 
@@ -142,4 +155,9 @@ public class Modification {
     public Vector<AminoAcid> getAttachedAminoAcids() {
         return iAttachedAminoAcids;
     }
+
+    public void addClassificationForAminoAcid(int aClassification) {
+        this.iAttachedClassifications.add(aClassification);
+    }
+
 }
