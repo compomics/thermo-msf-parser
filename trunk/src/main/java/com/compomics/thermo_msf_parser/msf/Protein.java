@@ -34,13 +34,13 @@ public class Protein {
      */
     private HashMap<Integer, String> iCustomDataFieldValues = new HashMap<Integer,String>();
     /**
+     * HashMap with the custom data field values. The key is the id of the custom data field
+     */
+    private HashMap<Integer, String> iDecoyCustomDataFieldValues = new HashMap<Integer,String>();
+    /**
      * The compomics.util protein
      */
     private com.compomics.util.protein.Protein iUtilProtein;
-    /**
-     * The protein score
-     */
-    private double iScore;
     /**
      * The accession found by the compomics.util protein
      */
@@ -57,6 +57,49 @@ public class Protein {
      * The msf file parser
      */
     private Parser iParser;
+    /**
+     * Int that indicates if this protein is the master protein
+     * Only works for Thermo Proteome Discoverer version 1.3
+     */
+    private int iMasterProtein;
+    /**
+     * The protein groupid
+     * Only works for Thermo Proteome Discoverer version 1.3
+     */
+    private int iProteinGroupId;
+    /**
+     * The ptm annotations
+     * Only works for Thermo Proteome Discoverer version 1.3
+     */
+    private Vector<PtmAnnotation> iPtmAnnotation = new Vector<PtmAnnotation>();
+    /**
+     * A vector with the decoy peptides
+     */
+    private Vector<Peptide> iDecoyPeptides = new Vector<Peptide>();
+    /**
+     * A vector with the processing node number from the scores
+     */
+    private Vector<Integer> iScoresProcessingNumber = new Vector<Integer>();
+    /**
+     * A vector with the coverage
+     */
+    private Vector<Double> iCoverages = new Vector<Double>();
+    /**
+     * The protein score
+     */
+    private Vector<Double> iDecoyScores = new Vector<Double>();
+    /**
+     * A vector with the processing node number from the scores
+     */
+    private Vector<Integer> iDecoyScoresProcessingNumber = new Vector<Integer>();
+    /**
+     * A vector with the coverage
+     */
+    private Vector<Double> iDecoyCoverages = new Vector<Double>();
+    /**
+     * The protein score
+     */
+    private Vector<Double> iScores = new Vector<Double>();
 
 
     public Protein(int iProteinId, String iSequence) {
@@ -111,8 +154,13 @@ public class Protein {
         iCustomDataFieldValues.put(lId, lValue);
     }
 
-    public void setScore(double score) {
-        this.iScore = score;
+    /**
+     * This method will add a value in the decoy custom data field map by the id off the custom data field
+     * @param lId The custom data field id
+     * @param lValue The value to add
+     */
+    public void addDecoyCustomDataField(int lId, String lValue){
+        iDecoyCustomDataFieldValues.put(lId, lValue);
     }
 
     public void addPeptide(Peptide lPeptide) {
@@ -124,12 +172,13 @@ public class Protein {
         return iCustomDataFieldValues;
     }
 
-    public com.compomics.util.protein.Protein getUtilProtein() {
-        return iUtilProtein;
+
+    public HashMap<Integer, String> getDecoyCustomDataFieldValues() {
+        return iDecoyCustomDataFieldValues;
     }
 
-    public double getScore() {
-        return iScore;
+    public com.compomics.util.protein.Protein getUtilProtein() {
+        return iUtilProtein;
     }
 
     public String getUtilAccession() {
@@ -151,6 +200,60 @@ public class Protein {
 
     public Parser getParser() {
         return iParser;
+    }
+
+    public void setMasterProtein(int aMasterProtein) {
+        this.iMasterProtein = aMasterProtein;
+    }
+
+    public int getMasterProtein() {
+        return iMasterProtein;
+    }
+
+    public void setProteinGroupId(int aProteinGroupId){
+        this.iProteinGroupId = aProteinGroupId;
+    }
+
+    public int getProteinGroupId() {
+        return iProteinGroupId;
+    }
+
+    public void addPtmAnnotation(PtmAnnotation aPtmAnnotation) {
+        this.iPtmAnnotation.add(aPtmAnnotation);
+    }
+
+    public void addDecoyPeptide(Peptide aPeptide) {
+        this.iDecoyPeptides.add(aPeptide);
+    }
+
+    public void addScore(double aProteinScore, int aProcessingNodeNumber, double aCoverage) {
+        this.iScores.add(aProteinScore);
+        this.iScoresProcessingNumber.add(aProcessingNodeNumber);
+        this.iCoverages.add(aCoverage);
+    }
+
+    public void addDecoyScore(double aProteinScore, int aProcessingNodeNumber, double aCoverage) {
+        this.iScores.add(aProteinScore);
+        this.iScoresProcessingNumber.add(aProcessingNodeNumber);
+        this.iCoverages.add(aCoverage);
+    }
+
+    public static class PtmAnnotation{
+        public int iPtmUnimodId;
+        public int iPosition;
+
+        public PtmAnnotation(int aPtmUnimodId, int aPosition) {
+            iPtmUnimodId = aPtmUnimodId;
+            iPosition = aPosition;
+        }
+
+        public int getPtmUnimodId() {
+            return iPtmUnimodId;
+        }
+
+        public int getPosition() {
+            return iPosition;
+        }
     }
 }
 
