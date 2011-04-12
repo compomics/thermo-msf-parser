@@ -259,6 +259,24 @@
             <artifactId>utilities</artifactId>
             <version>3.0.52</version>
             <type>jar</type>
+            <exclusions>
+                <exclusion>
+                    <artifactId>looks</artifactId>
+                    <groupId>com.jgoodies</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>mascotdatfile</artifactId>
+                    <groupId>com.compomics</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>omssa-parser</artifactId>
+                    <groupId>de.proteinms.omxparser</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>xtandem-parser</artifactId>
+                    <groupId>de.proteinms.xtandemparser</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.compomics</groupId>
