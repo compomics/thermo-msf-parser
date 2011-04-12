@@ -170,6 +170,8 @@ public class Thermo_msf_parserGUI extends JFrame {
 
     /**
      * The constructor
+     *
+     * @param lStandAlone
      */
     public Thermo_msf_parserGUI(boolean lStandAlone) {
 
@@ -625,7 +627,7 @@ public class Thermo_msf_parserGUI extends JFrame {
                                     }
                                 }
 
-                                if (lRatioGroupCollection.size() == 0) {
+                                if (lRatioGroupCollection.isEmpty()) {
                                     //show gui
                                     JOptionPane.showMessageDialog(getFrame(), "No quantitative data could be found!\n The program will close.", "INFO", JOptionPane.INFORMATION_MESSAGE);
                                 }
@@ -1100,7 +1102,7 @@ public class Thermo_msf_parserGUI extends JFrame {
             chbHighConfident.setSelected(true);
             chbMediumConfident = new JCheckBox("Medium");
             chbMediumConfident.setSelected(true);
-            chbLowConfidence = new JCheckBox("Low");
+            chbLowConfidence = new JCheckBox("Low");  
         }
 
         //create holders for the different columns
@@ -1390,7 +1392,13 @@ public class Thermo_msf_parserGUI extends JFrame {
         jscollPeptides.setViewportView(jtablePeptides);
         TableRowSorter<TableModel> sorter = new TableRowSorter<TableModel>(jtablePeptideModel);
         jtablePeptides.setRowSorter(sorter);
-        jtablePeptides.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+
+        if (peptideInformationChb.isSelected()) {
+            jtablePeptides.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        } else {
+            jtablePeptides.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        }
+
         jtablePeptides.updateUI();
     }
 

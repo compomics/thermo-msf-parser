@@ -441,7 +441,7 @@ public class Spectrum {
             double lScore = iSelectedPeptide.getScoreByScoreType(scoreType);
             for (int i = 0; i < iPeptides.size(); i++) {
                 if (!iSelectedPeptide.getModifiedPeptide().equalsIgnoreCase(iPeptides.get(i).getModifiedPeptide())) {
-                    if (lScore < iPeptides.get(i).getScoreByScoreType(scoreType)) {
+                    if (lScore < iPeptides.get(i).getScoreByScoreType(scoreType)) { // @TODO: null pointer!!
                         lIsHighestScore = false;
                     }
                 }
@@ -458,7 +458,7 @@ public class Spectrum {
             double lScore = iSelectedPeptide.getScoreByScoreType(scoreType);
             for (int i = 0; i < iPeptides.size(); i++) {
                 if (!iSelectedPeptide.getModifiedPeptide().equalsIgnoreCase(iPeptides.get(i).getModifiedPeptide())) {
-                    if (lScore > iPeptides.get(i).getScoreByScoreType(scoreType)) {
+                    if (lScore > iPeptides.get(i).getScoreByScoreType(scoreType)) { // @TODO: null pointer!!
                         lIsLowestScore = false;
                     }
                 }
