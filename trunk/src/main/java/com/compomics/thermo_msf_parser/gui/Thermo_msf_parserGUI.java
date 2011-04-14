@@ -413,6 +413,7 @@ public class Thermo_msf_parserGUI extends JFrame {
         peptideInformationChb.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 createPeptideTable(iSelectedProtein);
+                jtablePeptides.updateUI();
             }
         });
         showAllPeptidesButton.addActionListener(new ActionListener() {
@@ -428,6 +429,7 @@ public class Thermo_msf_parserGUI extends JFrame {
                 }
                 filterDisplayedProteins();
                 proteinList.updateUI();
+                jtablePeptides.updateUI();
                 selectedProteinList.updateUI();
             }
         }
@@ -478,6 +480,8 @@ public class Thermo_msf_parserGUI extends JFrame {
                 filterDisplayedProteins();
                 proteinList.updateUI();
                 selectedProteinList.updateUI();
+                jtablePeptides.updateUI();
+
 
             }
         };
@@ -981,7 +985,6 @@ public class Thermo_msf_parserGUI extends JFrame {
                     proteinSequenceCoverageJEditorPane.setText("");
                     sequenceCoverageJLabel.setText("");
                     createPeptideTable(null);
-                    getFrame().update(getFrame().getGraphics());
                     iDisplayedProteins.removeAllElements();
                     iDisplayedProteinsOfInterest.removeAllElements();
                     for (int i = 0; i < iProteins.size(); i++) {
@@ -1420,7 +1423,6 @@ public class Thermo_msf_parserGUI extends JFrame {
             jtablePeptides.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
         }
 
-        jtablePeptides.updateUI();
     }
 
     /**
@@ -3182,6 +3184,8 @@ public class Thermo_msf_parserGUI extends JFrame {
         }
         createPeptideTable(iSelectedProtein);
         formatProteinSequence(iSelectedProtein);
+        jtablePeptides.updateUI();
+
     }
 
     /**
