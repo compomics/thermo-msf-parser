@@ -352,6 +352,20 @@ public class Peptide {
     }
 
     /**
+     * Getter for the main score
+     * @return double with the score
+     */
+    public Double getMainScore(){
+        Double lScore = null;
+        for(int i = 0; i<iScoreTypes.size(); i ++){
+            if(iScoreTypes.get(i).getIsMainScore() == 1){
+                lScore = iScores.get(i);
+            }
+        }
+        return lScore;
+    }
+
+    /**
      * This method will add a score (with a specific score type id) to this peptide
      * @param iScore double with the score
      * @param iScoreTypeid the score type id the added score

@@ -435,35 +435,57 @@ public class Spectrum {
 
     }
 
-    public boolean isHighestScoring(Peptide iSelectedPeptide, ScoreType scoreType) {
-        boolean lIsHighestScore = true;
-        if (iSelectedPeptide.getScoreByScoreType(scoreType) != null) {
-            double lScore = iSelectedPeptide.getScoreByScoreType(scoreType);
-            for (int i = 0; i < iPeptides.size(); i++) {
-                if (!iSelectedPeptide.getModifiedPeptide().equalsIgnoreCase(iPeptides.get(i).getModifiedPeptide())) {
-                    if (lScore < iPeptides.get(i).getScoreByScoreType(scoreType)) { // @TODO: null pointer!!
-                        lIsHighestScore = false;
+    public boolean isHighestScoring(Peptide iSelectedPeptide, Vector<ScoreType> scoreTypes) {
+        Boolean lIsHighestScore = null;
+        for(int l = 0; l<scoreTypes.size(); l++){
+            if (iSelectedPeptide.getScoreByScoreType(scoreTypes.get(l)) != null) {
+                Double lScore = iSelectedPeptide.getScoreByScoreType(scoreTypes.get(l));
+                if(lIsHighestScore == null){
+                    lIsHighestScore = true;
+                }
+                if(lScore != null){
+                    for (int i = 0; i < iPeptides.size(); i++) {
+                        if (!iSelectedPeptide.getModifiedPeptide().equalsIgnoreCase(iPeptides.get(i).getModifiedPeptide())) {
+                            Double lCompareScore = iPeptides.get(i).getScoreByScoreType(scoreTypes.get(l));
+                            if(lCompareScore != null){
+                                if (lScore < lCompareScore) {
+                                    lIsHighestScore = false;
+                                }
+                            }
+                        }
                     }
                 }
             }
-        } else {
+        }
+        if(lIsHighestScore == null){
             lIsHighestScore = false;
         }
         return lIsHighestScore;
     }
 
-    public boolean isLowestScoring(Peptide iSelectedPeptide, ScoreType scoreType) {
-        boolean lIsLowestScore = true;
-        if (iSelectedPeptide.getScoreByScoreType(scoreType) != null) {
-            double lScore = iSelectedPeptide.getScoreByScoreType(scoreType);
-            for (int i = 0; i < iPeptides.size(); i++) {
-                if (!iSelectedPeptide.getModifiedPeptide().equalsIgnoreCase(iPeptides.get(i).getModifiedPeptide())) {
-                    if (lScore > iPeptides.get(i).getScoreByScoreType(scoreType)) { // @TODO: null pointer!!
-                        lIsLowestScore = false;
+    public boolean isLowestScoring(Peptide iSelectedPeptide, Vector<ScoreType> scoreTypes) {
+        Boolean lIsLowestScore = null;
+        for(int i = 0; i<scoreTypes.size(); i ++){
+            if (iSelectedPeptide.getScoreByScoreType(scoreTypes.get(i)) != null) {
+                Double lScore = iSelectedPeptide.getScoreByScoreType(scoreTypes.get(i));
+                if(lIsLowestScore == null){
+                    lIsLowestScore = true;
+                }
+                if(lScore != null){
+                    for (int j = 0; j < iPeptides.size(); j++) {
+                        if (!iSelectedPeptide.getModifiedPeptide().equalsIgnoreCase(iPeptides.get(j).getModifiedPeptide())) {
+                            Double lCompareScore = iPeptides.get(j).getScoreByScoreType(scoreTypes.get(j));
+                            if(lCompareScore != null){
+                                if (lScore > lCompareScore) {
+                                    lIsLowestScore = false;
+                                }
+                            }
+                        }
                     }
                 }
             }
-        } else {
+        }
+        if(lIsLowestScore == null){
             lIsLowestScore = false;
         }
         return lIsLowestScore;
