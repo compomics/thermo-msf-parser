@@ -30,6 +30,7 @@ import com.intellij.uiDesigner.core.GridLayoutManager;
 import com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel;
 import no.uib.jsparklines.renderers.JSparklinesIntegerColorTableCellRenderer;
 import no.uib.jsparklines.renderers.JSparklinesBarChartTableCellRenderer;
+import no.uib.jsparklines.renderers.JSparklinesIntervalChartTableCellRenderer;
 import no.uib.jsparklines.renderers.util.GradientColorCoding;
 import org.jfree.chart.plot.PlotOrientation;
 
@@ -1326,8 +1327,10 @@ public class Thermo_msf_parserGUI extends JFrame {
             }
         }
         lLowRT = lLowRT - 1.0;
+        double widthOfMarker = (lHighRT/lLowRT)/4;
 
-        JSparklinesBarChartTableCellRenderer lRTCellRenderer = new JSparklinesBarChartTableCellRenderer(PlotOrientation.HORIZONTAL, lLowRT, lHighRT, Color.YELLOW, Color.BLUE);
+        JSparklinesIntervalChartTableCellRenderer lRTCellRenderer = new JSparklinesIntervalChartTableCellRenderer(
+                PlotOrientation.HORIZONTAL, lLowRT - widthOfMarker/2, lHighRT + widthOfMarker/2, widthOfMarker, Color.YELLOW, Color.BLUE);
         jtablePeptides.getColumn("Retention Time").setCellRenderer(lRTCellRenderer);
         lRTCellRenderer.showNumberAndChart(true, 50);
 
