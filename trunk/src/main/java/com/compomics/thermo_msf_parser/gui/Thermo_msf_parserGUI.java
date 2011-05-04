@@ -20,6 +20,7 @@ import com.compomics.thermo_msf_parser.msf.proteinsorter.ProteinSorterByAccessio
 import com.compomics.thermo_msf_parser.msf.proteinsorter.ProteinSorterByNumberOfPeptides;
 import com.compomics.util.Util;
 import com.compomics.util.experiment.biology.ions.PeptideFragmentIon;
+import com.compomics.util.gui.UtilitiesGUIDefaults;
 import com.compomics.util.gui.protein.ProteinSequencePane;
 import com.compomics.util.gui.spectrum.ChromatogramPanel;
 import com.compomics.util.gui.spectrum.DefaultSpectrumAnnotation;
@@ -27,7 +28,6 @@ import com.compomics.util.gui.spectrum.ReferenceArea;
 import com.compomics.util.gui.spectrum.SpectrumPanel;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
-import com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel;
 import no.uib.jsparklines.renderers.JSparklinesIntegerColorTableCellRenderer;
 import no.uib.jsparklines.renderers.JSparklinesBarChartTableCellRenderer;
 import no.uib.jsparklines.renderers.JSparklinesIntervalChartTableCellRenderer;
@@ -2954,11 +2954,7 @@ public class Thermo_msf_parserGUI extends JFrame {
      * @param args no arguments are expected
      */
     public static void main(String[] args) {
-        try {
-            UIManager.setLookAndFeel(new NimbusLookAndFeel());
-        } catch (UnsupportedLookAndFeelException e) {
-            // ignore exception
-        }
+        UtilitiesGUIDefaults.setLookAndFeel();
         new Thermo_msf_parserGUI(true);
     }
 
