@@ -1,8 +1,6 @@
 package com.compomics.thermo_msf_parser.gui;
 
-import com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel;
-
-import javax.swing.*;
+import com.compomics.util.gui.UtilitiesGUIDefaults;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,11 +18,7 @@ public class ParserStarter {
      * Starts the launcher by calling the launch method. Use this as the main class in the jar file.
      */
     public ParserStarter() {
-        try {
-            UIManager.setLookAndFeel(new NimbusLookAndFeel());
-        } catch (UnsupportedLookAndFeelException e) {
-            // ignore exception
-        }
+        UtilitiesGUIDefaults.setLookAndFeel();
 
         try {
             launch();
@@ -39,7 +33,6 @@ public class ParserStarter {
      * @throws java.lang.Exception
      */
     private void launch() throws Exception {
-
 
         /**
          * The name of the thermo_msf_parser jar file. Must be equal to the name
@@ -58,7 +51,6 @@ public class ParserStarter {
 
         // Get Java vm options.
         String options = getJava();
-
 
         String quote = "";
         if (System.getProperty("os.name").lastIndexOf("Windows") != -1) {
@@ -138,5 +130,4 @@ public class ParserStarter {
     public static void main(String[] args) {
         new ParserStarter();
     }
-
 }
