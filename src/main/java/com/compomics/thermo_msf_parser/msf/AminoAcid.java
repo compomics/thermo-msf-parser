@@ -1,5 +1,7 @@
 package com.compomics.thermo_msf_parser.msf;
 
+import org.apache.log4j.Logger;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Niklaas
@@ -11,6 +13,8 @@ package com.compomics.thermo_msf_parser.msf;
  * This class represents an amino acid
  */
 public class AminoAcid {
+	// Class specific log4j logger for AminoAcid instances.
+	 private static Logger logger = Logger.getLogger(AminoAcid.class);
     /**
      * The amino acid id
      */

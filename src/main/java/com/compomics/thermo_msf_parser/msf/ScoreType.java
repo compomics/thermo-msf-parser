@@ -1,5 +1,7 @@
 package com.compomics.thermo_msf_parser.msf;
 
+import org.apache.log4j.Logger;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Niklaas
@@ -7,6 +9,8 @@ package com.compomics.thermo_msf_parser.msf;
  * Time: 13:46:17
  */
 public class ScoreType {
+    // Class specific log4j logger for Thermo_msf_parserGUI instances.
+	 private static Logger logger = Logger.getLogger(ScoreType.class);
     /**
      * The score type id
      */

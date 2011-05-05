@@ -1,6 +1,8 @@
 package com.compomics.thermo_msf_parser.msf;
 
 
+import org.apache.log4j.Logger;
+
 import java.io.*;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -18,7 +20,8 @@ import java.util.zip.ZipInputStream;
  * Time: 11:33:33
  */
 public class Spectrum {
-
+    // Class specific log4j logger for Thermo_msf_parserGUI instances.
+	 private static Logger logger = Logger.getLogger(Spectrum.class);
     /**
      * The spectrum id
      */

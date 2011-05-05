@@ -1,5 +1,7 @@
 package com.compomics.thermo_msf_parser.msf;
 
+import org.apache.log4j.Logger;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Niklaas
@@ -8,6 +10,8 @@ package com.compomics.thermo_msf_parser.msf;
  * To change this template use File | Settings | File Templates.
  */
 public class ModificationPosition {
+    // Class specific log4j logger for Thermo_msf_parserGUI instances.
+	 private static Logger logger = Logger.getLogger(ModificationPosition.class);
     /**
      * The position
      */

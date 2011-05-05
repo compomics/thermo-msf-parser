@@ -1,5 +1,7 @@
 package com.compomics.thermo_msf_parser.msf;
 
+import org.apache.log4j.Logger;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,6 +19,8 @@ import java.util.Vector;
  * This class represent an event
  */
 public class Event {
+    // Class specific log4j logger for Thermo_msf_parserGUI instances.
+	 private static Logger logger = Logger.getLogger(Event.class);
     /**
      * The event id
      */

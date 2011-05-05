@@ -1,9 +1,16 @@
 package com.compomics.thermo_msf_parser.gui;
 
 import com.compomics.util.gui.UtilitiesGUIDefaults;
+import org.apache.log4j.Logger;
+
+import com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel;
+
+import javax.swing.*;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import com.google.common.io.Resources;
 
 /**
  * Created by IntelliJ IDEA.
@@ -12,6 +19,8 @@ import java.io.InputStream;
  * Time: 14:31:09
  */
 public class ParserStarter {
+	// Class specific log4j logger for ParserStarter instances.
+	 private static Logger logger = Logger.getLogger(ParserStarter.class);
 
 
     /**
@@ -23,6 +32,7 @@ public class ParserStarter {
         try {
             launch();
         } catch (Exception e) {
+            System.out.println("Problem launching the application! :-(");
             System.err.println(e.getMessage());
         }
     }
@@ -112,8 +122,12 @@ public class ParserStarter {
         java.util.Properties p = new java.util.Properties();
 
         try {
-            InputStream is = this.getClass().getClassLoader().getResourceAsStream("thermo_msf_parser.properties");
-            p.load( is );
+            String lLocation = Resources.getResource("thermo_msf_parser.properties").toString();
+            lLocation = lLocation.substring(10);
+            lLocation = lLocation.substring(0,lLocation.indexOf("thermo_msf_parser-" + getVersion()));
+            lLocation = lLocation + "thermo_msf_parser-" + getVersion() + System.getProperties().getProperty("file.separator") + "java.properties";
+            InputStream is = new FileInputStream(lLocation);
+            p.load(is);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -130,4 +144,5 @@ public class ParserStarter {
     public static void main(String[] args) {
         new ParserStarter();
     }
+
 }

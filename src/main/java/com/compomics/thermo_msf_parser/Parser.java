@@ -1,6 +1,7 @@
 package com.compomics.thermo_msf_parser;
 
 import com.compomics.thermo_msf_parser.msf.*;
+import org.apache.log4j.Logger;
 
 import java.sql.*;
 import java.util.Collection;
@@ -200,6 +201,10 @@ public class Parser {
      * The version of the msf file
      */
     private MsfVersion iMsfVersion;
+    /**
+     * The quantification method name
+     */
+    private String iQuantificationMethodName;
 
     /**
      * This will parse the thermo msf file
@@ -865,6 +870,9 @@ public class Parser {
 
         for(int i = 0; i<lLines.length; i ++){
             String lLine = lLines[i].trim();
+            if(lLine.startsWith("<processingMethod")){
+                iQuantificationMethodName = lLine.substring(lLine.indexOf(lLine.indexOf("name=\"") + 6, lLine.indexOf("\"", lLine.indexOf("name=\"") + 6)));
+            }
             if(lLine.endsWith("selected=\"QuanLabels\">")){
                 //we have a component
                 String lComponent = lLine.substring(lLine.indexOf("name=\"") + 6, lLine.indexOf("\"", lLine.indexOf("name=\"") + 6));
@@ -1194,5 +1202,9 @@ public class Parser {
     public String getFileName(){
         String lSub = iFilePath.substring(iFilePath.lastIndexOf(System.getProperties().getProperty("file.separator"))+1);
         return lSub;
+    }
+
+    public String getQuantificationMethodName() {
+        return iQuantificationMethodName;
     }
 }
