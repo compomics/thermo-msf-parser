@@ -7,11 +7,14 @@ package com.compomics.thermo_msf_parser.msf;
  * Time: 10:11:01
  */
 
+import org.apache.log4j.Logger;
+
 /**
  * This class represent the enzyme
  */
 public class Enzyme {
-
+    // Class specific log4j logger for Thermo_msf_parserGUI instances.
+	 private static Logger logger = Logger.getLogger(Enzyme.class);
     /**
      * The enzyme id
      */

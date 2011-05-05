@@ -1,6 +1,7 @@
 package com.compomics.thermo_msf_parser.msf;
 
 import com.compomics.util.experiment.biology.ions.PeptideFragmentIon;
+import org.apache.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Vector;
@@ -12,7 +13,8 @@ import java.util.Vector;
  * Time: 09:17:23
  */
 public class Peptide {
-
+    // Class specific log4j logger for Thermo_msf_parserGUI instances.
+	 private static Logger logger = Logger.getLogger(Peptide.class);
     /**
      * The peptide id
      */

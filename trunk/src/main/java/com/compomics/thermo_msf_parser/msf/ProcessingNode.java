@@ -1,5 +1,7 @@
 package com.compomics.thermo_msf_parser.msf;
 
+import org.apache.log4j.Logger;
+
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -11,8 +13,8 @@ import java.util.Vector;
  * To change this template use File | Settings | File Templates.
  */
 public class ProcessingNode {
-
-
+    // Class specific log4j logger for Thermo_msf_parserGUI instances.
+	 private static Logger logger = Logger.getLogger(ProcessingNode.class);
     /**
      * The processing node number
      */

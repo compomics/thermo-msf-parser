@@ -7,10 +7,14 @@ package com.compomics.thermo_msf_parser.msf;
  * Time: 11:18:48
  */
 
+import org.apache.log4j.Logger;
+
 /**
  * This class represents the event annotation
  */
 public class EventAnnotation {
+    // Class specific log4j logger for Thermo_msf_parserGUI instances.
+	 private static Logger logger = Logger.getLogger(EventAnnotation.class);
     /**
      * The event id
      */

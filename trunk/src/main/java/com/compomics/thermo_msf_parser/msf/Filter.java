@@ -1,5 +1,7 @@
 package com.compomics.thermo_msf_parser.msf;
 
+import org.apache.log4j.Logger;
+
 import java.util.Vector;
 
 /**
@@ -9,7 +11,8 @@ import java.util.Vector;
  * Time: 09:32:57
  */
 public class Filter {
-
+    // Class specific log4j logger for Thermo_msf_parserGUI instances.
+	 private static Logger logger = Logger.getLogger(Filter.class);
     /**
      * The filter name
      */

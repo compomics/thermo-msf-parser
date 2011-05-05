@@ -10,7 +10,11 @@
 
     <!-- Set the version number for the whole project -->
     <properties>
-        <version.number>0.4.1</version.number>
+        <version.number>0.4.2</version.number>
+        <logging.level.default>ALL</logging.level.default>
+        <logging.file.path.name>thermo-msf-parser-log4j.log</logging.file.path.name>
+        <logging.file.max.size>5000KB</logging.file.max.size>
+        <logging.pattern>[%d{dd-MMM-yyyy HH:mm:ss} - %p] "%m" (%C:%L)%n</logging.pattern>
     </properties>
 
     <!-- Licence -->
@@ -24,10 +28,18 @@
    <!-- Build -->
     <build>
 
-        <!-- Copy the resources required during building -->
+        <!-- Copy the resources required during building-->
         <resources>
             <resource>
                 <directory>src/main/resources/</directory>
+                <includes>
+                    <include>*.png</include>
+                    <include>*.properties</include>
+                </includes>
+                <filtering>true</filtering>
+            </resource>
+            <resource>
+                <directory>./</directory>
                 <includes>
                     <include>thermo_msf_parser.properties</include>
                     <include>icon.png</include>
@@ -39,7 +51,7 @@
         <!-- Plugins -->
         <plugins>
 
-            <!-- Compiler plugin -->
+            <!-- Compiler plugin-->
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
@@ -104,6 +116,9 @@
                             <resources>
                                 <resource>
                                     <directory>src/main/resources</directory>
+                                    <includes>
+                                        <include>icon.png</include>
+                                    </includes>
                                     <filtering>true</filtering>
                                 </resource>
                             </resources>
@@ -158,7 +173,7 @@
                 </executions>
             </plugin>
 
-                        <!-- Resources plugin - copy modification conversion. -->
+                        <!-- Resources plugin - copy properties file. -->
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>2.3</version>
@@ -170,13 +185,12 @@
                             <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/thermo_msf_parser-${project.version}/resources
-                            </outputDirectory>
+                            <outputDirectory>${project.build.directory}/thermo_msf_parser-${project.version}</outputDirectory>
                             <resources>
                                 <resource>
-                                    <directory>src/main/resources</directory>
+                                    <directory>/</directory>
                                     <includes>
-                                        <include>*.properties</include>
+                                        <include>java.properties</include>
                                     </includes>
                                     <filtering>true</filtering>
                                 </resource>
@@ -231,7 +245,6 @@
             <url>http://genesis.UGent.be/maven</url>
             <layout>legacy</layout>
         </repository>
-
         <!-- UGent Genesis Maven 2 repository -->
         <repository>
             <id>genesis-maven2-repository</id>
@@ -251,13 +264,10 @@
             <version>3.6.16</version>
         </dependency>
 
-
-        <!-- This project depends on the utilities JAR file.
-          -->
         <dependency>
             <groupId>com.compomics</groupId>
             <artifactId>utilities</artifactId>
-            <version>3.0.57</version>
+            <version>3.0.58</version>
             <type>jar</type>
             <exclusions>
                 <exclusion>
@@ -274,6 +284,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
         <dependency>
             <groupId>com.compomics</groupId>
             <artifactId>rover</artifactId>
@@ -282,11 +293,16 @@
         </dependency>
 
         <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>r08</version>
+        </dependency>
+
+        <dependency>
             <groupId>no.uib</groupId>
             <artifactId>jsparklines</artifactId>
             <version>0.5.8</version>
         </dependency>
-
     </dependencies>
 
     <distributionManagement>

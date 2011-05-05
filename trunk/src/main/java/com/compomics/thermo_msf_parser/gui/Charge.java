@@ -1,5 +1,7 @@
 package com.compomics.thermo_msf_parser.gui;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.util.experiment.personalization.UrParameter;
 
 /**
@@ -9,6 +11,8 @@ import com.compomics.util.experiment.personalization.UrParameter;
  * @author Harald Barsnes
  */
 public class Charge implements UrParameter {
+	// Class specific log4j logger for Charge instances.
+	 private static Logger logger = Logger.getLogger(Charge.class);
 
     /**
      * The charge as an int.

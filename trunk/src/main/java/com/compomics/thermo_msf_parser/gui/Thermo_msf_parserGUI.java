@@ -1,5 +1,7 @@
 package com.compomics.thermo_msf_parser.gui;
 
+import org.apache.log4j.Logger;
+
 import com.compomics.rover.general.enumeration.ReferenceSetEnum;
 import com.compomics.rover.general.enumeration.RoverSource;
 import com.compomics.rover.general.fileio.readers.MsfReader;
@@ -26,8 +28,6 @@ import com.compomics.util.gui.spectrum.ChromatogramPanel;
 import com.compomics.util.gui.spectrum.DefaultSpectrumAnnotation;
 import com.compomics.util.gui.spectrum.ReferenceArea;
 import com.compomics.util.gui.spectrum.SpectrumPanel;
-import com.intellij.uiDesigner.core.GridConstraints;
-import com.intellij.uiDesigner.core.GridLayoutManager;
 import no.uib.jsparklines.renderers.JSparklinesIntegerColorTableCellRenderer;
 import no.uib.jsparklines.renderers.JSparklinesBarChartTableCellRenderer;
 import no.uib.jsparklines.renderers.JSparklinesIntervalChartTableCellRenderer;
@@ -53,6 +53,8 @@ import java.util.*;
  * Time: 08:01:12
  */
 public class Thermo_msf_parserGUI extends JFrame {
+    // Class specific log4j logger for Thermo_msf_parserGUI instances.
+    private static Logger logger = Logger.getLogger(Thermo_msf_parserGUI.class);
     //gui elements
     private JPanel jpanContent;
     private JTabbedPane jtabpanSpectrum;
@@ -196,7 +198,9 @@ public class Thermo_msf_parserGUI extends JFrame {
         onlyLowestScoringRadioButton = new JRadioButton();
         allRadioButton = new JRadioButton();
         proteinList = new JList(iDisplayedProteins);
+        proteinList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         selectedProteinList = new JList(iDisplayedProteinsOfInterest);
+        selectedProteinList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         $$$setupUI$$$();
 
         // Create the menu bar
@@ -228,7 +232,6 @@ public class Thermo_msf_parserGUI extends JFrame {
         final JMenuItem item = new JMenuItem("Export peptides as csv");
         item.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Export peptides csv"); // @TODO: remove??
                 //open file chooser
                 final String lPath;
                 JFileChooser fc = new JFileChooser();
@@ -271,7 +274,7 @@ public class Thermo_msf_parserGUI extends JFrame {
                             out.flush();
                             out.close();
                         } catch (IOException e1) {
-                            e1.printStackTrace();
+                            logger.info(e1);
                             JOptionPane.showMessageDialog(new JFrame(), "There was a problem saving your data!", "Problem saving", JOptionPane.ERROR_MESSAGE);
                         }
 
@@ -358,7 +361,7 @@ public class Thermo_msf_parserGUI extends JFrame {
                             out.flush();
                             out.close();
                         } catch (Exception e1) {
-                            e1.printStackTrace();
+                            logger.info(e1);
                             progressBar.setVisible(false);
                             JOptionPane.showMessageDialog(new JFrame(), "There was a problem saving your data!", "Problem saving", JOptionPane.ERROR_MESSAGE);
                         }
@@ -576,7 +579,7 @@ public class Thermo_msf_parserGUI extends JFrame {
                                     try {
                                         lMsfFiles.add(new MsfReader(iParsedMsfs.get(i), iParsedMsfs.get(i).getFileName(), lConfidenceLevel, onlyHighestScoringRadioButton.isSelected(), onlyLowestScoringRadioButton.isSelected()));
                                     } catch (Exception e) {
-                                        e.printStackTrace();
+                                        logger.info(e);
                                     }
 
                                     //update progress bar
@@ -763,7 +766,7 @@ public class Thermo_msf_parserGUI extends JFrame {
 
 
                         } catch (Exception e1) {
-                            e1.printStackTrace();
+                            logger.info(e1);
                             progressBar.setVisible(false);
                         }
                         return true;
@@ -791,7 +794,7 @@ public class Thermo_msf_parserGUI extends JFrame {
             try {
                 iParsedMsfs.get(i).getConnection().close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                logger.info(e);
             }
         }
         if (iStandAlone) {
@@ -817,7 +820,7 @@ public class Thermo_msf_parserGUI extends JFrame {
                             try {
                                 iParsedMsfs.get(i).getConnection().close();
                             } catch (SQLException e) {
-                                e.printStackTrace();
+                                logger.info(e);
                             }
                         }
 
@@ -893,10 +896,10 @@ public class Thermo_msf_parserGUI extends JFrame {
                             //progressBar.updateUI();
                             iParsedMsfs.add(new Parser(iMsfFileLocations.get(i), true));
                         } catch (SQLException e) {
-                            e.printStackTrace();
+                            logger.info(e);
                             iParsedMsfs.add(null);
                         } catch (ClassNotFoundException e) {
-                            e.printStackTrace();
+                            logger.info(e);
                             iParsedMsfs.add(null);
                         }
                         System.gc();
@@ -1002,7 +1005,7 @@ public class Thermo_msf_parserGUI extends JFrame {
 
                 } catch (Exception e1) {
                     lLoaded = false;
-                    e1.printStackTrace();
+                    logger.info(e1);
                     progressBar.setVisible(false);
                     JOptionPane.showMessageDialog(new JFrame(), "There was a problem loading your data!", "Problem loading", JOptionPane.ERROR_MESSAGE);
                 }
@@ -1327,10 +1330,10 @@ public class Thermo_msf_parserGUI extends JFrame {
             }
         }
         lLowRT = lLowRT - 1.0;
-        double widthOfMarker = (lHighRT/lLowRT)/4;
+        double widthOfMarker = (lHighRT / lLowRT) / 4;
 
         JSparklinesIntervalChartTableCellRenderer lRTCellRenderer = new JSparklinesIntervalChartTableCellRenderer(
-                PlotOrientation.HORIZONTAL, lLowRT - widthOfMarker/2, lHighRT + widthOfMarker/2, widthOfMarker, Color.YELLOW, Color.BLUE);
+                PlotOrientation.HORIZONTAL, lLowRT - widthOfMarker / 2, lHighRT + widthOfMarker / 2, widthOfMarker, Color.YELLOW, Color.BLUE);
         jtablePeptides.getColumn("Retention Time").setCellRenderer(lRTCellRenderer);
         lRTCellRenderer.showNumberAndChart(true, 50);
 
@@ -1456,17 +1459,23 @@ public class Thermo_msf_parserGUI extends JFrame {
     private void $$$setupUI$$$() {
         createUIComponents();
         contentPane = new JPanel();
-        contentPane.setLayout(new GridLayoutManager(1, 1, new Insets(0, 0, 0, 0), -1, -1));
+        contentPane.setLayout(new GridBagLayout());
         jSuperTabbedPane = new JTabbedPane();
         jSuperTabbedPane.setTabLayoutPolicy(0);
         jSuperTabbedPane.setTabPlacement(3);
-        contentPane.add(jSuperTabbedPane, new GridConstraints(0, 0, 1, 1, GridConstraints.ANCHOR_CENTER, GridConstraints.FILL_BOTH, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, GridConstraints.SIZEPOLICY_CAN_SHRINK | GridConstraints.SIZEPOLICY_WANT_GROW, null, new Dimension(200, 200), null, 0, false));
+        GridBagConstraints gbc;
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        contentPane.add(jSuperTabbedPane, gbc);
         final JPanel panel1 = new JPanel();
         panel1.setLayout(new GridBagLayout());
         jSuperTabbedPane.addTab("Thermo MSF Viewer", panel1);
         jpanContent = new JPanel();
         jpanContent.setLayout(new GridBagLayout());
-        GridBagConstraints gbc;
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -1925,7 +1934,7 @@ public class Thermo_msf_parserGUI extends JFrame {
         gbc.insets = new Insets(5, 5, 5, 5);
         panel8.add(jbuttonNumberSort, gbc);
         lblProteinOfIntersest = new JLabel();
-        lblProteinOfIntersest.setText("Proteins of interest");
+        lblProteinOfIntersest.setText("Matching protein(s)");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 2;
@@ -2404,7 +2413,7 @@ public class Thermo_msf_parserGUI extends JFrame {
             InputStream is = this.getClass().getClassLoader().getResourceAsStream("thermo_msf_parser.properties");
             p.load(is);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.info(e);
         }
 
         return p.getProperty("version");
@@ -2435,7 +2444,7 @@ public class Thermo_msf_parserGUI extends JFrame {
         try {
             lCleanProteinSequence = lProtein.getSequence();
         } catch (SQLException e) {
-            System.out.println("Protein sequence not found");
+            logger.info(e);
             return;
             //e.printStackTrace();
         }
@@ -2743,7 +2752,7 @@ public class Thermo_msf_parserGUI extends JFrame {
 
 
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        logger.info(e);
                     }
                 } else {
                     jtabpanLower.remove(jtabChromatogram);
@@ -2889,7 +2898,7 @@ public class Thermo_msf_parserGUI extends JFrame {
                             this.jpanQuantitationSpectrum.repaint();
                         }
                     } catch (SQLException e) {
-                        e.printStackTrace();
+                        logger.info(e);
                     }
                 } else {
                     jtabpanLower.remove(jpanQuantificationSpectrumHolder);
@@ -2908,9 +2917,9 @@ public class Thermo_msf_parserGUI extends JFrame {
                 }
 
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.info(e);
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.info(e);
             }
 
         } else {

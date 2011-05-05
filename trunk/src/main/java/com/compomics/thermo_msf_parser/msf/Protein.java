@@ -1,6 +1,7 @@
 package com.compomics.thermo_msf_parser.msf;
 
 import com.compomics.thermo_msf_parser.Parser;
+import org.apache.log4j.Logger;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,7 +17,8 @@ import java.util.Vector;
  * To change this template use File | Settings | File Templates.
  */
 public class Protein {
-
+    // Class specific log4j logger for Thermo_msf_parserGUI instances.
+	 private static Logger logger = Logger.getLogger(Protein.class);
     /**
      * The protein id
      */

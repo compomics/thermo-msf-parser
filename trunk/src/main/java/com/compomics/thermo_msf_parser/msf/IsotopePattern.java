@@ -1,5 +1,7 @@
 package com.compomics.thermo_msf_parser.msf;
 
+import org.apache.log4j.Logger;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Vector;
@@ -15,7 +17,8 @@ import java.util.Vector;
  * This class represents the isotope pattern with event annotations attached to it
  */
 public class IsotopePattern {
-
+    // Class specific log4j logger for Thermo_msf_parserGUI instances.
+	 private static Logger logger = Logger.getLogger(IsotopePattern.class);
     /**
      * The isotope pattern id
      */

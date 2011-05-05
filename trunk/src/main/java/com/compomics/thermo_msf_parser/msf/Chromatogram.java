@@ -1,5 +1,7 @@
 package com.compomics.thermo_msf_parser.msf;
 
+import org.apache.log4j.Logger;
+
 import java.io.*;
 import java.util.Vector;
 import java.util.zip.ZipEntry;
@@ -16,7 +18,8 @@ import java.util.zip.ZipInputStream;
  * This class represents a chromatogram
  */
 public class Chromatogram {
-
+    // Class specific log4j logger for Thermo_msf_parserGUI instances.
+	 private static Logger logger = Logger.getLogger(Chromatogram.class);
 
     /**
      * The raw file id
