@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<HTML>
+    <HEAD>
+        <TITLE></TITLE>
+    </HEAD>
+    <BODY>
+        <a name="#top"/>
+        <H2>Thermo-msf-parserGUI</H2>
+        This program is able to parse and to display the information found in <i>msf</i> files created by Thermo's Proteome
+        Discoverer (V1.2 and V1.3 Beta).
+
+        <br><br>
+        <ul>
+            <li><b>Protein list</b>: <i>Upper left side of the screen</i> This list displays all the protein found in all the selected <i>msf</i> files. If a protein is clicked
+            the peptides linked to the protein are displayed in the peptide table.</li>
+            <br>
+            <li><b>A->Z</b>: <i>Sort alphabetically</i> This button will sort the proteins in the protein list alphabetically</li>
+            <br>
+            <li><b>1->20</b>: <i>Sort by peptide count</i> This button will sort the proteins in the protein list by the number of peptides linked to the proteins</li>
+            <br>
+            <li><b>Show all</b>: <i>Restore protein/peptide selection</i> This button will deselect the selected peptide and protein. All the peptides found in the <i>msf</i> files are shown in the peptide table.</li>
+            <br>
+            <li><b>Peptide Table</b>: This table shows information for every identified spectrum. If a peptide is selected the MS, MS/MS, quantification spectra are shown (if requested, see below). Also the selected peptide is annotated in the protein coverage panel. If a
+            peptide can be linked to multiple proteins these different proteins will be indicated in the "Matching protein(s)" protein list.</li>
+            <br>
+            <li><b>Peptide Confidence Level</b>: Three check boxes show the confidence levels used to display the peptides in the peptide table. This confidence level is given by Proteome Discoverer.</li>
+            <br>
+            <li><b>Peptide Spectrum Match</b>: Three radio buttons show which PSM are shown in the peptide table. These can either by only highest scoring, only lowest scoring or all.</li>
+            <br>
+            <li><b>Load Spectrum</b>: Four check boxes indicate which spectra should be shown when a peptide in the peptide table is selected.</li>
+            <br>
+            <li><b>Start Rover</b>: If quantitative information can be found in the used <i>msf</i> files the "Start Rover" button is visible. When pressed this
+                button start the Rover program and loads the data from the used <i>msf</i> files. Rover is a program to validate and analyze quantified proteins in the context of the experiment
+                and in the context of the protein inference problem.</li>
+            <br>
+            <li><b>Chromatogram</b>: The peptides linked to the selected protein are displayed on the chromatogram with vertical bars. The selected protein is colored in red. Peptides found in the same lc-run as the selected protein are shown in blue.
+                The other peptides (not from the same lc-run) are indicated in green.</li>
+            <br>
+            <li><b>Protein coverage</b>: The protein sequence of the selected protein is given in the protein coverage panel. The peptides found are indicated in black whereas the unidentified sequence is colored in light gray. The selected peptide (from the peptide table) is underlined.</li>
+            <br>
+        </ul>
+        <br>
+    </BODY>
+</HTML>

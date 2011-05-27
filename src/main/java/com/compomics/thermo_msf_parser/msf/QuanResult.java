@@ -180,6 +180,44 @@ public class QuanResult {
         }
     }
 
+    /**
+     * This method will give a numerator based on the given ratio type
+     * @param lType The ratio type
+     * @return double with the numerator
+     */
+    public Double getNumeratorByRatioType(RatioType lType){
+        Double lNumValue = null;
+        Double lDenValue = null;
+        for(int i = 0; i<iQuanChannelIds.size(); i ++){
+            if(lType.getNumeratorChannelId() ==  iQuanChannelIds.get(i)){
+                lNumValue = iIntensities.get(i);
+            }
+            if(lType.getDenominatorChannelId() ==  iQuanChannelIds.get(i)){
+                lDenValue = iIntensities.get(i);
+            }
+        }
+        return lNumValue;
+    }
+
+    /**
+     * This method will give a denominator based on the given ratio type
+     * @param lType The ratio type
+     * @return double with the denominator
+     */
+    public Double getDenominatorByRatioType(RatioType lType){
+        Double lNumValue = null;
+        Double lDenValue = null;
+        for(int i = 0; i<iQuanChannelIds.size(); i ++){
+            if(lType.getNumeratorChannelId() ==  iQuanChannelIds.get(i)){
+                lNumValue = iIntensities.get(i);
+            }
+            if(lType.getDenominatorChannelId() ==  iQuanChannelIds.get(i)){
+                lDenValue = iIntensities.get(i);
+            }
+        }
+        return lDenValue;
+    }
+
     //setters
 
     public void setHeight(double iHeight) {

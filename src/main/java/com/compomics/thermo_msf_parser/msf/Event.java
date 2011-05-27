@@ -277,7 +277,9 @@ public class Event {
         for(int i = 0; i<lIds.size(); i ++){
             lIdsString = lIdsString  + lIds.get(i) + ",";
         }
-        lIdsString = lIdsString.substring(0, lIdsString.lastIndexOf(","));
+        if(lIdsString.indexOf(",") >= 0){
+            lIdsString = lIdsString.substring(0, lIdsString.lastIndexOf(","));
+        }
 
         Statement stat = lConn.createStatement();
         ResultSet rs;
