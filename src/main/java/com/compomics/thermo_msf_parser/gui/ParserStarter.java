@@ -2,10 +2,6 @@ package com.compomics.thermo_msf_parser.gui;
 
 import com.compomics.util.gui.UtilitiesGUIDefaults;
 import org.apache.log4j.Logger;
-
-import com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel;
-
-import javax.swing.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -113,9 +109,9 @@ public class ParserStarter {
     }
 
      /**
-     * Retrieves the version number set in the properties file
+     * Get the Java VM options.
      *
-     * @return the version number of the thermo_msf_parser
+     * @return the Java VM options
      */
     public String getJava() {
 
@@ -135,7 +131,6 @@ public class ParserStarter {
         return p.getProperty("java");
     }
 
-
     /**
      * Starts the launcher by calling the launch method. Use this as the main class in the jar file.
      *
@@ -144,5 +139,4 @@ public class ParserStarter {
     public static void main(String[] args) {
         new ParserStarter();
     }
-
 }

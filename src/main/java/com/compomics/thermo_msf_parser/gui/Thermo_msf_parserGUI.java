@@ -213,14 +213,19 @@ public class Thermo_msf_parserGUI extends JFrame {
 
         // Create a menu
         final JMenu lFileMenu = new JMenu("File");
+        lFileMenu.setMnemonic('F');
         menuBar.add(lFileMenu);
         final JMenu lExportMenu = new JMenu("Export");
+        lExportMenu.setMnemonic('E');
         menuBar.add(lExportMenu);
-        final JMenu lInfoMenu = new JMenu("Info");
+        final JMenu lInfoMenu = new JMenu("Help");
+        lInfoMenu.setMnemonic('H');
         menuBar.add(lInfoMenu);
 
         // Create a menu item
         final JMenuItem lOpenItem = new JMenuItem("Open");
+        lOpenItem.setMnemonic('O');
+        lOpenItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
         lOpenItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 loadData(true);
@@ -244,18 +249,21 @@ public class Thermo_msf_parserGUI extends JFrame {
         );
         lInfoMenu.add(lAboutItem);
         final JMenuItem lHelpItem = new JMenuItem("Help");
+        lHelpItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F1, 0));
         lHelpItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                int lResult = JOptionPane.showOptionDialog(getFrame(), "Are you experiencing unexpected failure or errors in this program, or dou you have a question about this program?",
+                int lResult = JOptionPane.showOptionDialog(getFrame(), 
+                        "Are you experiencing unexpected failures or errors?\n"
+                        + "Or have a question about the program?",
                         "Help",
                         JOptionPane.YES_NO_OPTION,
                         JOptionPane.ERROR_MESSAGE,
                         UIManager.getIcon("OptionPane.errorIcon"),
                         new Object[]{"Yes, report an issue!", "Cancel"},
-                        "Report issue");
+                        "Report Issue");
 
                 if (lResult == JOptionPane.OK_OPTION) {
-                    String lIssuesPage = new String("http://code.google.com/p/thermo-msf-parser/issues/entry");
+                    String lIssuesPage = "http://code.google.com/p/thermo-msf-parser/issues";
                     StartBrowser.start(lIssuesPage);
                 }
             }
@@ -264,7 +272,7 @@ public class Thermo_msf_parserGUI extends JFrame {
         lInfoMenu.add(lHelpItem);
 
         // Create a menu item
-        final JMenuItem item = new JMenuItem("Export peptides as csv");
+        final JMenuItem item = new JMenuItem("Export Peptides as CSV");
         item.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //open file chooser
@@ -334,7 +342,7 @@ public class Thermo_msf_parserGUI extends JFrame {
 
 
         // Create a menu item
-        final JMenuItem lItemMgf = new JMenuItem("Export spectra as mgf");
+        final JMenuItem lItemMgf = new JMenuItem("Export Spectra as MGF");
         lItemMgf.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Export spectra mgf");
@@ -434,7 +442,7 @@ public class Thermo_msf_parserGUI extends JFrame {
         this.setMinimumSize(new Dimension(1200, 800));
         this.setPreferredSize(new Dimension(1200, 800));
         this.setMaximumSize(new Dimension(1200, 800));
-        this.setIconImage(new ImageIcon(getClass().getResource("/logo.png")).getImage());
+        this.setIconImage(new ImageIcon(getClass().getResource("/logo.png")).getImage()); 
         this.setLocationRelativeTo(null);
         this.setExtendedState(MAXIMIZED_BOTH);
         this.setVisible(true);
@@ -1341,11 +1349,11 @@ public class Thermo_msf_parserGUI extends JFrame {
         HashMap<Integer, Color> confidenceColorMap = new HashMap<Integer, Color>();
         HashMap<Integer, String> confidenceTipMap = new HashMap<Integer, String>();
         confidenceColorMap.put(1, new Color(255, 51, 51)); // low
-        confidenceTipMap.put(1, "Low confidence");
+        confidenceTipMap.put(1, "Low Confidence");
         confidenceColorMap.put(2, Color.ORANGE); // medium
-        confidenceTipMap.put(2, "Medium confidence");
+        confidenceTipMap.put(2, "Medium Confidence");
         confidenceColorMap.put(3, new Color(110, 196, 97)); // high
-        confidenceTipMap.put(3, "High confidence");
+        confidenceTipMap.put(3, "High Confidence");
 
         //set some cell renderers
         jtablePeptides.getColumn(" ").setCellRenderer(new JSparklinesIntegerColorTableCellRenderer(Color.LIGHT_GRAY, confidenceColorMap, confidenceTipMap));
@@ -1533,7 +1541,7 @@ public class Thermo_msf_parserGUI extends JFrame {
         jpanContent.add(panel2, gbc);
         showAllPeptidesButton = new JButton();
         showAllPeptidesButton.setMinimumSize(new Dimension(150, 25));
-        showAllPeptidesButton.setText("Show all");
+        showAllPeptidesButton.setText("Show All");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -2517,7 +2525,7 @@ public class Thermo_msf_parserGUI extends JFrame {
 
             if (lUse) {
                 selectedPeptideStart = lCleanProteinSequence.indexOf(iSelectedPeptide.getSequence());
-                selectedPeptideEnd = selectedPeptideStart + iSelectedPeptide.getSequence().length();
+                selectedPeptideEnd = selectedPeptideStart + iSelectedPeptide.getSequence().length() + 1;
                 selectedPeptideStart = selectedPeptideStart + 1;
             }
         }
@@ -2561,8 +2569,14 @@ public class Thermo_msf_parserGUI extends JFrame {
             }
         }
 
+        ArrayList<Integer> selectedPeptideStartList = new ArrayList<Integer>();
+        selectedPeptideStartList.add(selectedPeptideStart);
+        
+        ArrayList<Integer> selectedPeptideEndList = new ArrayList<Integer>();
+        selectedPeptideEndList.add(selectedPeptideEnd);
+        
         // format and display the protein sequence coverage
-        double sequenceCoverage = ProteinSequencePane.formatProteinSequence(proteinSequenceCoverageJEditorPane, lCleanProteinSequence, selectedPeptideStart, selectedPeptideEnd, coverage);
+        double sequenceCoverage = ProteinSequencePane.formatProteinSequence(proteinSequenceCoverageJEditorPane, lCleanProteinSequence, selectedPeptideStartList, selectedPeptideEndList, coverage);
 
         // display the percent sequence coverage
         sequenceCoverageJLabel.setText("Protein Coverage: " + Util.roundDouble(sequenceCoverage, 2) + "%");
