@@ -1,5 +1,7 @@
 package com.compomics.thermo_msf_parser.gui;
 
+import com.compomics.util.examples.HelpWindow;
+import com.compomics.util.io.StartBrowser;
 import org.apache.log4j.Logger;
 
 import com.compomics.rover.general.enumeration.ReferenceSetEnum;
@@ -174,6 +176,9 @@ public class Thermo_msf_parserGUI extends JFrame {
      * Boolean that indicates if this is a stand alone window
      */
     private boolean iStandAlone;
+    /**
+     * Boolean that indicates if quantifications are found in the msf files
+     */
     private boolean iQuantitationFound = false;
 
 
@@ -211,6 +216,8 @@ public class Thermo_msf_parserGUI extends JFrame {
         menuBar.add(lFileMenu);
         final JMenu lExportMenu = new JMenu("Export");
         menuBar.add(lExportMenu);
+        final JMenu lInfoMenu = new JMenu("Info");
+        menuBar.add(lInfoMenu);
 
         // Create a menu item
         final JMenuItem lOpenItem = new JMenuItem("Open");
@@ -227,6 +234,34 @@ public class Thermo_msf_parserGUI extends JFrame {
             }
         }
         );
+        final JMenuItem lAboutItem = new JMenuItem("About");
+        lAboutItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                HelpWindow lHelp = new HelpWindow(getFrame(), getClass().getResource("/about.html"));
+                lHelp.setTitle("About Thermo-msf-parserGUI.");
+            }
+        }
+        );
+        lInfoMenu.add(lAboutItem);
+        final JMenuItem lHelpItem = new JMenuItem("Help");
+        lHelpItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                int lResult = JOptionPane.showOptionDialog(getFrame(), "Are you experiencing unexpected failure or errors in this program, or dou you have a question about this program?",
+                        "Help",
+                        JOptionPane.YES_NO_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        UIManager.getIcon("OptionPane.errorIcon"),
+                        new Object[]{"Yes, report an issue!", "Cancel"},
+                        "Report issue");
+
+                if (lResult == JOptionPane.OK_OPTION) {
+                    String lIssuesPage = new String("http://code.google.com/p/thermo-msf-parser/issues/entry");
+                    StartBrowser.start(lIssuesPage);
+                }
+            }
+        }
+        );
+        lInfoMenu.add(lHelpItem);
 
         // Create a menu item
         final JMenuItem item = new JMenuItem("Export peptides as csv");
@@ -1304,12 +1339,16 @@ public class Thermo_msf_parserGUI extends JFrame {
 
         // set up the confidence color map
         HashMap<Integer, Color> confidenceColorMap = new HashMap<Integer, Color>();
+        HashMap<Integer, String> confidenceTipMap = new HashMap<Integer, String>();
         confidenceColorMap.put(1, new Color(255, 51, 51)); // low
+        confidenceTipMap.put(1, "Low confidence");
         confidenceColorMap.put(2, Color.ORANGE); // medium
+        confidenceTipMap.put(2, "Medium confidence");
         confidenceColorMap.put(3, new Color(110, 196, 97)); // high
+        confidenceTipMap.put(3, "High confidence");
 
         //set some cell renderers
-        jtablePeptides.getColumn(" ").setCellRenderer(new JSparklinesIntegerColorTableCellRenderer(Color.LIGHT_GRAY, confidenceColorMap));
+        jtablePeptides.getColumn(" ").setCellRenderer(new JSparklinesIntegerColorTableCellRenderer(Color.LIGHT_GRAY, confidenceColorMap, confidenceTipMap));
         if (peptideInformationChb.isSelected()) {
             jtablePeptides.getColumn("Processing Node").setCellRenderer(new ProcessingNodeRenderer());
         }

@@ -10,7 +10,7 @@
 
     <!-- Set the version number for the whole project -->
     <properties>
-        <version.number>0.4.2</version.number>
+        <version.number>1.0</version.number>
         <logging.level.default>ALL</logging.level.default>
         <logging.file.path.name>thermo-msf-parser-log4j.log</logging.file.path.name>
         <logging.file.max.size>5000KB</logging.file.max.size>
@@ -301,7 +301,7 @@
         <dependency>
             <groupId>no.uib</groupId>
             <artifactId>jsparklines</artifactId>
-            <version>0.5.8</version>
+            <version>0.5.10</version>
         </dependency>
     </dependencies>
 

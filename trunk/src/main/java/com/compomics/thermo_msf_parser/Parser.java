@@ -870,8 +870,8 @@ public class Parser {
 
         for(int i = 0; i<lLines.length; i ++){
             String lLine = lLines[i].trim();
-            if(lLine.startsWith("<processingMethod")){
-                iQuantificationMethodName = lLine.substring(lLine.indexOf(lLine.indexOf("name=\"") + 6, lLine.indexOf("\"", lLine.indexOf("name=\"") + 6)));
+            if(lLine.startsWith("<ProcessingMethod")){
+                iQuantificationMethodName = lLine.substring(lLine.indexOf("name=\"") + 6, lLine.indexOf("\"", lLine.indexOf("name=\"") + 6));
             }
             if(lLine.endsWith("selected=\"QuanLabels\">")){
                 //we have a component
