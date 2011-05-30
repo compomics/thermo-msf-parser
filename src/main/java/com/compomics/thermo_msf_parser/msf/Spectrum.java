@@ -419,7 +419,7 @@ public class Spectrum {
         if (lRawFile == null) {
             lRawFile = "";
         } else {
-            lRawFile = lRawFile.substring(0, lRawFile.indexOf(".raw"));
+            lRawFile = lRawFile.substring(0, lRawFile.toLowerCase().indexOf(".raw"));
         }
 
         return lRawFile + "_" + iSpectrumId + "_" + iFirstScan + "_" + iCharge;
