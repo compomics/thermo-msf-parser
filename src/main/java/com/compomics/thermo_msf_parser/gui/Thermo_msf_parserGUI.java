@@ -225,7 +225,7 @@ public class Thermo_msf_parserGUI extends JFrame {
         // Create a menu item
         final JMenuItem lOpenItem = new JMenuItem("Open");
         lOpenItem.setMnemonic('O');
-        lOpenItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_O, java.awt.event.InputEvent.CTRL_MASK));
+        lOpenItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_MASK));
         lOpenItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 loadData(true);
@@ -249,12 +249,12 @@ public class Thermo_msf_parserGUI extends JFrame {
         );
         lInfoMenu.add(lAboutItem);
         final JMenuItem lHelpItem = new JMenuItem("Help");
-        lHelpItem.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F1, 0));
+        lHelpItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
         lHelpItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                int lResult = JOptionPane.showOptionDialog(getFrame(), 
+                int lResult = JOptionPane.showOptionDialog(getFrame(),
                         "Are you experiencing unexpected failures or errors?\n"
-                        + "Or have a question about the program?",
+                                + "Or have a question about the program?",
                         "Help",
                         JOptionPane.YES_NO_OPTION,
                         JOptionPane.ERROR_MESSAGE,
@@ -442,7 +442,7 @@ public class Thermo_msf_parserGUI extends JFrame {
         this.setMinimumSize(new Dimension(1200, 800));
         this.setPreferredSize(new Dimension(1200, 800));
         this.setMaximumSize(new Dimension(1200, 800));
-        this.setIconImage(new ImageIcon(getClass().getResource("/logo.png")).getImage()); 
+        this.setIconImage(new ImageIcon(getClass().getResource("/logo.png")).getImage());
         this.setLocationRelativeTo(null);
         this.setExtendedState(MAXIMIZED_BOTH);
         this.setVisible(true);
@@ -1541,7 +1541,7 @@ public class Thermo_msf_parserGUI extends JFrame {
         jpanContent.add(panel2, gbc);
         showAllPeptidesButton = new JButton();
         showAllPeptidesButton.setMinimumSize(new Dimension(150, 25));
-        showAllPeptidesButton.setText("Show All");
+        showAllPeptidesButton.setText("Show all");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -2571,10 +2571,10 @@ public class Thermo_msf_parserGUI extends JFrame {
 
         ArrayList<Integer> selectedPeptideStartList = new ArrayList<Integer>();
         selectedPeptideStartList.add(selectedPeptideStart);
-        
+
         ArrayList<Integer> selectedPeptideEndList = new ArrayList<Integer>();
         selectedPeptideEndList.add(selectedPeptideEnd);
-        
+
         // format and display the protein sequence coverage
         double sequenceCoverage = ProteinSequencePane.formatProteinSequence(proteinSequenceCoverageJEditorPane, lCleanProteinSequence, selectedPeptideStartList, selectedPeptideEndList, coverage);
 
