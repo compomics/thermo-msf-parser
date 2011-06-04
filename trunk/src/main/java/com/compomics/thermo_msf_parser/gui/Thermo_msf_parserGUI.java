@@ -243,7 +243,7 @@ public class Thermo_msf_parserGUI extends JFrame {
         lAboutItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 HelpWindow lHelp = new HelpWindow(getFrame(), getClass().getResource("/about.html"));
-                lHelp.setTitle("About Thermo-msf-parserGUI.");
+                lHelp.setTitle("About Thermo MSF Viewer");
             }
         }
         );
@@ -1541,7 +1541,7 @@ public class Thermo_msf_parserGUI extends JFrame {
         jpanContent.add(panel2, gbc);
         showAllPeptidesButton = new JButton();
         showAllPeptidesButton.setMinimumSize(new Dimension(150, 25));
-        showAllPeptidesButton.setText("Show all");
+        showAllPeptidesButton.setText("Show All");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
