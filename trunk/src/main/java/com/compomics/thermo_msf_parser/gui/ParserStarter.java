@@ -118,10 +118,16 @@ public class ParserStarter {
         java.util.Properties p = new java.util.Properties();
 
         try {
+
             String lLocation = Resources.getResource("thermo_msf_parser.properties").toString();
+
             lLocation = lLocation.substring(10);
-            lLocation = lLocation.substring(0,lLocation.indexOf("thermo_msf_parser-" + getVersion()));
-            lLocation = lLocation + "thermo_msf_parser-" + getVersion() + System.getProperties().getProperty("file.separator") + "java.properties";
+            lLocation = lLocation.replace("%20", " ");
+            lLocation = lLocation.substring(0,lLocation.lastIndexOf("thermo_msf_parser-" + getVersion()));
+            //System.out.println(lLocation);
+            lLocation = lLocation + System.getProperties().getProperty("file.separator") + "java.properties";
+            //System.out.println(lLocation);
+
             InputStream is = new FileInputStream(lLocation);
             p.load(is);
         } catch (IOException e) {
