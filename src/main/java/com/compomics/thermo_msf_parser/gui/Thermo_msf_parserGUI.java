@@ -1541,7 +1541,7 @@ public class Thermo_msf_parserGUI extends JFrame {
         jpanContent.add(panel2, gbc);
         showAllPeptidesButton = new JButton();
         showAllPeptidesButton.setMinimumSize(new Dimension(150, 25));
-        showAllPeptidesButton.setText("Show All");
+        showAllPeptidesButton.setText("Show all");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
