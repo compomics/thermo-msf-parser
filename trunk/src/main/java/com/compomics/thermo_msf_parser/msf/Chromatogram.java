@@ -101,7 +101,7 @@ public class Chromatogram {
     public String getUnzippedChromatogramXml() throws IOException {
         if(iUnzippedChromatogramXml == null){
 
-            File lZippedFile = new File("zip");
+            File lZippedFile = File.createTempFile("zip",null);
             FileOutputStream fos = new FileOutputStream(lZippedFile);
             fos.write(iZippedChromatogramXml);
             fos.flush();
