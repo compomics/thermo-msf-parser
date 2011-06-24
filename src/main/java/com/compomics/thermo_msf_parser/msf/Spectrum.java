@@ -245,7 +245,7 @@ public class Spectrum {
             rs.close();
             stat.close();
         }
-        File lZippedFile = new File("zip");
+        File lZippedFile = File.createTempFile("zip",null);
         FileOutputStream fos = new FileOutputStream(lZippedFile);
         fos.write(lZippedSpectrumXml);
         fos.flush();
