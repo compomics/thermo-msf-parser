@@ -43,6 +43,7 @@
                 <directory>./</directory>
                 <includes>
                     <include>thermo_msf_parser.properties</include>
+                    <include>java.properties</include>
                     <include>icon.png</include>
                     <include>logo.ico</include>
                 </includes>

@@ -828,7 +828,7 @@ public class Thermo_msf_parserGUI extends JFrame {
     public void closeMethod() {
         try {
             //try to delete the zip file
-            File lZip = File.createTempFile("zip",null);
+            File lZip = File.createTempFile("zip", null);
             lZip.delete();
         } catch (Exception e) {
             //do nothing
