@@ -280,13 +280,17 @@ public class Spectrum {
      */
     public Vector<Peak> getMSMSPeaks() throws Exception {
         String lXml = getUnzippedSpectrumXml();
-        lXml = lXml.substring(lXml.indexOf("<Peak ", lXml.indexOf("<PeakCentr")), lXml.lastIndexOf("</PeakCent"));
-        String[] lLines = lXml.split("\n");
         Vector<Peak> lPeaks = new Vector<Peak>();
-        for (int i = 0; i < lLines.length; i++) {
-            if (lLines[i].trim().startsWith("<Peak ")) {
-                lPeaks.add(new Peak(lLines[i]));
+        try{
+            lXml = lXml.substring(lXml.indexOf("<Peak ", lXml.indexOf("<PeakCentr")), lXml.lastIndexOf("</PeakCent"));
+            String[] lLines = lXml.split("\n");
+            for (int i = 0; i < lLines.length; i++) {
+                if (lLines[i].trim().startsWith("<Peak ")) {
+                    lPeaks.add(new Peak(lLines[i]));
+                }
             }
+        } catch(IndexOutOfBoundsException e){
+            //no peaks found
         }
         return lPeaks;
     }
