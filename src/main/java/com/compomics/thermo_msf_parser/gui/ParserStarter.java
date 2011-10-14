@@ -1,12 +1,13 @@
 package com.compomics.thermo_msf_parser.gui;
 
 import com.compomics.util.gui.UtilitiesGUIDefaults;
+import com.google.common.io.Resources;
 import org.apache.log4j.Logger;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import com.google.common.io.Resources;
 
 /**
  * Created by IntelliJ IDEA.
@@ -28,8 +29,8 @@ public class ParserStarter {
         try {
             launch();
         } catch (Exception e) {
-            System.out.println("Problem launching the application! :-(");
-            System.err.println(e.getMessage());
+            logger.info("Problem launching the application! :-(");
+            logger.error(e.getMessage());
         }
     }
 
@@ -70,18 +71,16 @@ public class ParserStarter {
                 + new File(path, jarFileName).getAbsolutePath()
                 + quote + " com.compomics.thermo_msf_parser.gui.Thermo_msf_parserGUI";
 
-        System.out.println(cmdLine);
+        logger.info(cmdLine);
 
         try {
             // Run the process!
             Runtime.getRuntime().exec(cmdLine);
 
         } catch (IOException e1) {
-            System.err.println(e1.getMessage());
-            e1.printStackTrace();
+            logger.error(e1.getMessage());
         } catch (Throwable t) {
-            System.err.println(t.getMessage());
-            t.printStackTrace();
+            logger.error(t.getMessage());
         }
 
         finally {
@@ -102,7 +101,7 @@ public class ParserStarter {
             InputStream is = this.getClass().getClassLoader().getResourceAsStream("thermo_msf_parser.properties");
             p.load( is );
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
 
         return p.getProperty("version");
@@ -117,21 +116,27 @@ public class ParserStarter {
 
         java.util.Properties p = new java.util.Properties();
 
+        String lLocation = null;
         try {
 
-            String lLocation = Resources.getResource("thermo_msf_parser.properties").toString();
-
-            lLocation = lLocation.substring(10);
+            lLocation = Resources.getResource("thermo_msf_parser.properties").toString();
+            int i = 1;
+            logger.debug(i++ + "\t" + lLocation);
+            int lProtocolOffset = lLocation.lastIndexOf(":") + 1;
+            lLocation = lLocation.substring(lProtocolOffset);
+            logger.debug(i++ + "\t" + lLocation);
             lLocation = lLocation.replace("%20", " ");
+            logger.debug(i++ + "\t" + lLocation);
             lLocation = lLocation.substring(0,lLocation.lastIndexOf("thermo_msf_parser-" + getVersion()));
-            //System.out.println(lLocation);
+            logger.debug(i++ + "\t" + lLocation);
             lLocation = lLocation + System.getProperties().getProperty("file.separator") + "java.properties";
-            //System.out.println(lLocation);
+            logger.debug(i++ + "\t" + lLocation);
 
             InputStream is = new FileInputStream(lLocation);
             p.load(is);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("failed to build java properties from '" + lLocation);
+            logger.error(e.getMessage(), e);
         }
 
         return p.getProperty("java");
