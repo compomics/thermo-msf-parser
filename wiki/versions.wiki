@@ -1,0 +1,17 @@
+#labels Featured
+#Starting from thermo-msf-parser version 1.0, all subsequent versions of the library are listed here.
+
+===1.0.3 (14 September 2011)===
+ * Fixed the Starter on Unix machines.
+ * Changed the mvn copy of the Java.properties file (again)
+ * Enabled log4j in the Starter
+
+===1.0.2 (29 June 2011)===
+ * Bugfix Resolved a bug where a there was a string index out of bound exception when a
+spectrum with no peaks was found.
+
+===1.0.1 (30 May 2011)===
+ * Refactored the dependency management.
+
+==1.0 (27 May 2011)==
+ * Initial release of the thermo-msf-parser library
