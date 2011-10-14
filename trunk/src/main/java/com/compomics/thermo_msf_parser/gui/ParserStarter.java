@@ -30,7 +30,7 @@ public class ParserStarter {
             launch();
         } catch (Exception e) {
             logger.info("Problem launching the application! :-(");
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
         }
     }
 
