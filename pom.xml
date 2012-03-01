@@ -11,7 +11,7 @@
 
     <!-- Set the version number for the whole project -->
     <properties>
-        <version.number>1.0.3</version.number>
+        <version.number>1.0.4</version.number>
         <logging.level.default>INFO</logging.level.default>
         <logging.file.path.name>thermo-msf-parser-log4j.log</logging.file.path.name>
         <logging.file.max.size>5000KB</logging.file.max.size>
