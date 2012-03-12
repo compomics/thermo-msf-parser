@@ -141,21 +141,22 @@ public class Protein {
 
     public void setDescription(String iDescription) {
         this.iDescription = iDescription;
-        if (iDescription.contains(">gi|")) {
-            String lFasta = iDescription + "\n"  + iSequence;
-            iUtilProtein = new com.compomics.util.protein.Protein(lFasta);
-            iUtilAccession = iUtilProtein.getHeader().getAccession();
-            iUtilDescription = iUtilProtein.getHeader().getDescription();
-        } else if (iDescription.contains(">ENS")) {
-            String lFasta = iDescription + "\n"  + iSequence;
-            iUtilProtein = new com.compomics.util.protein.Protein(lFasta);
-            iUtilAccession =iUtilProtein.getHeader().toString().substring(iDescription.indexOf("ENS"),iDescription.indexOf("pep") -1);
-            iUtilDescription = iDescription;
-        } else if ( iDescription.contains(">GENSCAN")){
+        if ( iDescription.contains(">GENSCAN")){
             String lFasta = iDescription + "\n"  + iSequence;
             iUtilProtein = new com.compomics.util.protein.Protein(lFasta);
             iUtilAccession =iUtilProtein.getHeader().toString().substring(iDescription.indexOf("GEN"),iDescription.indexOf("pep") -1);
             iUtilDescription = iDescription;
+        }
+        else if (iDescription.contains(">ENS")) {
+            String lFasta = iDescription + "\n"  + iSequence;
+            iUtilProtein = new com.compomics.util.protein.Protein(lFasta);
+            iUtilAccession =iUtilProtein.getHeader().toString().substring(iDescription.indexOf("ENS"),iDescription.indexOf("pep") -1);
+            iUtilDescription = iDescription;
+        } else {
+            String lFasta = iDescription + "\n"  + iSequence;
+            iUtilProtein = new com.compomics.util.protein.Protein(lFasta);
+            iUtilAccession = iUtilProtein.getHeader().getAccession();
+            iUtilDescription = iUtilProtein.getHeader().getDescription();
         }
     }
 
