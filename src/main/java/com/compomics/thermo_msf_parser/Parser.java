@@ -18,6 +18,11 @@ import java.util.Vector;
 public class Parser {
 
     /**
+     * Prepared statements to fetch spectra
+     */
+    private PreparedStatement spectrumStatement;
+    
+    /**
      * The modifications
      */
     private Vector<Modification> iModifications = new Vector<Modification>();
@@ -208,13 +213,16 @@ public class Parser {
 
     /**
      * This will parse the thermo msf file
+     *
      * @param iMsfFileLocation A String with the location of the msf file
      * @param iLowMemory
-     * @throws ClassNotFoundException This is thrown when the sqlite library cannot be found
-     * @throws java.sql.SQLException This is thrown when there is a problem extracting the data from the thermo msf file
+     * @throws ClassNotFoundException This is thrown when the sqlite library
+     * cannot be found
+     * @throws java.sql.SQLException This is thrown when there is a problem
+     * extracting the data from the thermo msf file
      */
     public Parser(String iMsfFileLocation, boolean iLowMemory) throws SQLException, ClassNotFoundException {
-
+        
         iFilePath = iMsfFileLocation;
         //create the connection to the msf file
         Class.forName("org.sqlite.JDBC");
@@ -301,28 +309,31 @@ public class Parser {
         rs = stat.executeQuery("select * from EnzymesCleavageSpecificities");
         while (rs.next()) {
             int lEnzymeId = rs.getInt("EnzymeID");
-            if(iEnzymesMap.get(lEnzymeId) != null){
+            if (iEnzymesMap.get(lEnzymeId) != null) {
                 iEnzymesMap.get(lEnzymeId).setSpecificity(rs.getInt("Specificity"));
             }
         }
-
+        
+       
         //get the peptides
         rs = stat.executeQuery("select * from Peptides as p");
         while (rs.next()) {
             Peptide lPeptide = new Peptide(rs.getInt("PeptideID"), rs.getInt("SpectrumID"), rs.getInt("ConfidenceLevel"), rs.getString("Sequence"), rs.getInt("TotalIonsCount"), rs.getInt("MatchedIonsCount"), rs.getString("Annotation"), rs.getInt("ProcessingNodeNumber"), iAminoAcids);
-            if(iMsfVersion ==  MsfVersion.VERSION1_3){
+            if (iMsfVersion == MsfVersion.VERSION1_3) {
                 lPeptide.setMissedCleavage(rs.getInt("MissedCleavages"));
                 lPeptide.setUniquePeptideSequenceId(rs.getInt("UniquePeptideSequenceID"));
             }
             iPeptides.add(lPeptide);
             iPeptidesMap.put(lPeptide.getPeptideId(), lPeptide);
         }
+        
+
 
         //get the peptides
         rs = stat.executeQuery("select * from Peptides_decoy as p");
         while (rs.next()) {
             Peptide lPeptide = new Peptide(rs.getInt("PeptideID"), rs.getInt("SpectrumID"), rs.getInt("ConfidenceLevel"), rs.getString("Sequence"), rs.getInt("TotalIonsCount"), rs.getInt("MatchedIonsCount"), "", rs.getInt("ProcessingNodeNumber"), iAminoAcids);
-            if(iMsfVersion ==  MsfVersion.VERSION1_3){
+            if (iMsfVersion == MsfVersion.VERSION1_3) {
                 lPeptide.setMissedCleavage(rs.getInt("MissedCleavages"));
                 lPeptide.setUniquePeptideSequenceId(rs.getInt("UniquePeptideSequenceID"));
                 lPeptide.setAnnotation(rs.getString("Annotation"));
@@ -330,12 +341,12 @@ public class Parser {
             iPeptidesDecoy.add(lPeptide);
             iPeptidesDecoyMap.put(lPeptide.getPeptideId(), lPeptide);
         }
-        if(iMsfVersion == MsfVersion.VERSION1_3){
+        if (iMsfVersion == MsfVersion.VERSION1_3) {
             //add the processing node Custom data fields
             rs = stat.executeQuery("select * from CustomDataPeptides_Decoy");
             while (rs.next()) {
-                if(iPeptidesDecoyMap.get(rs.getInt("PeptideID")) != null){
-                    iPeptidesDecoyMap.get(rs.getInt("PeptideID")).addCustomDataField(rs.getInt("FieldID"),rs.getString("FieldValue"));
+                if (iPeptidesDecoyMap.get(rs.getInt("PeptideID")) != null) {
+                    iPeptidesDecoyMap.get(rs.getInt("PeptideID")).addCustomDataField(rs.getInt("FieldID"), rs.getString("FieldValue"));
                 }
             }
             rs = stat.executeQuery("select fieldid from CustomDataPeptides_Decoy group by fieldid");
@@ -353,7 +364,7 @@ public class Parser {
         //add the score to the peptides
         rs = stat.executeQuery("select  * from  PeptideScores ");
         while (rs.next()) {
-            if(iPeptidesMap.get(rs.getInt("PeptideID")) != null){
+            if (iPeptidesMap.get(rs.getInt("PeptideID")) != null) {
                 int lScoreId = rs.getInt("ScoreID");
                 iPeptidesMap.get(rs.getInt("PeptideID")).setScore(rs.getDouble("ScoreValue"), lScoreId, iScoreTypes);
             }
@@ -361,7 +372,7 @@ public class Parser {
         //add the score to the peptides decoy
         rs = stat.executeQuery("select  * from  PeptideScores_decoy ");
         while (rs.next()) {
-            if(iPeptidesDecoyMap.get(rs.getInt("PeptideID")) != null){
+            if (iPeptidesDecoyMap.get(rs.getInt("PeptideID")) != null) {
                 int lScoreId = rs.getInt("ScoreID");
                 iPeptidesDecoyMap.get(rs.getInt("PeptideID")).setScore(rs.getDouble("ScoreValue"), lScoreId, iScoreTypes);
             }
@@ -369,11 +380,11 @@ public class Parser {
         //add the modifications to the peptide
         rs = stat.executeQuery("select  * from  PeptidesTerminalModifications");
         while (rs.next()) {
-            if(iPeptidesMap.get(rs.getInt("PeptideID")) != null){
-                if(iModificationsMap.get(rs.getInt("TerminalModificationID")) != null){
+            if (iPeptidesMap.get(rs.getInt("PeptideID")) != null) {
+                if (iModificationsMap.get(rs.getInt("TerminalModificationID")) != null) {
                     Modification lMod = iModificationsMap.get(rs.getInt("TerminalModificationID"));
                     boolean lNterm = false;
-                    if(lMod.getPositionType() == 1){
+                    if (lMod.getPositionType() == 1) {
                         lNterm = true;
                     }
                     ModificationPosition lModPos = new ModificationPosition(0, lNterm, !lNterm);
@@ -383,8 +394,8 @@ public class Parser {
         }
         rs = stat.executeQuery("select  * from  PeptidesAminoAcidModifications");
         while (rs.next()) {
-            if(iPeptidesMap.get(rs.getInt("PeptideID")) != null){
-                if(iModificationsMap.get(rs.getInt("AminoAcidModificationID")) != null){
+            if (iPeptidesMap.get(rs.getInt("PeptideID")) != null) {
+                if (iModificationsMap.get(rs.getInt("AminoAcidModificationID")) != null) {
                     Modification lMod = iModificationsMap.get(rs.getInt("AminoAcidModificationID"));
                     ModificationPosition lModPos = new ModificationPosition(rs.getInt("Position"), false, false);
                     iPeptidesMap.get(rs.getInt("PeptideID")).addModification(lMod, lModPos);
@@ -395,11 +406,11 @@ public class Parser {
         //add the modifications to the peptide
         rs = stat.executeQuery("select  * from  PeptidesTerminalModifications_decoy");
         while (rs.next()) {
-            if(iPeptidesDecoyMap.get(rs.getInt("PeptideID")) != null){
-                if(iModificationsMap.get(rs.getInt("TerminalModificationID")) != null){
+            if (iPeptidesDecoyMap.get(rs.getInt("PeptideID")) != null) {
+                if (iModificationsMap.get(rs.getInt("TerminalModificationID")) != null) {
                     Modification lMod = iModificationsMap.get(rs.getInt("TerminalModificationID"));
                     boolean lNterm = false;
-                    if(lMod.getPositionType() == 1){
+                    if (lMod.getPositionType() == 1) {
                         lNterm = true;
                     }
                     ModificationPosition lModPos = new ModificationPosition(0, lNterm, !lNterm);
@@ -409,8 +420,8 @@ public class Parser {
         }
         rs = stat.executeQuery("select  * from  PeptidesAminoAcidModifications_decoy");
         while (rs.next()) {
-            if(iPeptidesDecoyMap.get(rs.getInt("PeptideID")) != null){
-                if(iModificationsMap.get(rs.getInt("AminoAcidModificationID")) != null){
+            if (iPeptidesDecoyMap.get(rs.getInt("PeptideID")) != null) {
+                if (iModificationsMap.get(rs.getInt("AminoAcidModificationID")) != null) {
                     Modification lMod = iModificationsMap.get(rs.getInt("AminoAcidModificationID"));
                     ModificationPosition lModPos = new ModificationPosition(rs.getInt("Position"), false, false);
                     iPeptidesDecoyMap.get(rs.getInt("PeptideID")).addModification(lMod, lModPos);
@@ -428,7 +439,7 @@ public class Parser {
         //add the name to the taxonomy
         rs = stat.executeQuery("select  * from  TaxonomyNames ");
         while (rs.next()) {
-            if(iTaxonomiesMap.get(rs.getInt("TaxonomyID")) != null){
+            if (iTaxonomiesMap.get(rs.getInt("TaxonomyID")) != null) {
                 iTaxonomiesMap.get(rs.getInt("TaxonomyID")).setName(rs.getString("Name"));
                 iTaxonomiesMap.get(rs.getInt("TaxonomyID")).setNameCategory(rs.getInt("NameCategory"));
             }
@@ -437,7 +448,7 @@ public class Parser {
         //get the spectra
         rs = stat.executeQuery("select s.*, m.FileID from spectrumheaders as s, masspeaks as m where m.masspeakid = s.masspeakid");
         while (rs.next()) {
-            Spectrum lSpectrum = new Spectrum(rs.getInt("SpectrumID"), rs.getInt("UniqueSpectrumID"), rs.getInt("MassPeakID"), rs.getInt("LastScan"), rs.getInt("FirstScan"), rs.getInt("ScanNumbers"), rs.getInt("Charge"), rs.getDouble("RetentionTime"), rs.getDouble("Mass"), rs.getInt("ScanEventID"), iConnection, this);
+            Spectrum lSpectrum = spectrumFromSpectrumheadersQuery(rs);
             lSpectrum.setFileId(rs.getInt("FileID"));
             iSpectra.add(lSpectrum);
             iSpectraMapByMassPeakId.put(lSpectrum.getMassPeakId(), lSpectrum);
@@ -445,20 +456,21 @@ public class Parser {
             iSpectraMapByUniqueSpectrumId.put(lSpectrum.getUniqueSpectrumId(), lSpectrum);
         }
 
-        if(!iLowMemory){
+        if (!iLowMemory) {
             rs = stat.executeQuery("select * from Spectra");
             while (rs.next()) {
-                int lSpectrumId =  rs.getInt("UniqueSpectrumID");
+                int lSpectrumId = rs.getInt("UniqueSpectrumID");
                 byte[] lZipped = rs.getBytes("Spectrum");
-                if(iSpectraMapByUniqueSpectrumId.get(lSpectrumId) != null){
+                if (iSpectraMapByUniqueSpectrumId.get(lSpectrumId) != null) {
                     iSpectraMapByUniqueSpectrumId.get(lSpectrumId).setZippedBytes(lZipped);
                 }
             }
         }
+        
         rs = stat.executeQuery("select * from SpectrumScores");
         while (rs.next()) {
-            int lSpectrumId =  rs.getInt("SpectrumID");
-            if(iSpectraMapBySpectrumId.get(lSpectrumId) != null){
+            int lSpectrumId = rs.getInt("SpectrumID");
+            if (iSpectraMapBySpectrumId.get(lSpectrumId) != null) {
                 iSpectraMapBySpectrumId.get(lSpectrumId).addSpectrumScore(rs.getDouble("Score"), rs.getInt("ProcessingNodeNumber"));
             }
         }
@@ -468,9 +480,9 @@ public class Parser {
             ScanEvent lScanEvent = new ScanEvent(rs.getInt("ScanEventID"), rs.getInt("MSLevel"), rs.getInt("Polarity"), rs.getInt("ScanType"), rs.getInt("Ionization"), rs.getInt("MassAnalyzer"), rs.getInt("ActivationType"));
             iScanEvents.add(lScanEvent);
         }
-        for(int i = 0; i<iSpectra.size(); i ++){
-            for(int j = 0; j<iScanEvents.size(); j ++){
-                if(iSpectra.get(i).getScanEventId() == iScanEvents.get(j).getScanEventId()){
+        for (int i = 0; i < iSpectra.size(); i++) {
+            for (int j = 0; j < iScanEvents.size(); j++) {
+                if (iSpectra.get(i).getScanEventId() == iScanEvents.get(j).getScanEventId()) {
                     iSpectra.get(j).setScanEvent(iScanEvents.get(j));
                 }
             }
@@ -480,9 +492,9 @@ public class Parser {
         rs = stat.executeQuery("select * from Proteins ");
         while (rs.next()) {
             Protein lProtein = null;
-            if(iLowMemory){
+            if (iLowMemory) {
                 lProtein = new Protein(rs.getInt("ProteinID"), this);
-                if(iMsfVersion == MsfVersion.VERSION1_3){
+                if (iMsfVersion == MsfVersion.VERSION1_3) {
                     lProtein.setMasterProtein(rs.getInt("IsMasterProtein"));
                 }
             } else {
@@ -494,23 +506,23 @@ public class Parser {
         //add the description to the protein
         rs = stat.executeQuery("select  * from  ProteinAnnotations ");
         while (rs.next()) {
-            if(iProteinsMap.get(rs.getInt("ProteinID")) != null){
+            if (iProteinsMap.get(rs.getInt("ProteinID")) != null) {
                 iProteinsMap.get(rs.getInt("ProteinID")).setDescription(rs.getString("Description"));
             }
         }
         //add the score to the protein
         rs = stat.executeQuery("select  * from  ProteinScores ");
         while (rs.next()) {
-            if(iProteinsMap.get(rs.getInt("ProteinID")) != null){
+            if (iProteinsMap.get(rs.getInt("ProteinID")) != null) {
                 iProteinsMap.get(rs.getInt("ProteinID")).addScore(rs.getDouble("ProteinScore"), rs.getInt("ProcessingNodeNumber"), rs.getDouble("Coverage"));
             }
         }
 
-        if(iMsfVersion == MsfVersion.VERSION1_3){
+        if (iMsfVersion == MsfVersion.VERSION1_3) {
             //add the protein group to the protein
             rs = stat.executeQuery("select  * from  ProteinsProteinGroups");
             while (rs.next()) {
-                if(iProteinsMap.get(rs.getInt("ProteinID")) != null){
+                if (iProteinsMap.get(rs.getInt("ProteinID")) != null) {
                     iProteinsMap.get(rs.getInt("ProteinID")).setProteinGroupId(rs.getInt("ProteinGroupID"));
                 }
             }
@@ -518,7 +530,7 @@ public class Parser {
             rs = stat.executeQuery("select  * from  PtmAnnotationData");
             while (rs.next()) {
                 Protein.PtmAnnotation lAnno = new Protein.PtmAnnotation(rs.getInt("PtmUnimodID"), rs.getInt("Position"));
-                if(iProteinsMap.get(rs.getInt("ProteinID")) != null){
+                if (iProteinsMap.get(rs.getInt("ProteinID")) != null) {
                     iProteinsMap.get(rs.getInt("ProteinID")).addPtmAnnotation(lAnno);
                 }
             }
@@ -526,15 +538,15 @@ public class Parser {
             //add the custom data fields to the proteins
             rs = stat.executeQuery("select  * from  CustomDataProteins_Decoy ");
             while (rs.next()) {
-                if(iProteinsMap.get(rs.getInt("ProteinID")) != null){
-                    iProteinsMap.get(rs.getInt("ProteinID")).addDecoyCustomDataField(rs.getInt("FieldID"),rs.getString("FieldValue"));
+                if (iProteinsMap.get(rs.getInt("ProteinID")) != null) {
+                    iProteinsMap.get(rs.getInt("ProteinID")).addDecoyCustomDataField(rs.getInt("FieldID"), rs.getString("FieldValue"));
                 }
             }
 
             //add the decoy score to the protein
             rs = stat.executeQuery("select  * from  ProteinScores_Decoy");
             while (rs.next()) {
-                if(iProteinsMap.get(rs.getInt("ProteinID")) != null){
+                if (iProteinsMap.get(rs.getInt("ProteinID")) != null) {
                     iProteinsMap.get(rs.getInt("ProteinID")).addDecoyScore(rs.getDouble("ProteinScore"), rs.getInt("ProcessingNodeNumber"), rs.getDouble("Coverage"));
                 }
             }
@@ -551,19 +563,21 @@ public class Parser {
         //add the custom data fields to the peptides
         rs = stat.executeQuery("select  * from  CustomDataPeptides ");
         while (rs.next()) {
-            if(iPeptidesMap.get(rs.getInt("PeptideID")) != null){
-                iPeptidesMap.get(rs.getInt("PeptideID")).addCustomDataField(rs.getInt("FieldID"),rs.getString("FieldValue"));
-                
+            if (iPeptidesMap.get(rs.getInt("PeptideID")) != null) {
+                iPeptidesMap.get(rs.getInt("PeptideID")).addCustomDataField(rs.getInt("FieldID"), rs.getString("FieldValue"));
+
             }
         }
         //add the custom data fields to the peptides
-        /*rs = stat.executeQuery("select  * from  CustomDataPeptides ");
-        while (rs.next()) {
-            if(iPeptidesDecoyMap.get(rs.getInt("PeptideID")) != null){
-                iPeptidesDecoyMap.get(rs.getInt("PeptideID")).addCustomDataField(rs.getInt("FieldID"),rs.getString("FieldValue"));
-
-            }
-        } */
+        /*
+         * rs = stat.executeQuery("select * from CustomDataPeptides "); while
+         * (rs.next()) { if(iPeptidesDecoyMap.get(rs.getInt("PeptideID")) !=
+         * null){
+         * iPeptidesDecoyMap.get(rs.getInt("PeptideID")).addCustomDataField(rs.getInt("FieldID"),rs.getString("FieldValue"));
+         *
+         * }
+         * }
+         */
         rs = stat.executeQuery("select fieldid from CustomDataPeptides group by fieldid");
         while (rs.next()) {
             iPeptideUsedCustomDataFields.add(iCustomDataFieldsMap.get(rs.getInt("FieldID")));
@@ -571,8 +585,8 @@ public class Parser {
         //add the custom data fields to the proteins
         rs = stat.executeQuery("select  * from  CustomDataProteins ");
         while (rs.next()) {
-            if(iProteinsMap.get(rs.getInt("ProteinID")) != null){
-                iProteinsMap.get(rs.getInt("ProteinID")).addCustomDataField(rs.getInt("FieldID"),rs.getString("FieldValue"));
+            if (iProteinsMap.get(rs.getInt("ProteinID")) != null) {
+                iProteinsMap.get(rs.getInt("ProteinID")).addCustomDataField(rs.getInt("FieldID"), rs.getString("FieldValue"));
             }
         }
         rs = stat.executeQuery("select fieldid from CustomDataProteins group by fieldid");
@@ -582,20 +596,20 @@ public class Parser {
         //add the custom data fields to the proteins
         rs = stat.executeQuery("select  * from  CustomDataSpectra ");
         while (rs.next()) {
-            if(iSpectraMapBySpectrumId.get(rs.getInt("SpectrumID")) != null){
-                iSpectraMapBySpectrumId.get(rs.getInt("SpectrumID")).addCustomDataField(rs.getInt("FieldID"),rs.getString("FieldValue"));
+            if (iSpectraMapBySpectrumId.get(rs.getInt("SpectrumID")) != null) {
+                iSpectraMapBySpectrumId.get(rs.getInt("SpectrumID")).addCustomDataField(rs.getInt("FieldID"), rs.getString("FieldValue"));
             }
         }
         rs = stat.executeQuery("select fieldid from CustomDataSpectra group by fieldid");
         while (rs.next()) {
             iSpectrumUsedCustomDataFields.add(iCustomDataFieldsMap.get(rs.getInt("FieldID")));
         }
-        
+
 
         //get the quantification method
         rs = stat.executeQuery("select ParameterValue from ProcessingNodeParameters where ParameterName = 'QuantificationMethod'");
         while (rs.next()) {
-            iQuantificationMethod =  rs.getString(1);
+            iQuantificationMethod = rs.getString(1);
             parseQuantitationXml();
         }
 
@@ -607,7 +621,7 @@ public class Parser {
         //add the messages to the workflow info
         rs = stat.executeQuery("select * from WorkflowMessages");
         while (rs.next()) {
-            iWorkFlowInfo.addMessage(new WorkflowMessage(rs.getInt("MessageID"), rs.getInt("ProcessingNodeID"), rs.getInt("ProcessingNodeNumber"), rs.getInt("Time"), rs.getInt("MessageKind"), rs.getString("Message")));
+            iWorkFlowInfo.addMessage(new WorkflowMessage(rs.getInt("MessageID"), rs.getInt("ProcessingNodeID"), rs.getInt("ProcessingNodeNumber"), rs.getLong("Time"), rs.getInt("MessageKind"), rs.getString("Message")));
         }
         //add the msf version info the the workflowinfo
         rs = stat.executeQuery("select * from SchemaInfo");
@@ -620,15 +634,15 @@ public class Parser {
         while (rs.next()) {
             ProcessingNode lNode = new ProcessingNode(rs.getInt("ProcessingNodeNumber"), rs.getInt("ProcessingNodeID"), rs.getString("ProcessingNodeParentNumber"), rs.getString("NodeName"), rs.getString("FriendlyName"), rs.getInt("MajorVersion"), rs.getInt("MinorVersion"), rs.getString("NodeComment"));
             iProcessingNodes.add(lNode);
-            iProcessingNodesMap.put(lNode.getProcessingNodeNumber(),lNode);
+            iProcessingNodesMap.put(lNode.getProcessingNodeNumber(), lNode);
         }
 
-        if(iMsfVersion == MsfVersion.VERSION1_3){
+        if (iMsfVersion == MsfVersion.VERSION1_3) {
             //add the processing node Custom data fields
             rs = stat.executeQuery("select * from CustomDataProcessingNodes");
             while (rs.next()) {
-                if(iProcessingNodesMap.get(rs.getInt("ProcessingNodeNumber")) != null){
-                    iProcessingNodesMap.get(rs.getInt("ProcessingNodeNumber")).addCustomDataField(rs.getInt("FieldID"),rs.getString("FieldValue"));
+                if (iProcessingNodesMap.get(rs.getInt("ProcessingNodeNumber")) != null) {
+                    iProcessingNodesMap.get(rs.getInt("ProcessingNodeNumber")).addCustomDataField(rs.getInt("FieldID"), rs.getString("FieldValue"));
                 }
             }
             rs = stat.executeQuery("select fieldid from CustomDataProcessingNodes group by fieldid");
@@ -642,30 +656,30 @@ public class Parser {
         while (rs.next()) {
             ProcessingNodeParameter lNodeParameter = new ProcessingNodeParameter(rs.getInt("ProcessingNodeNumber"), rs.getInt("ProcessingNodeId"), rs.getString("ParameterName"), rs.getString("FriendlyName"), rs.getInt("IntendedPurpose"), rs.getString("PurposeDetails"), rs.getInt("Advanced"), rs.getString("Category"), rs.getInt("Position"), rs.getString("ParameterValue"), rs.getString("ValueDisplayString"));
 
-            if(iProcessingNodesMap.get(lNodeParameter.getProcessingNodeNumber()) != null){
+            if (iProcessingNodesMap.get(lNodeParameter.getProcessingNodeNumber()) != null) {
                 iProcessingNodesMap.get(lNodeParameter.getProcessingNodeNumber()).addProcessingNodeParameter(lNodeParameter);
             }
         }
-        if(iMsfVersion == MsfVersion.VERSION1_2){
+        if (iMsfVersion == MsfVersion.VERSION1_2) {
 
             //get the filters
             rs = stat.executeQuery("select * from ResultFilterSet");
             while (rs.next()) {
                 String lXml = rs.getString("ResultFilterSet");
                 String[] lXmlLines = lXml.split("\n");
-                String lFilterSetName = lXml.substring(lXml.indexOf("\"", lXml.indexOf("FilterSetName")) + 1,lXml.indexOf("\"", lXml.indexOf("\"", lXml.indexOf("FilterSetName")) + 1));
+                String lFilterSetName = lXml.substring(lXml.indexOf("\"", lXml.indexOf("FilterSetName")) + 1, lXml.indexOf("\"", lXml.indexOf("\"", lXml.indexOf("FilterSetName")) + 1));
                 Vector<String> lFilterLines = new Vector<String>();
-                for(int i = 0; i<lXmlLines.length; i ++){
+                for (int i = 0; i < lXmlLines.length; i++) {
                     String lLine = lXmlLines[i].trim();
-                    if(lLine.startsWith("<FilterInfo ")){
+                    if (lLine.startsWith("<FilterInfo ")) {
                         lFilterLines.add(lLine);
                     }
-                    if(lLine.startsWith("<Parameter ")){
+                    if (lLine.startsWith("<Parameter ")) {
                         lFilterLines.add(lLine);
                     }
-                    if(lLine.startsWith("</FilterInfo>")){
-                        iFilter.add(new Filter(lFilterSetName,lFilterLines));
-                        lFilterLines.removeAllElements();
+                    if (lLine.startsWith("</FilterInfo>")) {
+                        iFilter.add(new Filter(lFilterSetName, lFilterLines));
+                        lFilterLines.clear();
                     }
                 }
             }
@@ -676,7 +690,7 @@ public class Parser {
         while (rs.next()) {
             int lIsotopePatternId = rs.getInt("IsotopePatternID");
             EventAnnotation lEventAnno = new EventAnnotation(rs.getInt("EventID"), rs.getInt("IsotopePatternID"), rs.getInt("QuanResultID"), rs.getInt("QuanChannelID"));
-            if(iIsotopePatternMap.get(lIsotopePatternId) == null){
+            if (iIsotopePatternMap.get(lIsotopePatternId) == null) {
                 IsotopePattern lIso = new IsotopePattern(lIsotopePatternId);
                 lIso.addEventAnnotation(lEventAnno);
                 iIsotopePatternMap.put(lIsotopePatternId, lIso);
@@ -688,7 +702,7 @@ public class Parser {
         while (rs.next()) {
             int lIsotopePatternId = rs.getInt("IsotopePatternID");
             EventAnnotation lEventAnno = new EventAnnotation(rs.getInt("EventID"), rs.getInt("IsotopePatternID"), rs.getInt("QuanResultID"), -1);
-            if(iIsotopePatternMap.get(lIsotopePatternId) == null){
+            if (iIsotopePatternMap.get(lIsotopePatternId) == null) {
                 IsotopePattern lIso = new IsotopePattern(lIsotopePatternId);
                 lIso.addEventAnnotation(lEventAnno);
                 iIsotopePatternMap.put(lIsotopePatternId, lIso);
@@ -702,11 +716,11 @@ public class Parser {
         rs = stat.executeQuery("select * from PrecursorIonQuanResults");
         while (rs.next()) {
             int lQuantId = rs.getInt("QuanResultID");
-            if(iQuanResultsMap.get(lQuantId) != null){
-                iQuanResultsMap.get(lQuantId).addQuanValues( rs.getInt("QuanChannelID"), rs.getDouble("Mass"), rs.getInt("Charge"), rs.getDouble("Area"), rs.getDouble("RetentionTime"));
+            if (iQuanResultsMap.get(lQuantId) != null) {
+                iQuanResultsMap.get(lQuantId).addQuanValues(rs.getInt("QuanChannelID"), rs.getDouble("Mass"), rs.getInt("Charge"), rs.getDouble("Area"), rs.getDouble("RetentionTime"));
             } else {
-                QuanResult  lQuant = new QuanResult(rs.getInt("QuanResultID"));
-                lQuant.addQuanValues( rs.getInt("QuanChannelID"), rs.getDouble("Mass"), rs.getInt("Charge"), rs.getDouble("Area"), rs.getDouble("RetentionTime"));
+                QuanResult lQuant = new QuanResult(rs.getInt("QuanResultID"));
+                lQuant.addQuanValues(rs.getInt("QuanChannelID"), rs.getDouble("Mass"), rs.getInt("Charge"), rs.getDouble("Area"), rs.getDouble("RetentionTime"));
                 iQuanResults.add(lQuant);
                 iQuanResultsMap.put(lQuant.getQuanResultId(), lQuant);
             }
@@ -715,11 +729,11 @@ public class Parser {
         rs = stat.executeQuery("select * from PrecursorIonAreaSearchSpectra");
         while (rs.next()) {
             int lQuantId = rs.getInt("QuanResultID");
-            if(iQuanResultsMap.get(lQuantId) != null){
+            if (iQuanResultsMap.get(lQuantId) != null) {
                 iQuanResultsMap.get(lQuantId).addSpectrumId(rs.getInt("SearchSpectrumID"));
                 iQuanResultsMap.get(lQuantId).addProcessingNodeNumber(-1);
             } else {
-                QuanResult  lQuant = new QuanResult(rs.getInt("QuanResultID"));
+                QuanResult lQuant = new QuanResult(rs.getInt("QuanResultID"));
                 lQuant.addSpectrumId(rs.getInt("SearchSpectrumID"));
                 lQuant.addProcessingNodeNumber(-1);
                 iQuanResults.add(lQuant);
@@ -730,7 +744,7 @@ public class Parser {
         rs = stat.executeQuery("select * from PrecursorIonQuanResultsSearchSpectra");
         while (rs.next()) {
             int lQuantId = rs.getInt("QuanResultID");
-            if(iQuanResultsMap.get(lQuantId) != null){
+            if (iQuanResultsMap.get(lQuantId) != null) {
                 iQuanResultsMap.get(lQuantId).addSpectrumId(rs.getInt("SearchSpectrumID"));
                 iQuanResultsMap.get(lQuantId).addProcessingNodeNumber(rs.getInt("ProcessingNodeNumber"));
             }
@@ -740,9 +754,9 @@ public class Parser {
         //add the isotope patterns to the quan results
         Collection iIsotopePatterns = iIsotopePatternMap.values();
         Iterator lIsotopePatternIterator = iIsotopePatterns.iterator();
-        while(lIsotopePatternIterator.hasNext()){
+        while (lIsotopePatternIterator.hasNext()) {
             IsotopePattern lIso = (IsotopePattern) lIsotopePatternIterator.next();
-            if(iQuanResultsMap.get(lIso.getSharedQuanResultId()) != null){
+            if (iQuanResultsMap.get(lIso.getSharedQuanResultId()) != null) {
                 iQuanResultsMap.get(lIso.getSharedQuanResultId()).addIsotopePattern(lIso);
             }
         }
@@ -758,19 +772,19 @@ public class Parser {
         //add the proteins to the peptides
         rs = stat.executeQuery("select * from  PeptidesProteins");
         while (rs.next()) {
-            if(iPeptidesMap.get(rs.getInt("PeptideID")) != null){
-                if(iProteinsMap.get(rs.getInt("ProteinId")) != null){
+            if (iPeptidesMap.get(rs.getInt("PeptideID")) != null) {
+                if (iProteinsMap.get(rs.getInt("ProteinId")) != null) {
                     iPeptidesMap.get(rs.getInt("PeptideID")).addProtein(iProteinsMap.get(rs.getInt("ProteinId")));
                 }
             }
         }
 
-        if(iMsfVersion == MsfVersion.VERSION1_3){
+        if (iMsfVersion == MsfVersion.VERSION1_3) {
             //add the proteins to the peptides
             rs = stat.executeQuery("select * from  PeptidesProteins_Decoy");
             while (rs.next()) {
-                if(iPeptidesDecoyMap.get(rs.getInt("PeptideID")) != null){
-                    if(iProteinsMap.get(rs.getInt("ProteinId")) != null){
+                if (iPeptidesDecoyMap.get(rs.getInt("PeptideID")) != null) {
+                    if (iProteinsMap.get(rs.getInt("ProteinId")) != null) {
                         iPeptidesDecoyMap.get(rs.getInt("PeptideID")).addDecoyProtein(iProteinsMap.get(rs.getInt("ProteinId")));
                     }
                 }
@@ -779,26 +793,26 @@ public class Parser {
 
 
         //add peptide to spectra
-        for(int p = 0; p<iPeptides.size(); p ++){
-            if(iSpectraMapBySpectrumId.get(iPeptides.get(p).getSpectrumId()) != null){
+        for (int p = 0; p < iPeptides.size(); p++) {
+            if (iSpectraMapBySpectrumId.get(iPeptides.get(p).getSpectrumId()) != null) {
                 iSpectraMapBySpectrumId.get(iPeptides.get(p).getSpectrumId()).addPeptide(iPeptides.get(p));
             }
         }
 
         //add decoy peptide to spectra
-        for(int p = 0; p<iPeptidesDecoy.size(); p ++){
-            if(iSpectraMapBySpectrumId.get(iPeptidesDecoy.get(p).getSpectrumId()) != null){
+        for (int p = 0; p < iPeptidesDecoy.size(); p++) {
+            if (iSpectraMapBySpectrumId.get(iPeptidesDecoy.get(p).getSpectrumId()) != null) {
                 iSpectraMapBySpectrumId.get(iPeptidesDecoy.get(p).getSpectrumId()).addDecoyPeptide(iPeptidesDecoy.get(p));
             }
         }
 
 
         //add ratios to spectra
-        for(int i = 0; i<iQuanResults.size(); i ++){
+        for (int i = 0; i < iQuanResults.size(); i++) {
             Vector<Integer> lSpectrumids = iQuanResults.get(i).getSpectrumIds();
-            for(int j = 0; j<lSpectrumids.size(); j++){
+            for (int j = 0; j < lSpectrumids.size(); j++) {
                 int lSpectrumid = lSpectrumids.get(j);
-                if(iSpectraMapBySpectrumId.get(lSpectrumid) != null){
+                if (iSpectraMapBySpectrumId.get(lSpectrumid) != null) {
                     iSpectraMapBySpectrumId.get(lSpectrumid).setQuanResult(iQuanResults.get(i));
                 }
             }
@@ -815,14 +829,14 @@ public class Parser {
         int lFieldId = 0;
         rs = stat.executeQuery("select * from CustomDataFields");
         while (rs.next()) {
-            if(rs.getString("DisplayName").equalsIgnoreCase("QuanChannelID")){
+            if (rs.getString("DisplayName").equalsIgnoreCase("QuanChannelID")) {
                 lFieldId = rs.getInt("FieldID");
             }
         }
-        if(lFieldId != 0){
+        if (lFieldId != 0) {
             rs = stat.executeQuery("select * from CustomDataPeptides where FieldID = " + lFieldId);
             while (rs.next()) {
-                if(iPeptidesMap.get(rs.getInt("PeptideID")) != null){
+                if (iPeptidesMap.get(rs.getInt("PeptideID")) != null) {
                     iPeptidesMap.get(rs.getInt("PeptideID")).setChannelId(rs.getInt("FieldValue"));
                 }
             }
@@ -831,14 +845,20 @@ public class Parser {
         rs.close();
     }
 
+    private Spectrum spectrumFromSpectrumheadersQuery(ResultSet rs) throws SQLException {
+        Spectrum lSpectrum = new Spectrum(rs.getInt("SpectrumID"), rs.getInt("UniqueSpectrumID"), rs.getInt("MassPeakID"), rs.getInt("LastScan"), rs.getInt("FirstScan"), rs.getInt("ScanNumbers"), rs.getInt("Charge"), rs.getDouble("RetentionTime"), rs.getDouble("Mass"), rs.getInt("ScanEventID"), iConnection, this);
+        return lSpectrum;
+    }
+
     /**
      * This getter gives the name of the channel for a given channelid
+     *
      * @param lChannelId Int with the channelid
      * @return String with the name of the channel
      */
-    public String getQuanChannelNameById(int lChannelId){
-        for(int i = 0; i<iChannelIds.size(); i ++){
-            if(iChannelIds.get(i)==lChannelId){
+    public String getQuanChannelNameById(int lChannelId) {
+        for (int i = 0; i < iChannelIds.size(); i++) {
+            if (iChannelIds.get(i) == lChannelId) {
                 return iComponents.get(i);
             }
         }
@@ -847,33 +867,34 @@ public class Parser {
 
     /**
      * This getter gives the name of the raw data file for a given fileid
+     *
      * @param lFileid int with the fileid
      * @return String with the name of the raw file
      */
-    public String getRawfileNameByFileId(int lFileid){
+    public String getRawfileNameByFileId(int lFileid) {
         String lResult = null;
-        for(int i = 0; i<iRawFiles.size(); i ++){
-            if(lFileid == iRawFiles.get(i).getFileId()){
+        for (int i = 0; i < iRawFiles.size(); i++) {
+            if (lFileid == iRawFiles.get(i).getFileId()) {
                 lResult = iRawFiles.get(i).getFileName().substring(iRawFiles.get(i).getFileName().lastIndexOf("\\") + 1);
             }
         }
         return lResult;
     }
 
-
     /**
-     * The method will parse the quantitation xml and will set the ratio types, components and channelids
+     * The method will parse the quantitation xml and will set the ratio types,
+     * components and channelids
      */
-    public void parseQuantitationXml(){
+    public void parseQuantitationXml() {
         String[] lLines = iQuantificationMethod.split("\r\n");
         boolean lRatioReporting = false;
 
-        for(int i = 0; i<lLines.length; i ++){
+        for (int i = 0; i < lLines.length; i++) {
             String lLine = lLines[i].trim();
-            if(lLine.startsWith("<ProcessingMethod")){
+            if (lLine.startsWith("<ProcessingMethod")) {
                 iQuantificationMethodName = lLine.substring(lLine.indexOf("name=\"") + 6, lLine.indexOf("\"", lLine.indexOf("name=\"") + 6));
             }
-            if(lLine.endsWith("selected=\"QuanLabels\">")){
+            if (lLine.endsWith("selected=\"QuanLabels\">")) {
                 //we have a component
                 String lComponent = lLine.substring(lLine.indexOf("name=\"") + 6, lLine.indexOf("\"", lLine.indexOf("name=\"") + 6));
                 String lNextChannelLine = lLines[i + 1];
@@ -881,11 +902,11 @@ public class Parser {
                 iComponents.add(lComponent);
                 iChannelIds.add(lChannel);
             }
-            if(lLine.startsWith("<MethodPart name=\"RatioCalculation\"")){
+            if (lLine.startsWith("<MethodPart name=\"RatioCalculation\"")) {
                 lRatioReporting = false;
             }
-            if(lRatioReporting){
-                if(lLine.startsWith("<MethodPart")){
+            if (lRatioReporting) {
+                if (lLine.startsWith("<MethodPart")) {
                     String lRatioType = lLine.substring(lLine.indexOf("name=\"") + 6, lLine.indexOf("\"", lLine.indexOf("name=\"") + 6));
                     String lNextNumeratorLine = lLines[i + 2];
                     String lNextDenominatorLine = lLines[i + 3];
@@ -895,12 +916,11 @@ public class Parser {
                     iRatioTypes.add(new RatioType(lRatioType, lNumerator, lDenominator, iChannelIds, iComponents));
                 }
             }
-            if(lLine.startsWith("<MethodPart name=\"RatioReporting\"")){
+            if (lLine.startsWith("<MethodPart name=\"RatioReporting\"")) {
                 lRatioReporting = true;
             }
         }
     }
-
 
     /**
      * This getter gives a vector with all the modifications found in the msf file
@@ -911,8 +931,11 @@ public class Parser {
     }
 
     /**
-     * This getter gives a hashmap with the modificationid as key and the modification as value
-     * @return HashMap with the modificationid as key and the modification as value
+     * This getter gives a hashmap with the modificationid as key and the
+     * modification as value
+     *
+     * @return HashMap with the modificationid as key and the modification as
+     * value
      */
     public HashMap<Integer, Modification> getModificationsMap() {
         return iModificationsMap;
@@ -943,7 +966,9 @@ public class Parser {
     }
 
     /**
-     * This getter gives a hashmap with the enzyme id as key and the enzyme as value
+     * This getter gives a hashmap with the enzyme id as key and the enzyme as
+     * value
+     *
      * @return HashMap with the enzyme id as key and the enzyme as value
      */
     public HashMap<Integer, Enzyme> getEnzymesMap() {
@@ -959,7 +984,9 @@ public class Parser {
     }
 
     /**
-     * This getter gives a hashmap with the peptide id as key and the peptide as value
+     * This getter gives a hashmap with the peptide id as key and the peptide as
+     * value
+     *
      * @return HashMap with the peptide id as key and the peptide as value
      */
     public HashMap<Integer, Peptide> getPeptidesMap() {
@@ -975,7 +1002,9 @@ public class Parser {
     }
 
     /**
-     * This getter gives a hashmap with the taxonomies id as key and the taxonomies as value
+     * This getter gives a hashmap with the taxonomies id as key and the
+     * taxonomies as value
+     *
      * @return HashMap with the taxonomies id as key and the taxonomies as value
      */
     public HashMap<Integer, Taxonomy> getTaxonomiesMap() {
@@ -991,7 +1020,9 @@ public class Parser {
     }
 
     /**
-     * This getter gives a hashmap with the spectrum id as key and the spectrum as value
+     * This getter gives a hashmap with the spectrum id as key and the spectrum
+     * as value
+     *
      * @return HashMap with the spectrum id as key and the spectrum as value
      */
     public HashMap<Integer, Spectrum> getSpectraMapBySpectrumId() {
@@ -999,24 +1030,33 @@ public class Parser {
     }
 
     /**
-     * This getter gives a hashmap with the unique spectrum id as key and the spectrum as value
-     * @return HashMap with the unique spectrum id as key and the spectrum as value
+     * This getter gives a hashmap with the unique spectrum id as key and the
+     * spectrum as value
+     *
+     * @return HashMap with the unique spectrum id as key and the spectrum as
+     * value
      */
     public HashMap<Integer, Spectrum> getSpectraMapByUniqueSpectrumId() {
         return iSpectraMapByUniqueSpectrumId;
     }
 
     /**
-     * This getter gives a hashmap with the mass peak id as key and the spectrum as value
-     * @return HashMap with the unique mass peak id as key and the spectrum as value
+     * This getter gives a hashmap with the mass peak id as key and the spectrum
+     * as value
+     *
+     * @return HashMap with the unique mass peak id as key and the spectrum as
+     * value
      */
     public HashMap<Integer, Spectrum> getSpectraMapByMassPeakId() {
         return iSpectraMapByMassPeakId;
     }
 
     /**
-     * This getter gives a string with the xml formatted quantification method found in the msf file
-     * @return String with the xml formatted quantification method found in the msf file
+     * This getter gives a string with the xml formatted quantification method
+     * found in the msf file
+     *
+     * @return String with the xml formatted quantification method found in the
+     * msf file
      */
     public String getQuantificationMethod() {
         return iQuantificationMethod;
@@ -1071,7 +1111,9 @@ public class Parser {
     }
 
     /**
-     * This getter gives a hashmap with the protein id as key and the protein as value
+     * This getter gives a hashmap with the protein id as key and the protein as
+     * value
+     *
      * @return HashMap with the protein id as key and the protein as value
      */
     public HashMap<Integer, Protein> getProteinsMap() {
@@ -1087,8 +1129,11 @@ public class Parser {
     }
 
     /**
-     * This getter gives a hashmap with the custom data fields id as key and the custom data fields as value
-     * @return HashMap with the custom data fields id as key and the custom data fields as value
+     * This getter gives a hashmap with the custom data fields id as key and the
+     * custom data fields as value
+     *
+     * @return HashMap with the custom data fields id as key and the custom data
+     * fields as value
      */
     public HashMap<Integer, CustomDataField> getCustomDataFieldsMap() {
         return iCustomDataFieldsMap;
@@ -1120,6 +1165,7 @@ public class Parser {
 
     /**
      * This getter gives the workflow info of the msf file
+     *
      * @return WorkflowInfo Workflow info of the msf file
      */
     public WorkflowInfo getWorkFlowInfo() {
@@ -1135,8 +1181,11 @@ public class Parser {
     }
 
     /**
-     * This getter gives a hashmap with the isotope pattern id as key and the isotope pattern as value
-     * @return hashmap with the isotope pattern id as key and the isotope pattern as value 
+     * This getter gives a hashmap with the isotope pattern id as key and the
+     * isotope pattern as value
+     *
+     * @return hashmap with the isotope pattern id as key and the isotope
+     * pattern as value
      */
     public HashMap<Integer, IsotopePattern> getIsotopePatternMap() {
         return iIsotopePatternMap;
@@ -1151,8 +1200,11 @@ public class Parser {
     }
 
     /**
-     * This getter gives a hashmap with the quan result id as key and the quan result as value
-     * @return hashmap with the quan result id as key and the quan result as value
+     * This getter gives a hashmap with the quan result id as key and the quan
+     * result as value
+     *
+     * @return hashmap with the quan result id as key and the quan result as
+     * value
      */
     public HashMap<Integer, QuanResult> getQuanResultsMap() {
         return iQuanResultsMap;
@@ -1168,6 +1220,7 @@ public class Parser {
 
     /**
      * This getter gives the sql connection to the msf file
+     *
      * @return Connection to the msf file
      */
     public Connection getConnection() {
@@ -1184,10 +1237,11 @@ public class Parser {
 
     /**
      * This method will give a processing node based on the given number
+     *
      * @param lId Int with the id of the processing node
      * @return The requested processing node
      */
-    public ProcessingNode getProcessingNodeByNumber(int lId){
+    public ProcessingNode getProcessingNodeByNumber(int lId) {
         return iProcessingNodesMap.get(lId);
     }
 
@@ -1199,8 +1253,8 @@ public class Parser {
         return iFilePath;
     }
 
-    public String getFileName(){
-        String lSub = iFilePath.substring(iFilePath.lastIndexOf(System.getProperties().getProperty("file.separator"))+1);
+    public String getFileName() {
+        String lSub = iFilePath.substring(iFilePath.lastIndexOf(System.getProperties().getProperty("file.separator")) + 1);
         return lSub;
     }
 

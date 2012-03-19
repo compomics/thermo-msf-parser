@@ -1,0 +1,6 @@
+[27-Jan-2012 17:13:18 - INFO] "java.sql.SQLException: file is encrypted or is not a database" (com.compomics.thermo_msf_parser.gui.Thermo_msf_parserGUI$17:942)
+[27-Jan-2012 17:13:18 - INFO] "java.lang.NullPointerException" (com.compomics.thermo_msf_parser.gui.Thermo_msf_parserGUI$17:1051)
+[27-Jan-2012 17:13:33 - INFO] "java.lang.NullPointerException" (com.compomics.thermo_msf_parser.gui.Thermo_msf_parserGUI$17:1051)
+[27-Jan-2012 17:13:38 - INFO] "java.lang.NullPointerException" (com.compomics.thermo_msf_parser.gui.Thermo_msf_parserGUI$17:1051)
+[21-Feb-2012 11:17:31 - INFO] "java.sql.SQLException: no such table: Spectrum" (com.compomics.thermo_msf_parser.gui.Thermo_msf_parserGUI$17:949)
+[21-Feb-2012 11:17:32 - INFO] "java.lang.NullPointerException" (com.compomics.thermo_msf_parser.gui.Thermo_msf_parserGUI$17:1058)

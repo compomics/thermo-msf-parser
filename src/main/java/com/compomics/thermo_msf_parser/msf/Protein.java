@@ -78,31 +78,12 @@ public class Protein {
      * A vector with the decoy peptides
      */
     private Vector<Peptide> iDecoyPeptides = new Vector<Peptide>();
+    
     /**
-     * A vector with the processing node number from the scores
+     * vector with score objects
      */
-    private Vector<Integer> iScoresProcessingNumber = new Vector<Integer>();
-    /**
-     * A vector with the coverage
-     */
-    private Vector<Double> iCoverages = new Vector<Double>();
-    /**
-     * The protein score
-     */
-    private Vector<Double> iDecoyScores = new Vector<Double>();
-    /**
-     * A vector with the processing node number from the scores
-     */
-    private Vector<Integer> iDecoyScoresProcessingNumber = new Vector<Integer>();
-    /**
-     * A vector with the coverage
-     */
-    private Vector<Double> iDecoyCoverages = new Vector<Double>();
-    /**
-     * The protein score
-     */
-    private Vector<Double> iScores = new Vector<Double>();
-
+    private Vector<ProteinScore> scores = new Vector<ProteinScore>();
+    private Vector<ProteinScore> decoyScores = new Vector<ProteinScore>();
 
     public Protein(int iProteinId, String iSequence) {
         this.iProteinId = iProteinId;
@@ -242,15 +223,19 @@ public class Protein {
     }
 
     public void addScore(double aProteinScore, int aProcessingNodeNumber, double aCoverage) {
-        this.iScores.add(aProteinScore);
-        this.iScoresProcessingNumber.add(aProcessingNodeNumber);
-        this.iCoverages.add(aCoverage);
+        this.scores.add(new ProteinScore(aProteinScore,aProcessingNodeNumber,aCoverage));
+    }
+
+    public Vector<ProteinScore> getScores() {
+        return scores;
     }
 
     public void addDecoyScore(double aProteinScore, int aProcessingNodeNumber, double aCoverage) {
-        this.iScores.add(aProteinScore);
-        this.iScoresProcessingNumber.add(aProcessingNodeNumber);
-        this.iCoverages.add(aCoverage);
+        this.decoyScores.add(new ProteinScore(aProteinScore,aProcessingNodeNumber,aCoverage));
+    }
+    
+    public Vector<ProteinScore> getDecoyScores() {
+        return decoyScores;
     }
 
     public static class PtmAnnotation{
@@ -268,6 +253,30 @@ public class Protein {
 
         public int getPosition() {
             return iPosition;
+        }
+    }
+    
+    public class ProteinScore {
+        private double score;
+        private int processingNodeNumber;
+        private double coverage;
+
+        public ProteinScore(double score, int processingNodeNumber, double coverage) {
+            this.score = score;
+            this.processingNodeNumber = processingNodeNumber;
+            this.coverage = coverage;
+        }
+
+        public double getCoverage() {
+            return coverage;
+        }
+
+        public int getProcessingNodeNumber() {
+            return processingNodeNumber;
+        }
+
+        public double getScore() {
+            return score;
         }
     }
 }
