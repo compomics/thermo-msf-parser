@@ -1,5 +1,12 @@
 package com.compomics.thermo_msf_parser.msf;
 
+import com.compomics.thermo_msf_parser.msf.enums.ActivationType;
+import com.compomics.thermo_msf_parser.msf.enums.DetectorType;
+import com.compomics.thermo_msf_parser.msf.enums.IonizationType;
+import com.compomics.thermo_msf_parser.msf.enums.ScanType;
+import java.util.EnumSet;
+import org.apache.commons.lang3.EnumUtils;
+
 /**
  * Created by IntelliJ IDEA.
  * User: Niklaas
@@ -75,17 +82,33 @@ public class ScanEvent {
     public int getScanType() {
         return iScanType;
     }
+    
+    public EnumSet<ScanType> getScanTypes() {
+        return EnumUtils.processBitVector(ScanType.class, (long)iScanType);
+    }
 
     public int getIonization() {
         return iIonization;
+    }
+    
+    public EnumSet<IonizationType> getIonizationTypes() {
+        return EnumUtils.processBitVector(IonizationType.class, (long)iIonization);
     }
 
     public int getMassAnalyzer() {
         return iMassAnalyzer;
     }
+    
+    public EnumSet<DetectorType> getMassAnalyzerTypes() {
+        return EnumUtils.processBitVector(DetectorType.class, (long)iMassAnalyzer);
+    }
 
     public int getActivationType() {
         return iActivationType;
+    }
+    
+    public EnumSet<ActivationType> getActivationTypeSet() {
+        return EnumUtils.processBitVector(ActivationType.class, (long)iActivationType);
     }
 
     

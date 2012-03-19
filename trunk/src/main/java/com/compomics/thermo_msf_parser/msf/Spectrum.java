@@ -142,6 +142,14 @@ public class Spectrum {
         this.iParser = iParser;
     }
 
+    @Override
+    public Spectrum clone() {
+        Spectrum newSpectrum = new Spectrum(iSpectrumId, iUniqueSpectrumId, iMassPeakId,
+                iLastScan, iFirstScan, iScan,
+                iCharge, iRetentionTime, iSinglyChargedMass,
+                iScanEventId, iConnection, iParser);
+        return newSpectrum;
+    }
 
     //getters
 
@@ -215,7 +223,17 @@ public class Spectrum {
         return iCustomDataFieldValues;
     }
 
-    public byte[] getZippedSpectrumXml() {
+    public byte[] getZippedSpectrumXml() throws SQLException {
+        if (iZippedSpectrumXml == null) {
+            ResultSet rs;
+            Statement stat = iConnection.createStatement();
+            rs = stat.executeQuery("select * from Spectra where UniqueSpectrumID = " + iUniqueSpectrumId);
+            while (rs.next()) {
+                iZippedSpectrumXml = rs.getBytes("Spectrum");
+            }
+            rs.close();
+            stat.close();
+        }
         return iZippedSpectrumXml;
     }
 
@@ -234,39 +252,19 @@ public class Spectrum {
      * @throws Exception An exception is thrown when there is a problem with the connection to the msf file
      */
     public String getUnzippedSpectrumXml() throws Exception {
-        byte[] lZippedSpectrumXml = iZippedSpectrumXml;
-        if (lZippedSpectrumXml == null) {
-            ResultSet rs;
-            Statement stat = iConnection.createStatement();
-            rs = stat.executeQuery("select * from Spectra where UniqueSpectrumID = " + iUniqueSpectrumId);
-            while (rs.next()) {
-                lZippedSpectrumXml = rs.getBytes("Spectrum");
-            }
-            rs.close();
-            stat.close();
-        }
-        File lZippedFile = File.createTempFile("zip",null);
-        FileOutputStream fos = new FileOutputStream(lZippedFile);
-        fos.write(lZippedSpectrumXml);
-        fos.flush();
-        fos.close();
-        BufferedOutputStream out = null;
-        ZipInputStream in = new ZipInputStream(new BufferedInputStream(new FileInputStream(lZippedFile)));
-        ZipEntry entry;
-        byte[] ltest = new byte[0];
+        byte[] lZippedSpectrumXml = getZippedSpectrumXml();
+
+        ZipInputStream in = new ZipInputStream(new ByteArrayInputStream(lZippedSpectrumXml));
+        
         ByteArrayOutputStream lStream = new ByteArrayOutputStream(50);
-        while ((entry = in.getNextEntry()) != null) {
+        while (in.getNextEntry() != null) {
             int count;
-            byte data[] = new byte[50];
-            out = new BufferedOutputStream(lStream, 50);
+            byte[] data = new byte[50];
             while ((count = in.read(data, 0, 50)) != -1) {
-                out.write(data, 0, count);
+                lStream.write(data, 0, count);
             }
         }
-        in.close();
-        out.flush();
-        out.close();
-        lZippedFile.delete();
+
         String lResult = lStream.toString();
         lStream.close();
         return lResult;

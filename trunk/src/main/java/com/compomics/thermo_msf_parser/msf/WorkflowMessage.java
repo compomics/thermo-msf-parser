@@ -1,5 +1,7 @@
 package com.compomics.thermo_msf_parser.msf;
 
+import com.compomics.thermo_msf_parser.msf.util.DateConverter;
+import java.util.Date;
 import org.apache.log4j.Logger;
 
 /**
@@ -27,7 +29,7 @@ public class WorkflowMessage {
     /**
      * The time
      */
-    private int iTime;
+    private long iTime;
     /**
      * The message kind
      */
@@ -46,7 +48,7 @@ public class WorkflowMessage {
      * @param iMessageKind The message kind
      * @param iMessage The message
      */
-    public WorkflowMessage(int iMessageId, int iProcessingNodeId, int iProcessingNodeNumber, int iTime, int iMessageKind, String iMessage) {
+    public WorkflowMessage(int iMessageId, int iProcessingNodeId, int iProcessingNodeNumber, long iTime, int iMessageKind, String iMessage) {
         this.iMessageId = iMessageId;
         this.iProcessingNodeId = iProcessingNodeId;
         this.iProcessingNodeNumber = iProcessingNodeNumber;
@@ -67,8 +69,16 @@ public class WorkflowMessage {
         return iProcessingNodeNumber;
     }
 
-    public int getTime() {
+    public long getTimeTicks() {
         return iTime;
+    }
+    
+    public Date getDate() {
+        return DateConverter.ticksToDate(iTime);
+    }
+    
+    public long getUnixTime() {
+        return DateConverter.ticksToEpoch(iTime);
     }
 
     public int getMessageKind() {
