@@ -297,18 +297,6 @@
             <artifactId>jgraph</artifactId>
             <version>5.12.4</version>
         </dependency>
-        <dependency>
-            <artifactId>thermo_msf_parser</artifactId>
-            <groupId>com.compomics</groupId>
-            <type>jar</type>
-            <version>0.4</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>thermo_msf_parser</artifactId>
-                    <groupId>com.compomics</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
     </dependencies>
 
     <distributionManagement>
