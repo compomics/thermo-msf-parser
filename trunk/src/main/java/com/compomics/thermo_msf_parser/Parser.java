@@ -425,12 +425,13 @@ public class Parser {
             while (rs.next()) {
                 iSpectrumUsedCustomDataFields.add(iCustomDataFieldsMap.get(rs.getInt("FieldID")));
             }
+            
+
         }
         
-        
-        // Get the populations from the db
-        populateModifications(stat);
-        
+        // Get the modifications from the db
+        populateModifications(stat);   
+            
         //get the taxonomies
         rs = stat.executeQuery("select * from TaxonomyNodes");
         while (rs.next()) {
@@ -797,14 +798,16 @@ public class Parser {
 
     private void populateModifications(Statement stat) throws SQLException {
         ResultSet rs;
-        
-        // Obtain the IDs specific for the pRS site probabilities
         Vector<Integer> pRSSiteProbabilityFieldIDs = new Vector<Integer>();
-        rs = stat.executeQuery("select fieldid from customdatafields where guid='4baa6fcd-f366-46a4-ad29-674b23c5641c'");
-        while (rs.next()) {
-            pRSSiteProbabilityFieldIDs.add(rs.getInt("FieldID"));
-        }
         
+        // pRS probabilities only for version 1.3 and greater
+        if (iMsfVersion.compareTo(MsfVersion.VERSION1_3) >= 0) {
+            // Obtain the IDs specific for the pRS site probabilities
+            rs = stat.executeQuery("select fieldid from customdatafields where guid='4baa6fcd-f366-46a4-ad29-674b23c5641c'");
+            while (rs.next()) {
+                pRSSiteProbabilityFieldIDs.add(rs.getInt("FieldID"));
+            }
+        }
         //add the modifications to the peptide
         String[] modificationTypes = new String[]{"TerminalModification", "AminoAcidModification"};
         String[] decoySuffixes = new String[]{"", "_decoy"};
