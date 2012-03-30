@@ -180,6 +180,10 @@ public class Thermo_msf_parserGUI extends JFrame {
      * Boolean that indicates if quantifications are found in the msf files
      */
     private boolean iQuantitationFound = false;
+    /**
+     * Boolean indicating phosphoRS is calculated in msf files
+     */
+    private boolean hasPhosphoRS;
 
 
     /**
@@ -925,7 +929,7 @@ public class Thermo_msf_parserGUI extends JFrame {
                         return true;
                     }
                     if (lFiles.length > 1) {
-                        JOptionPane.showMessageDialog(getFrame(), "The workflow of the differnt msf files that are loaded must be the same.\nUnexpected crashes can occur if files with different workflows are loaded!", "Info", JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.showMessageDialog(getFrame(), "The workflow of the different msf files that are loaded must be the same.\nUnexpected crashes can occur if files with different workflows are loaded!", "Info", JOptionPane.INFORMATION_MESSAGE);
                     }
 
                     progressBar.setVisible(true);
@@ -947,13 +951,16 @@ public class Thermo_msf_parserGUI extends JFrame {
                         }
                         System.gc();
                     }
-
+                    
+                    hasPhosphoRS = iParsedMsfs.get(0).hasPhosphoRS();
+                    
                     //load processing nodes
                     processingNodeTabbedPane.removeAll();
                     for (int i = 0; i < iParsedMsfs.get(0).getProcessingNodes().size(); i++) {
                         if (iParsedMsfs.get(0).getQuantificationMethod() != null) {
                             iQuantitationFound = true;
                         }
+                        
                         ProcessingNode lNode = iParsedMsfs.get(0).getProcessingNodes().get(i);
                         String lTitle = lNode.getProcessingNodeNumber() + " " + lNode.getFriendlyName();
 
@@ -1198,7 +1205,16 @@ public class Thermo_msf_parserGUI extends JFrame {
         lPeptideTableColumnsTitleVector.add("Modified Sequence");
         lPeptideTableColumnsEditableVector.add(false);
         lPeptideTableColumnsClassVector.add(String.class);
-
+        
+        if (hasPhosphoRS) {
+            lPeptideTableColumnsTitleVector.add("pRS Score");
+            lPeptideTableColumnsEditableVector.add(false);
+            lPeptideTableColumnsClassVector.add(Double.class);
+            lPeptideTableColumnsTitleVector.add("pRS Seq Probability");
+            lPeptideTableColumnsEditableVector.add(false);
+            lPeptideTableColumnsClassVector.add(Double.class);
+        }
+        
         //get the different score types and add it as columns
         if (iMergedPeptidesScores == null) {
             this.collectPeptideScoreTypes();
@@ -2205,6 +2221,22 @@ public class Thermo_msf_parserGUI extends JFrame {
         lPeptideObject.add(lPeptide.getParentSpectrum().getSpectrumTitle());
         lPeptideObject.add(lPeptide);
         lPeptideObject.add(lPeptide.getModifiedPeptide());
+        
+        if (hasPhosphoRS) {
+            Float pRSScore = lPeptide.getPhosphoRSScore();
+            if (pRSScore != null) {
+                lPeptideObject.add(pRSScore.doubleValue());
+            } else {
+                lPeptideObject.add(null);
+            }
+            Float pRSProbability = lPeptide.getPhoshpoRSSequenceProbability();
+            if (pRSProbability != null) {
+                lPeptideObject.add(pRSProbability.doubleValue());
+            } else {
+                lPeptideObject.add(null);
+            }
+        }
+        
         for (int j = 0; j < iMergedPeptidesScores.size(); j++) {
             if (!peptideInformationChb.isSelected()) {
                 if (iMergedPeptidesScores.get(j).getIsMainScore() == 1) {

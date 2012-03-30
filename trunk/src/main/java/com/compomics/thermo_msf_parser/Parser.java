@@ -208,6 +208,10 @@ public class Parser {
      * The quantification method name
      */
     private String iQuantificationMethodName;
+    /**
+     * Flag to set if phosphoRS processing nodes are found
+     */
+    private boolean hasPhosphoRS = false;
 
     /**
      * This will parse the thermo msf file
@@ -584,6 +588,7 @@ public class Parser {
         rs = stat.executeQuery("select * from ProcessingNodes");
         while (rs.next()) {
             ProcessingNode lNode = new ProcessingNode(rs.getInt("ProcessingNodeNumber"), rs.getInt("ProcessingNodeID"), rs.getString("ProcessingNodeParentNumber"), rs.getString("NodeName"), rs.getString("FriendlyName"), rs.getInt("MajorVersion"), rs.getInt("MinorVersion"), rs.getString("NodeComment"));
+            if (rs.getString("NodeGUID").equals("0787547a-095f-4721-bbb2-83a59ea52e13")) hasPhosphoRS = true;
             iProcessingNodes.add(lNode);
             iProcessingNodesMap.put(lNode.getProcessingNodeNumber(), lNode);
         }
@@ -796,19 +801,37 @@ public class Parser {
         rs.close();
     }
 
+    /**
+     * Retrieve the modifications of a peptide
+     * @param stat statement object for the database
+     * @throws SQLException 
+     */
     private void populateModifications(Statement stat) throws SQLException {
         ResultSet rs;
         Vector<Integer> pRSSiteProbabilityFieldIDs = new Vector<Integer>();
+        Vector<Integer> pRSProbabilityFieldIDs = new Vector<Integer>();
+        Vector<Integer> pRSScoreFieldIDs = new Vector<Integer>();
         
         // pRS probabilities only for version 1.3 and greater
         if (iMsfVersion.compareTo(MsfVersion.VERSION1_3) >= 0) {
-            // Obtain the IDs specific for the pRS site probabilities
+            // Obtain IDs for the pRS sequence probability in customdata
+            rs = stat.executeQuery("select fieldid from customdatafields where guid='648ca109-d0d0-4cee-a4bc-6b65ce8b29b5'");
+            while (rs.next()) {
+                pRSProbabilityFieldIDs.add(rs.getInt("FieldID"));
+            }
+            // Obtain the IDs specific for the pRS site probabilities in customdata
+            rs = stat.executeQuery("select fieldid from customdatafields where guid='67a9ceea-d1d8-4730-be55-8b2e079d3bcd'");
+            while (rs.next()) {
+                pRSScoreFieldIDs.add(rs.getInt("FieldID"));
+            }
+            // Obtain the IDs specific for the pRS site probabilities in customdata
             rs = stat.executeQuery("select fieldid from customdatafields where guid='4baa6fcd-f366-46a4-ad29-674b23c5641c'");
             while (rs.next()) {
                 pRSSiteProbabilityFieldIDs.add(rs.getInt("FieldID"));
             }
         }
-        //add the modifications to the peptide
+ 
+        //add the modifications to the peptides
         String[] modificationTypes = new String[]{"TerminalModification", "AminoAcidModification"};
         String[] decoySuffixes = new String[]{"", "_decoy"};
         
@@ -818,7 +841,9 @@ public class Parser {
                 
                 rs = stat.executeQuery("select * from Peptides" + modificationType + "s" + decoySuffix);
                 while (rs.next()) {
-                    if (iPeptidesMap.get(rs.getInt("PeptideID")) != null) {
+                    Peptide pep = iPeptidesMap.get(rs.getInt("PeptideID"));
+                    if (pep != null) {
+                        
                         if (iModificationsMap.get(rs.getInt(modificationType + "ID")) != null) {
                             Modification lMod = iModificationsMap.get(rs.getInt(modificationType + "ID"));
                             int location = 0;
@@ -835,16 +860,33 @@ public class Parser {
                             
                             ModificationPosition lModPos = new ModificationPosition(location, isNterm, isCterm);
                             
-                            Peptide pep = iPeptidesMap.get(rs.getInt("PeptideID"));
                             Float lpRSSiteProb = null;
+                            boolean pRSProbabilitiesAdded = false;
                             if (!isNterm && !isCterm) {
-                                for (Integer fieldId: pRSSiteProbabilityFieldIDs) {
-                                    if(pep.getCustomDataFieldValues().containsKey(fieldId)) {
-                                        Map<Integer, Float> probabilities = parsePRSIdentificationProbabilities(pep.getCustomDataFieldValues().get(fieldId));
+                                for (Integer fieldID : pRSSiteProbabilityFieldIDs) {
+                                    if(pep.getCustomDataFieldValues().containsKey(fieldID)) {
+                                        Map<Integer, Float> probabilities = parsePRSIdentificationProbabilities(pep.getCustomDataFieldValues().get(fieldID));
                                         if (probabilities.containsKey(location)) {
                                             lpRSSiteProb = probabilities.get(location);
                                         }
                                     }
+                                }
+                                
+                                // pRS probability will only be present if there's a modification. Therefore, we can add it to the peptide here
+                                // For a little bit of optimization, only do it once
+                                if (!pRSProbabilitiesAdded) {
+                                    for (Integer fieldID : pRSProbabilityFieldIDs) {
+                                        if (pep.getCustomDataFieldValues().containsKey(fieldID)){
+                                            pep.setPhoshpoRSSequenceProbability(Float.parseFloat(pep.getCustomDataFieldValues().get(fieldID)));
+                                        }
+                                    }
+                                    for (Integer fieldID : pRSScoreFieldIDs) {
+                                        if (pep.getCustomDataFieldValues().containsKey(fieldID)){
+                                            pep.setPhosphoRSScore(Float.parseFloat(pep.getCustomDataFieldValues().get(fieldID)));
+                                        }
+                                    }
+
+                                    pRSProbabilitiesAdded = true; // If it was not actually added, it won't also happen on a next try
                                 }
                             }
 
@@ -1289,5 +1331,9 @@ public class Parser {
 
     public String getQuantificationMethodName() {
         return iQuantificationMethodName;
+    }
+
+    public boolean hasPhosphoRS() {
+        return hasPhosphoRS;
     }
 }
