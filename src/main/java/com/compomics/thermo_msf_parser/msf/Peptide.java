@@ -71,7 +71,15 @@ public class Peptide {
     /**
      * The site probabilities of the Phospho modifications
      */
-    private Vector<Float> iPhosphoRSSiteProbability = new Vector<Float>();
+    private Vector<Float> iPhosphoRSSiteProbabilities = new Vector<Float>();
+    /**
+     * the phosphoRS p value for the current 'phosphorylation isoform'
+     */
+    private Float phosphoRSScore = null;
+    /**
+     * the phosphoRS probability of the sequence
+     */
+    private Float phoshpoRSSequenceProbability = null;
     /**
      * Boolean that indicates if this peptide is N-terminally modified
      */
@@ -118,6 +126,7 @@ public class Peptide {
      * WORKS ONLY FROM PROTEOME DISCOVERER VERSION 1.3
      */
     private int iUniquePeptideSequenceId;
+
     /**
      * Constructor for the peptide
      * @param iPeptideId The peptide id
@@ -409,7 +418,7 @@ public class Peptide {
     public void addModification(Modification lMod, ModificationPosition lModPos, Float pRSSiteMod) {
         iPeptideModifications.add(lMod);
         iPeptideModificationPositions.add(lModPos);
-        iPhosphoRSSiteProbability.add(pRSSiteMod);
+        iPhosphoRSSiteProbabilities.add(pRSSiteMod);
         if (lModPos.isNterm()) {
             iHasNTermModification = true;
         }
@@ -446,7 +455,7 @@ public class Peptide {
                     if (iPeptideModificationPositions.get(m).getPosition() == c && !iPeptideModificationPositions.get(m).isNterm()) {
                         
                         iModifiedPeptide = iModifiedPeptide + "<" + iPeptideModifications.get(m).getAbbreviation();
-                        if (iPhosphoRSSiteProbability.get(m) != null) iModifiedPeptide += ":"+(iPhosphoRSSiteProbability.get(m)*100) + "%";
+                        if (iPhosphoRSSiteProbabilities.get(m) != null) iModifiedPeptide += ":"+(iPhosphoRSSiteProbabilities.get(m)*100) + "%";
                         iModifiedPeptide += ">";
                     }
                 }
@@ -650,5 +659,25 @@ public class Peptide {
 
     public void setAnnotation(String aAnnotation) {
         this.iAnnotation = aAnnotation;
+    }
+
+    public void setPhosphoRSScore(Float pRSScore) {
+        this.phosphoRSScore = pRSScore;
+    }
+
+    public Float getPhosphoRSScore() {
+        return phosphoRSScore;
+    }
+
+    public Float getPhoshpoRSSequenceProbability() {
+        return phoshpoRSSequenceProbability;
+    }
+
+    public void setPhoshpoRSSequenceProbability(Float phoshpoRSSequenceProbability) {
+        this.phoshpoRSSequenceProbability = phoshpoRSSequenceProbability;
+    }
+    
+    public Float getPoshpoRSSequenceProbability() {
+        return phoshpoRSSequenceProbability;
     }
 }
