@@ -69,6 +69,10 @@ public class Peptide {
      */
     private Vector<ModificationPosition> iPeptideModificationPositions = new Vector<ModificationPosition>();
     /**
+     * The site probabilities of the Phospho modifications
+     */
+    private Vector<Float> iPhosphoRSSiteProbability = new Vector<Float>();
+    /**
      * Boolean that indicates if this peptide is N-terminally modified
      */
     private boolean iHasNTermModification = false;
@@ -402,9 +406,10 @@ public class Peptide {
      * @param lMod The modification
      * @param lModPos The modification position
      */
-    public void addModification(Modification lMod, ModificationPosition lModPos) {
+    public void addModification(Modification lMod, ModificationPosition lModPos, Float pRSSiteMod) {
         iPeptideModifications.add(lMod);
         iPeptideModificationPositions.add(lModPos);
+        iPhosphoRSSiteProbability.add(pRSSiteMod);
         if (lModPos.isNterm()) {
             iHasNTermModification = true;
         }
@@ -439,7 +444,10 @@ public class Peptide {
                 iModifiedPeptide = iModifiedPeptide + iSequence.charAt(c);
                 for (int m = 0; m < iPeptideModifications.size(); m++) {
                     if (iPeptideModificationPositions.get(m).getPosition() == c && !iPeptideModificationPositions.get(m).isNterm()) {
-                        iModifiedPeptide = iModifiedPeptide + "<" + iPeptideModifications.get(m).getAbbreviation() + ">";
+                        
+                        iModifiedPeptide = iModifiedPeptide + "<" + iPeptideModifications.get(m).getAbbreviation();
+                        if (iPhosphoRSSiteProbability.get(m) != null) iModifiedPeptide += ":"+(iPhosphoRSSiteProbability.get(m)*100) + "%";
+                        iModifiedPeptide += ">";
                     }
                 }
             }

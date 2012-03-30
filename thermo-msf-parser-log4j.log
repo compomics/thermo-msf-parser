@@ -4,3 +4,17 @@
 [27-Jan-2012 17:13:38 - INFO] "java.lang.NullPointerException" (com.compomics.thermo_msf_parser.gui.Thermo_msf_parserGUI$17:1051)
 [21-Feb-2012 11:17:31 - INFO] "java.sql.SQLException: no such table: Spectrum" (com.compomics.thermo_msf_parser.gui.Thermo_msf_parserGUI$17:949)
 [21-Feb-2012 11:17:32 - INFO] "java.lang.NullPointerException" (com.compomics.thermo_msf_parser.gui.Thermo_msf_parserGUI$17:1058)
+[19-Mar-2012 18:08:10 - INFO] "Problem launching the application! :-(" (com.compomics.thermo_msf_parser.gui.ParserStarter:32)
+[19-Mar-2012 18:08:10 - ERROR] "String index out of range: -6" (com.compomics.thermo_msf_parser.gui.ParserStarter:33)
+java.lang.StringIndexOutOfBoundsException: String index out of range: -6
+	at java.lang.String.substring(String.java:1958)
+	at com.compomics.thermo_msf_parser.gui.ParserStarter.launch(ParserStarter.java:54)
+	at com.compomics.thermo_msf_parser.gui.ParserStarter.<init>(ParserStarter.java:30)
+	at com.compomics.thermo_msf_parser.gui.ParserStarter.main(ParserStarter.java:151)
+[28-Mar-2012 15:59:21 - INFO] "Problem launching the application! :-(" (com.compomics.thermo_msf_parser.gui.ParserStarter:32)
+[28-Mar-2012 15:59:21 - ERROR] "String index out of range: -6" (com.compomics.thermo_msf_parser.gui.ParserStarter:33)
+java.lang.StringIndexOutOfBoundsException: String index out of range: -6
+	at java.lang.String.substring(String.java:1958)
+	at com.compomics.thermo_msf_parser.gui.ParserStarter.launch(ParserStarter.java:54)
+	at com.compomics.thermo_msf_parser.gui.ParserStarter.<init>(ParserStarter.java:30)
+	at com.compomics.thermo_msf_parser.gui.ParserStarter.main(ParserStarter.java:151)
