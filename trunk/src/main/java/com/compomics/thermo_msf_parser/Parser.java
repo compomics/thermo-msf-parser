@@ -1,13 +1,11 @@
 package com.compomics.thermo_msf_parser;
 
 import com.compomics.thermo_msf_parser.msf.*;
-import org.apache.log4j.Logger;
 
 import java.sql.*;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Vector;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by IntelliJ IDEA.
@@ -362,7 +360,7 @@ public class Parser {
             iScoreTypes.add(lScoreType);
         }
         //add the score to the peptides
-        rs = stat.executeQuery("select  * from  PeptideScores ");
+        rs = stat.executeQuery("select * from  PeptideScores ");
         while (rs.next()) {
             if (iPeptidesMap.get(rs.getInt("PeptideID")) != null) {
                 int lScoreId = rs.getInt("ScoreID");
@@ -377,58 +375,62 @@ public class Parser {
                 iPeptidesDecoyMap.get(rs.getInt("PeptideID")).setScore(rs.getDouble("ScoreValue"), lScoreId, iScoreTypes);
             }
         }
-        //add the modifications to the peptide
-        rs = stat.executeQuery("select  * from  PeptidesTerminalModifications");
-        while (rs.next()) {
-            if (iPeptidesMap.get(rs.getInt("PeptideID")) != null) {
-                if (iModificationsMap.get(rs.getInt("TerminalModificationID")) != null) {
-                    Modification lMod = iModificationsMap.get(rs.getInt("TerminalModificationID"));
-                    boolean lNterm = false;
-                    if (lMod.getPositionType() == 1) {
-                        lNterm = true;
-                    }
-                    ModificationPosition lModPos = new ModificationPosition(0, lNterm, !lNterm);
-                    iPeptidesMap.get(rs.getInt("PeptideID")).addModification(lMod, lModPos);
-                }
+        
+        if (iMsfVersion == MsfVersion.VERSION1_3) {
+            //get the custom data fields
+            rs = stat.executeQuery("select  * from  CustomDataFields ");
+            while (rs.next()) {
+                CustomDataField lField = new CustomDataField(rs.getInt("FieldID"), rs.getString("DisplayName"));
+                iCustomDataFields.add(lField);
+                iCustomDataFieldsMap.put(lField.getFieldId(), lField);
             }
-        }
-        rs = stat.executeQuery("select  * from  PeptidesAminoAcidModifications");
-        while (rs.next()) {
-            if (iPeptidesMap.get(rs.getInt("PeptideID")) != null) {
-                if (iModificationsMap.get(rs.getInt("AminoAcidModificationID")) != null) {
-                    Modification lMod = iModificationsMap.get(rs.getInt("AminoAcidModificationID"));
-                    ModificationPosition lModPos = new ModificationPosition(rs.getInt("Position"), false, false);
-                    iPeptidesMap.get(rs.getInt("PeptideID")).addModification(lMod, lModPos);
-                }
-            }
-        }
 
-        //add the modifications to the peptide
-        rs = stat.executeQuery("select  * from  PeptidesTerminalModifications_decoy");
-        while (rs.next()) {
-            if (iPeptidesDecoyMap.get(rs.getInt("PeptideID")) != null) {
-                if (iModificationsMap.get(rs.getInt("TerminalModificationID")) != null) {
-                    Modification lMod = iModificationsMap.get(rs.getInt("TerminalModificationID"));
-                    boolean lNterm = false;
-                    if (lMod.getPositionType() == 1) {
-                        lNterm = true;
-                    }
-                    ModificationPosition lModPos = new ModificationPosition(0, lNterm, !lNterm);
-                    iPeptidesDecoyMap.get(rs.getInt("PeptideID")).addModification(lMod, lModPos);
+            //add the custom data fields to the peptides
+            rs = stat.executeQuery("select * from CustomDataPeptides ");
+            while (rs.next()) {
+                if(iPeptidesMap.get(rs.getInt("PeptideID")) != null) {
+                    iPeptidesMap.get(rs.getInt("PeptideID")).addCustomDataField(rs.getInt("FieldID"),rs.getString("FieldValue"));
                 }
             }
-        }
-        rs = stat.executeQuery("select  * from  PeptidesAminoAcidModifications_decoy");
-        while (rs.next()) {
-            if (iPeptidesDecoyMap.get(rs.getInt("PeptideID")) != null) {
-                if (iModificationsMap.get(rs.getInt("AminoAcidModificationID")) != null) {
-                    Modification lMod = iModificationsMap.get(rs.getInt("AminoAcidModificationID"));
-                    ModificationPosition lModPos = new ModificationPosition(rs.getInt("Position"), false, false);
-                    iPeptidesDecoyMap.get(rs.getInt("PeptideID")).addModification(lMod, lModPos);
+            rs = stat.executeQuery("select * from CustomDataPeptides_decoy ");
+            while (rs.next()) {
+                if(iPeptidesDecoyMap.get(rs.getInt("PeptideID")) != null) {
+                    iPeptidesDecoyMap.get(rs.getInt("PeptideID")).addCustomDataField(rs.getInt("FieldID"),rs.getString("FieldValue"));
                 }
             }
-        }
 
+            rs = stat.executeQuery("select fieldid from CustomDataPeptides group by fieldid");
+            while (rs.next()) {
+                iPeptideUsedCustomDataFields.add(iCustomDataFieldsMap.get(rs.getInt("FieldID")));
+            }
+            //add the custom data fields to the proteins
+            rs = stat.executeQuery("select  * from  CustomDataProteins ");
+            while (rs.next()) {
+                if (iProteinsMap.get(rs.getInt("ProteinID")) != null) {
+                    iProteinsMap.get(rs.getInt("ProteinID")).addCustomDataField(rs.getInt("FieldID"), rs.getString("FieldValue"));
+                }
+            }
+            rs = stat.executeQuery("select fieldid from CustomDataProteins group by fieldid");
+            while (rs.next()) {
+                iProteinUsedCustomDataFields.add(iCustomDataFieldsMap.get(rs.getInt("FieldID")));
+            }
+            //add the custom data fields to the proteins
+            rs = stat.executeQuery("select  * from  CustomDataSpectra ");
+            while (rs.next()) {
+                if (iSpectraMapBySpectrumId.get(rs.getInt("SpectrumID")) != null) {
+                    iSpectraMapBySpectrumId.get(rs.getInt("SpectrumID")).addCustomDataField(rs.getInt("FieldID"), rs.getString("FieldValue"));
+                }
+            }
+            rs = stat.executeQuery("select fieldid from CustomDataSpectra group by fieldid");
+            while (rs.next()) {
+                iSpectrumUsedCustomDataFields.add(iCustomDataFieldsMap.get(rs.getInt("FieldID")));
+            }
+        }
+        
+        
+        // Get the populations from the db
+        populateModifications(stat);
+        
         //get the taxonomies
         rs = stat.executeQuery("select * from TaxonomyNodes");
         while (rs.next()) {
@@ -552,59 +554,7 @@ public class Parser {
             }
         }
 
-
-        //get the custom data fields
-        rs = stat.executeQuery("select  * from  CustomDataFields ");
-        while (rs.next()) {
-            CustomDataField lField = new CustomDataField(rs.getInt("FieldID"), rs.getString("DisplayName"));
-            iCustomDataFields.add(lField);
-            iCustomDataFieldsMap.put(lField.getFieldId(), lField);
-        }
-        //add the custom data fields to the peptides
-        rs = stat.executeQuery("select  * from  CustomDataPeptides ");
-        while (rs.next()) {
-            if (iPeptidesMap.get(rs.getInt("PeptideID")) != null) {
-                iPeptidesMap.get(rs.getInt("PeptideID")).addCustomDataField(rs.getInt("FieldID"), rs.getString("FieldValue"));
-
-            }
-        }
-        //add the custom data fields to the peptides
-        /*
-         * rs = stat.executeQuery("select * from CustomDataPeptides "); while
-         * (rs.next()) { if(iPeptidesDecoyMap.get(rs.getInt("PeptideID")) !=
-         * null){
-         * iPeptidesDecoyMap.get(rs.getInt("PeptideID")).addCustomDataField(rs.getInt("FieldID"),rs.getString("FieldValue"));
-         *
-         * }
-         * }
-         */
-        rs = stat.executeQuery("select fieldid from CustomDataPeptides group by fieldid");
-        while (rs.next()) {
-            iPeptideUsedCustomDataFields.add(iCustomDataFieldsMap.get(rs.getInt("FieldID")));
-        }
-        //add the custom data fields to the proteins
-        rs = stat.executeQuery("select  * from  CustomDataProteins ");
-        while (rs.next()) {
-            if (iProteinsMap.get(rs.getInt("ProteinID")) != null) {
-                iProteinsMap.get(rs.getInt("ProteinID")).addCustomDataField(rs.getInt("FieldID"), rs.getString("FieldValue"));
-            }
-        }
-        rs = stat.executeQuery("select fieldid from CustomDataProteins group by fieldid");
-        while (rs.next()) {
-            iProteinUsedCustomDataFields.add(iCustomDataFieldsMap.get(rs.getInt("FieldID")));
-        }
-        //add the custom data fields to the proteins
-        rs = stat.executeQuery("select  * from  CustomDataSpectra ");
-        while (rs.next()) {
-            if (iSpectraMapBySpectrumId.get(rs.getInt("SpectrumID")) != null) {
-                iSpectraMapBySpectrumId.get(rs.getInt("SpectrumID")).addCustomDataField(rs.getInt("FieldID"), rs.getString("FieldValue"));
-            }
-        }
-        rs = stat.executeQuery("select fieldid from CustomDataSpectra group by fieldid");
-        while (rs.next()) {
-            iSpectrumUsedCustomDataFields.add(iCustomDataFieldsMap.get(rs.getInt("FieldID")));
-        }
-
+        
 
         //get the quantification method
         rs = stat.executeQuery("select ParameterValue from ProcessingNodeParameters where ParameterName = 'QuantificationMethod'");
@@ -843,6 +793,82 @@ public class Parser {
         }
 
         rs.close();
+    }
+
+    private void populateModifications(Statement stat) throws SQLException {
+        ResultSet rs;
+        
+        // Obtain the IDs specific for the pRS site probabilities
+        Vector<Integer> pRSSiteProbabilityFieldIDs = new Vector<Integer>();
+        rs = stat.executeQuery("select fieldid from customdatafields where guid='4baa6fcd-f366-46a4-ad29-674b23c5641c'");
+        while (rs.next()) {
+            pRSSiteProbabilityFieldIDs.add(rs.getInt("FieldID"));
+        }
+        
+        //add the modifications to the peptide
+        String[] modificationTypes = new String[]{"TerminalModification", "AminoAcidModification"};
+        String[] decoySuffixes = new String[]{"", "_decoy"};
+        
+        for (String decoySuffix : decoySuffixes) {
+            for (String modificationType: modificationTypes) {
+                boolean isTerminalModification = modificationType.startsWith("Terminal"); //hacky but it saves some space
+                
+                rs = stat.executeQuery("select * from Peptides" + modificationType + "s" + decoySuffix);
+                while (rs.next()) {
+                    if (iPeptidesMap.get(rs.getInt("PeptideID")) != null) {
+                        if (iModificationsMap.get(rs.getInt(modificationType + "ID")) != null) {
+                            Modification lMod = iModificationsMap.get(rs.getInt(modificationType + "ID"));
+                            int location = 0;
+                            boolean isCterm = false, isNterm = false;
+                            if (isTerminalModification) {
+                                if (lMod.getPositionType() == 1) {
+                                    isNterm = true;
+                                } else {
+                                    isCterm = true;
+                                }
+                            } else {
+                                location = rs.getInt("Position");
+                            }
+                            
+                            ModificationPosition lModPos = new ModificationPosition(location, isNterm, isCterm);
+                            
+                            Peptide pep = iPeptidesMap.get(rs.getInt("PeptideID"));
+                            Float lpRSSiteProb = null;
+                            if (!isNterm && !isCterm) {
+                                for (Integer fieldId: pRSSiteProbabilityFieldIDs) {
+                                    if(pep.getCustomDataFieldValues().containsKey(fieldId)) {
+                                        Map<Integer, Float> probabilities = parsePRSIdentificationProbabilities(pep.getCustomDataFieldValues().get(fieldId));
+                                        if (probabilities.containsKey(location)) {
+                                            lpRSSiteProb = probabilities.get(location);
+                                        }
+                                    }
+                                }
+                            }
+
+                            pep.addModification(lMod, lModPos, lpRSSiteProb);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    /**
+     * Create a map with position information and identification probabilities from a string obtained from the customdatapeptides* tables
+     * @param pRSString string from customdatapeptides pRS identification probabilities
+     * @return map with peptide locations and probabilities
+     */
+    private Map<Integer, Float> parsePRSIdentificationProbabilities(String pRSString) {
+        String[] parts = pRSString.split(";\\s?");
+        HashMap<Integer, Float> probsPerSite = new HashMap<Integer, Float>();
+        Pattern p = Pattern.compile(".*\\((\\d+)\\)\\s*?:\\s*?([0-9.]+)");
+        for(String part: parts) {
+            Matcher m = p.matcher(part);
+            if (m.matches()) {
+                probsPerSite.put(Integer.parseInt(m.group(1)) - 1, Float.parseFloat(m.group(2))/100f);
+            }
+        }
+        return probsPerSite;
     }
 
     private Spectrum spectrumFromSpectrumheadersQuery(ResultSet rs) throws SQLException {

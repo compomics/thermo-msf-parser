@@ -5,13 +5,13 @@
     <groupId>com.compomics</groupId>
     <artifactId>thermo_msf_parser</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.4</version>
+    <version>1.0.5</version>
     <name>thermo_msf_parser</name>
     <url>http://code.google.com/p/thermo_msf_parser/</url>
 
     <!-- Set the version number for the whole project -->
     <properties>
-        <version.number>1.0.5</version.number>
+        <version.number>${version}</version.number>
         <logging.level.default>INFO</logging.level.default>
         <logging.file.path.name>thermo-msf-parser-log4j.log</logging.file.path.name>
         <logging.file.max.size>5000KB</logging.file.max.size>
@@ -291,6 +291,23 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jgraph</groupId>
+            <artifactId>jgraph</artifactId>
+            <version>5.12.4</version>
+        </dependency>
+        <dependency>
+            <artifactId>thermo_msf_parser</artifactId>
+            <groupId>com.compomics</groupId>
+            <type>jar</type>
+            <version>0.4</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>thermo_msf_parser</artifactId>
+                    <groupId>com.compomics</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
