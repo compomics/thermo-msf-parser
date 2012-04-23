@@ -8,7 +8,6 @@ package com.compomics.thermo_msf_parser.msf.enums;
  *
  * @author toorn101
  */
-public enum DetectorType {
-
-    UNKNOWN,ION_TRAP, FOURIER_TRANSFORM, TIME_OF_FLIGHT, SINGLE_QUAD, TRIPLE_QUAD, SECTOR_FIELD;
+public enum ChromatogramTraceType {
+    MASS_RANGE_TRACE, TIC_TRACE, BASE_PEAK_TRACE, FRAGMENT_TRACE;
 }
