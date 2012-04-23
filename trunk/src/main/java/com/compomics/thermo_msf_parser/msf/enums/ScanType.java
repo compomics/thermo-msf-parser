@@ -9,6 +9,6 @@ package com.compomics.thermo_msf_parser.msf.enums;
  * @author toorn101
  */
 public enum ScanType {
-
-    CENTROID, PROFILE;
+    
+    UNKNOWN, FULL, SINGLE_ION_MONITORING, SINGLE_REACTION_MONITORING;
 }
