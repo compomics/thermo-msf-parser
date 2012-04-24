@@ -1,5 +1,6 @@
 package com.compomics.thermo_msf_parser.msf;
 
+import com.compomics.thermo_msf_parser.msf.enums.GUID;
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;
@@ -48,6 +49,10 @@ public class ProcessingNode {
      */
     private String iNodeComment;
     /**
+     * The node GUID
+     */
+    private String iNodeGUID;
+    /**
      * The processing node parameters added to this processingnode
      */
     private Vector<ProcessingNodeParameter> iProcessingNodeParameters = new Vector<ProcessingNodeParameter>();
@@ -67,7 +72,7 @@ public class ProcessingNode {
      * @param iMinorVersion The minor version
      * @param iNodeComment The node comment
      */
-    public ProcessingNode(int iProcessingNodeNumber, int iProcessingNodeId, String iProcessingNodeParentNumber, String iNodeName, String iFriendlyName, int iMajorVersion, int iMinorVersion, String iNodeComment) {
+    public ProcessingNode(int iProcessingNodeNumber, int iProcessingNodeId, String iProcessingNodeParentNumber, String iNodeName, String iFriendlyName, int iMajorVersion, int iMinorVersion, String iNodeComment, String iNodeGuID) {
         this.iProcessingNodeNumber = iProcessingNodeNumber;
         this.iProcessingNodeId = iProcessingNodeId;
         this.iProcessingNodeParentNumber = iProcessingNodeParentNumber;
@@ -76,6 +81,7 @@ public class ProcessingNode {
         this.iMajorVersion = iMajorVersion;
         this.iMinorVersion = iMinorVersion;
         this.iNodeComment = iNodeComment;
+        this.iNodeGUID = iNodeGuID;
     }
 
 
@@ -111,13 +117,21 @@ public class ProcessingNode {
         return iNodeComment;
     }
 
+    public String getNodeGUIDString() {
+        return iNodeGUID;
+    }
+    
+    public GUID getNodeGUID() {
+        return GUID.fromGUIDString(iNodeGUID);
+    }
+
     public Vector<ProcessingNodeParameter> getProcessingNodeParameters() {
         return iProcessingNodeParameters;
     }
 
     /**
      * This method will add a processing node parameter to this processing node
-     * @param lNodeParameter The processing node parameter to addd
+     * @param lNodeParameter The processing node parameter to add
      */
     public void addProcessingNodeParameter(ProcessingNodeParameter lNodeParameter) {
         iProcessingNodeParameters.add(lNodeParameter);
