@@ -1,6 +1,7 @@
 package com.compomics.thermo_msf_parser;
 
 import com.compomics.thermo_msf_parser.msf.*;
+import com.compomics.thermo_msf_parser.msf.enums.GUID;
 
 import java.sql.*;
 import java.util.*;
@@ -16,10 +17,9 @@ import java.util.regex.Pattern;
 public class Parser {
 
     /**
-     * Prepared statements to fetch spectra
+     * Obtain a list of fasta files used
      */
-    private PreparedStatement spectrumStatement;
-    
+    private Vector<String> iFastaFiles = new Vector<String>();
     /**
      * The modifications
      */
@@ -329,6 +329,11 @@ public class Parser {
             iPeptidesMap.put(lPeptide.getPeptideId(), lPeptide);
         }
         
+        //get the fasta files
+        rs = stat.executeQuery("select VirtualFileName as file from fastafiles");
+        while (rs.next()) {
+            iFastaFiles.add(rs.getString("file"));
+        }
 
 
         //get the peptides
@@ -587,8 +592,7 @@ public class Parser {
         //get the processing nodes
         rs = stat.executeQuery("select * from ProcessingNodes");
         while (rs.next()) {
-            ProcessingNode lNode = new ProcessingNode(
-                    rs.getInt("ProcessingNodeNumber"),
+            ProcessingNode lNode = new ProcessingNode(rs.getInt("ProcessingNodeNumber"),
                     rs.getInt("ProcessingNodeID"),
                     rs.getString("ProcessingNodeParentNumber"),
                     rs.getString("NodeName"),
@@ -597,8 +601,7 @@ public class Parser {
                     rs.getInt("MinorVersion"),
                     rs.getString("NodeComment"),
                     rs.getString("NodeGUID"));
-
-            if (rs.getString("NodeGUID").equals("0787547a-095f-4721-bbb2-83a59ea52e13")) hasPhosphoRS = true;
+            if (rs.getString("NodeGUID").equals(GUID.NODE_PTM_SCORER)) hasPhosphoRS = true;
             iProcessingNodes.add(lNode);
             iProcessingNodesMap.put(lNode.getProcessingNodeNumber(), lNode);
         }
@@ -825,17 +828,17 @@ public class Parser {
         // pRS probabilities only for version 1.3 and greater
         if (iMsfVersion.compareTo(MsfVersion.VERSION1_3) >= 0) {
             // Obtain IDs for the pRS sequence probability in customdata
-            rs = stat.executeQuery("select fieldid from customdatafields where guid='648ca109-d0d0-4cee-a4bc-6b65ce8b29b5'");
+            rs = stat.executeQuery("select fieldid from customdatafields where guid='" + GUID.PRS_SEQUENCE_PROBABILITY + "'");
             while (rs.next()) {
                 pRSProbabilityFieldIDs.add(rs.getInt("FieldID"));
             }
             // Obtain the IDs specific for the pRS site probabilities in customdata
-            rs = stat.executeQuery("select fieldid from customdatafields where guid='67a9ceea-d1d8-4730-be55-8b2e079d3bcd'");
+            rs = stat.executeQuery("select fieldid from customdatafields where guid='" + GUID.PRS_SCORE + "'");
             while (rs.next()) {
                 pRSScoreFieldIDs.add(rs.getInt("FieldID"));
             }
             // Obtain the IDs specific for the pRS site probabilities in customdata
-            rs = stat.executeQuery("select fieldid from customdatafields where guid='4baa6fcd-f366-46a4-ad29-674b23c5641c'");
+            rs = stat.executeQuery("select fieldid from customdatafields where guid='" + GUID.PRS_SITE_PROBABILITIES + "'");
             while (rs.next()) {
                 pRSSiteProbabilityFieldIDs.add(rs.getInt("FieldID"));
             }
@@ -925,7 +928,14 @@ public class Parser {
         }
         return probsPerSite;
     }
-
+    
+    /**
+     * Close the database connection
+     */
+    public void close() throws SQLException {
+        iConnection.close();
+    }
+    
     private Spectrum spectrumFromSpectrumheadersQuery(ResultSet rs) throws SQLException {
         Spectrum lSpectrum = new Spectrum(rs.getInt("SpectrumID"), rs.getInt("UniqueSpectrumID"), rs.getInt("MassPeakID"), rs.getInt("LastScan"), rs.getInt("FirstScan"), rs.getInt("ScanNumbers"), rs.getInt("Charge"), rs.getDouble("RetentionTime"), rs.getDouble("Mass"), rs.getInt("ScanEventID"), iConnection, this);
         return lSpectrum;
@@ -1346,4 +1356,9 @@ public class Parser {
     public boolean hasPhosphoRS() {
         return hasPhosphoRS;
     }
+
+    public Vector<String> getFastaFiles() {
+        return iFastaFiles;
+    }
+    
 }
