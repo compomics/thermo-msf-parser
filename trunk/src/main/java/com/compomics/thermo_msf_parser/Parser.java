@@ -587,7 +587,17 @@ public class Parser {
         //get the processing nodes
         rs = stat.executeQuery("select * from ProcessingNodes");
         while (rs.next()) {
-            ProcessingNode lNode = new ProcessingNode(rs.getInt("ProcessingNodeNumber"), rs.getInt("ProcessingNodeID"), rs.getString("ProcessingNodeParentNumber"), rs.getString("NodeName"), rs.getString("FriendlyName"), rs.getInt("MajorVersion"), rs.getInt("MinorVersion"), rs.getString("NodeComment"));
+            ProcessingNode lNode = new ProcessingNode(
+                    rs.getInt("ProcessingNodeNumber"),
+                    rs.getInt("ProcessingNodeID"),
+                    rs.getString("ProcessingNodeParentNumber"),
+                    rs.getString("NodeName"),
+                    rs.getString("FriendlyName"),
+                    rs.getInt("MajorVersion"),
+                    rs.getInt("MinorVersion"),
+                    rs.getString("NodeComment"),
+                    rs.getString("NodeGUID"));
+
             if (rs.getString("NodeGUID").equals("0787547a-095f-4721-bbb2-83a59ea52e13")) hasPhosphoRS = true;
             iProcessingNodes.add(lNode);
             iProcessingNodesMap.put(lNode.getProcessingNodeNumber(), lNode);
