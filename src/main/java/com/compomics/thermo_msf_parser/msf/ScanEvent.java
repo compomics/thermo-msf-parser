@@ -79,28 +79,28 @@ public class ScanEvent {
         return iPolarity;
     }
 
-    public int getScanType() {
-        return iScanType;
-    }
+//    public int getScanType() {
+//        return iScanType;
+//    }
     
-    public EnumSet<ScanType> getScanTypes() {
-        return EnumUtils.processBitVector(ScanType.class, (long)iScanType);
+    public ScanType getScanType() {
+        return ScanType.values()[iScanType];
     }
 
     public int getIonization() {
         return iIonization;
     }
     
-    public EnumSet<IonizationType> getIonizationTypes() {
-        return EnumUtils.processBitVector(IonizationType.class, (long)iIonization);
+    public IonizationType getIonizationTypes() {
+        return IonizationType.values()[iIonization];
     }
 
     public int getMassAnalyzer() {
         return iMassAnalyzer;
     }
     
-    public EnumSet<DetectorType> getMassAnalyzerTypes() {
-        return EnumUtils.processBitVector(DetectorType.class, (long)iMassAnalyzer);
+    public DetectorType getMassAnalyzerType() {
+        return DetectorType.values()[iMassAnalyzer];
     }
 
     public int getActivationType() {
