@@ -676,8 +676,4 @@ public class Peptide {
     public void setPhoshpoRSSequenceProbability(Float phoshpoRSSequenceProbability) {
         this.phoshpoRSSequenceProbability = phoshpoRSSequenceProbability;
     }
-    
-    public Float getPoshpoRSSequenceProbability() {
-        return phoshpoRSSequenceProbability;
-    }
 }
