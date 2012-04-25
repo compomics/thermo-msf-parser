@@ -5,7 +5,7 @@
     <groupId>com.compomics</groupId>
     <artifactId>thermo_msf_parser</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.5</version>
+    <version>1.0.6</version>
     <name>thermo_msf_parser</name>
     <url>http://code.google.com/p/thermo_msf_parser/</url>
 
@@ -263,6 +263,10 @@
             <exclusions>
                 <exclusion>
                     <artifactId>mascotdatfile</artifactId>
+                    <groupId>com.compomics</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>thermo_msf_parser</artifactId>
                     <groupId>com.compomics</groupId>
                 </exclusion>
                 <exclusion>

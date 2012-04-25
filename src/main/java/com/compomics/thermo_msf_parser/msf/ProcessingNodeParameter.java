@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
  */
 public class ProcessingNodeParameter {
     // Class specific log4j logger for Thermo_msf_parserGUI instances.
-	 private static Logger logger = Logger.getLogger(ProcessingNodeParameter.class);
+    private static Logger logger = Logger.getLogger(ProcessingNodeParameter.class);
     /**
      * The processing node number
      */
@@ -59,19 +59,22 @@ public class ProcessingNodeParameter {
 
     /**
      * The processing node parameter
+     *
      * @param iProcessingNodeNumber The processing node number
-     * @param iProcessingNodeId The processing node id
-     * @param iParameterName The parameter name
-     * @param iFriendlyName The friendly name
-     * @param iIntendedPurpose The intended purpose
-     * @param iPurposeDetails The purpose details 
-     * @param iAdvanced An int that indicates the advanced status
-     * @param iCategory The category
-     * @param iPosition The position
-     * @param iParameterValue The parameter value
-     * @param iValueDisplayString The displayed parameter value
+     * @param iProcessingNodeId     The processing node id
+     * @param iParameterName        The parameter name
+     * @param iFriendlyName         The friendly name
+     * @param iIntendedPurpose      The intended purpose
+     * @param iPurposeDetails       The purpose details
+     * @param iAdvanced             An int that indicates the advanced status
+     * @param iCategory             The category
+     * @param iPosition             The position
+     * @param iParameterValue       The parameter value
+     * @param iValueDisplayString   The displayed parameter value
      */
-    public ProcessingNodeParameter(int iProcessingNodeNumber, int iProcessingNodeId, String iParameterName, String iFriendlyName, int iIntendedPurpose, String iPurposeDetails, int iAdvanced, String iCategory, int iPosition, String iParameterValue, String iValueDisplayString) {
+    public ProcessingNodeParameter(int iProcessingNodeNumber, int iProcessingNodeId, String iParameterName,
+                                   String iFriendlyName, int iIntendedPurpose, String iPurposeDetails,
+                                   int iAdvanced, String iCategory, int iPosition, String iParameterValue, String iValueDisplayString) {
         this.iProcessingNodeNumber = iProcessingNodeNumber;
         this.iProcessingNodeId = iProcessingNodeId;
         this.iParameterName = iParameterName;
