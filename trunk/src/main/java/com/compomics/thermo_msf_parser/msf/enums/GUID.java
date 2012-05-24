@@ -42,6 +42,15 @@ public enum GUID {
      */
     NODE_MASCOT("7643d5ae-af3b-40c7-9be3-da9413336c93", "Mascot search"),
     /**
+     * Sequest search node
+     */
+    NODE_SEQUEST("033d39f9-b398-4cac-9ad7-a308e68c5df9", "Sequest search"),
+    /**
+     * X-Core search node
+     * TODO: obtain the X-CORE GUID
+     */
+    NODE_XCORE("43091f25-f2d1-4a79-9d07-5f1b9a30bf69", "X-Core search"),
+    /**
      * Peptide validator node
      */
     NODE_PEPTIDE_VALIDATOR("4aba1d19-1fd5-4a42-8671-175a1800878a", "Peptide validator"),
@@ -57,10 +66,6 @@ public enum GUID {
      * Spectrum files node
      */
     NODE_SPECTRUM_FILES("848160ba-2f76-46ca-a281-f7bf66990a5b", "Spectrum files"),
-    /**
-     * Sequest search node
-     */
-    NODE_SEQUEST("033d39f9-b398-4cac-9ad7-a308e68c5df9", "SEQUEST"),
     /**
      * Spectrum normalizer for Sequest
      */

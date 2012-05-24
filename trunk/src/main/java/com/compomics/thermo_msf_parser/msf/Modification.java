@@ -63,6 +63,10 @@ public class Modification {
      */
     private Vector<AminoAcid> iAttachedAminoAcids = new Vector<AminoAcid>();
     /**
+     * The amino acids selected to search on
+     */
+    private Vector<AminoAcid> iSelectedAminoAcids = new Vector<AminoAcid>();
+    /**
      * The neutral losses attached to this amino acid
      * Only works for Thermo Proteome Discoverer version 1.3
      */
@@ -72,6 +76,10 @@ public class Modification {
      * Only works for Thermo Proteome Discoverer version 1.3
      */
     private Vector<Integer> iAttachedClassifications = new Vector<Integer>();
+    /**
+     * Indication if modification is used as a fixed or variable modification
+     */
+    private boolean fixedModification = false;
 
     /**
      * The Modification constructor
@@ -86,8 +94,9 @@ public class Modification {
      * @param iDeltaAverageMass The average delta mass
      * @param iUnimodAccession The unimod accession
      * @param iIsSubstitution An int that indicates if this modification is a substitution
+     * @param isFixedModification boolean to indicate whether the modification is used as fixed or variable
      */
-    public Modification(int iAminoAcidModificationId, String iModificationName, double iDeltaMass, String iSubstitution, String iLeavingGroup, String iAbbreviation, int iPositionType, int iIsActive, double iDeltaAverageMass, int iUnimodAccession, int iIsSubstitution) {
+    public Modification(int iAminoAcidModificationId, String iModificationName, double iDeltaMass, String iSubstitution, String iLeavingGroup, String iAbbreviation, int iPositionType, int iIsActive, double iDeltaAverageMass, int iUnimodAccession, int iIsSubstitution, boolean isFixedModification) {
         this.iAminoAcidModificationId = iAminoAcidModificationId;
         this.iModificationName = iModificationName;
         this.iDeltaMass = iDeltaMass;
@@ -99,6 +108,7 @@ public class Modification {
         this.iDeltaAverageMass = iDeltaAverageMass;
         this.iUnimodAccession = iUnimodAccession;
         this.iIsSubstitution = iIsSubstitution;
+        this.fixedModification = isFixedModification;
     }
 
 
@@ -160,8 +170,18 @@ public class Modification {
         return iAttachedAminoAcids;
     }
 
+    public Vector<AminoAcid> getSelectedAminoAcids() {
+        return iSelectedAminoAcids;
+    }
+    
+    
+
     public void addClassificationForAminoAcid(int aClassification) {
         this.iAttachedClassifications.add(aClassification);
+    }
+
+    public boolean isFixedModification() {
+        return fixedModification;
     }
 
 }

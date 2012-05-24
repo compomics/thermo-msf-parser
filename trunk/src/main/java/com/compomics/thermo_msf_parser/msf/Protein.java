@@ -110,7 +110,7 @@ public class Protein {
                 }
                 rs.close();
                 stat.close();
-            iSequence = lSequence;
+            iSequence = lSequence; //TODO: HENK: this sort of defeats the point of lazy loading, when obtaining large numbers of sequences?
             return lSequence;
         }
         return iSequence;

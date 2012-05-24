@@ -345,7 +345,6 @@ public class Spectrum {
 
     }
 
-
     //setters
 
     public void setFileId(int iFileId) {
