@@ -2,6 +2,7 @@ package com.compomics.thermo_msf_parser;
 
 import com.compomics.thermo_msf_parser.msf.*;
 import com.compomics.thermo_msf_parser.msf.enums.GUID;
+import com.compomics.thermo_msf_parser.msf.util.Joiner;
 
 import java.sql.*;
 import java.util.*;
@@ -9,10 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Niklaas
- * Date: 18-Feb-2011
- * Time: 09:12:53
+ * Created by IntelliJ IDEA. User: Niklaas Date: 18-Feb-2011 Time: 09:12:53
  */
 public class Parser {
 
@@ -113,6 +111,10 @@ public class Parser {
      */
     private Vector<ScanEvent> iScanEvents = new Vector<ScanEvent>();
     /**
+     * Scan events map
+     */
+    private Map<Integer, ScanEvent> iScanEventsMap = new HashMap<Integer, ScanEvent>();
+    /**
      * The score types
      */
     private Vector<ScoreType> iScoreTypes = new Vector<ScoreType>();
@@ -120,6 +122,10 @@ public class Parser {
      * The proteins
      */
     private Vector<Protein> iProteins = new Vector<Protein>();
+    /**
+     * Protein Group map with proteinGroupId as key
+     */
+    private Map<Integer, ProteinGroup> proteinGroups = new HashMap<Integer, ProteinGroup>();
     /**
      * A map with the proteinid as key and the protein as value
      */
@@ -131,7 +137,7 @@ public class Parser {
     /**
      * A map with the fieldid as key and the custom data field as value
      */
-    private HashMap<Integer,CustomDataField> iCustomDataFieldsMap = new HashMap<Integer,CustomDataField>();
+    private HashMap<Integer, CustomDataField> iCustomDataFieldsMap = new HashMap<Integer, CustomDataField>();
     /**
      * This holds the field ids used for the peptides
      */
@@ -163,7 +169,7 @@ public class Parser {
     /**
      * A map with the isotope pattern id as key and the isotopepattern as value
      */
-    private HashMap<Integer,IsotopePattern> iIsotopePatternMap = new HashMap<Integer,IsotopePattern>();
+    private HashMap<Integer, IsotopePattern> iIsotopePatternMap = new HashMap<Integer, IsotopePattern>();
     /**
      * The quan results
      */
@@ -171,7 +177,7 @@ public class Parser {
     /**
      * A map with the quanresult id as key and the quanresult as value
      */
-    private HashMap<Integer,QuanResult> iQuanResultsMap = new HashMap<Integer,QuanResult>();
+    private HashMap<Integer, QuanResult> iQuanResultsMap = new HashMap<Integer, QuanResult>();
     /**
      * The raw files
      */
@@ -191,7 +197,7 @@ public class Parser {
     /**
      * A map with the processingnode id as key and the processingnode as value
      */
-    private HashMap<Integer, ProcessingNode> iProcessingNodesMap = new HashMap<Integer,ProcessingNode>();
+    private HashMap<Integer, ProcessingNode> iProcessingNodesMap = new HashMap<Integer, ProcessingNode>();
     /**
      * A boolean that indicates if we need to use a low memory footprint
      */
@@ -224,7 +230,7 @@ public class Parser {
      * extracting the data from the thermo msf file
      */
     public Parser(String iMsfFileLocation, boolean iLowMemory) throws SQLException, ClassNotFoundException {
-        
+
         iFilePath = iMsfFileLocation;
         //create the connection to the msf file
         Class.forName("org.sqlite.JDBC");
@@ -237,10 +243,53 @@ public class Parser {
         rs = stat.executeQuery("select * from SchemaInfo");
         while (rs.next()) {
             String lVersion = rs.getString("SoftwareVersion");
-            if(lVersion.startsWith("1.2")){
+            if (lVersion.startsWith("1.2")) {
                 iMsfVersion = MsfVersion.VERSION1_2;
-            } else if(lVersion.startsWith("1.3")){
+            } else if (lVersion.startsWith("1.3")) {
                 iMsfVersion = MsfVersion.VERSION1_3;
+            }
+        }
+
+        //get the processing nodes
+        rs = stat.executeQuery("select * from ProcessingNodes");
+        while (rs.next()) {
+            ProcessingNode lNode = new ProcessingNode(rs.getInt("ProcessingNodeNumber"),
+                    rs.getInt("ProcessingNodeID"),
+                    rs.getString("ProcessingNodeParentNumber"),
+                    rs.getString("NodeName"),
+                    rs.getString("FriendlyName"),
+                    rs.getInt("MajorVersion"),
+                    rs.getInt("MinorVersion"),
+                    rs.getString("NodeComment"),
+                    rs.getString("NodeGUID"));
+            if (rs.getString("NodeGUID").equals(GUID.NODE_PTM_SCORER)) {
+                hasPhosphoRS = true;
+            }
+            iProcessingNodes.add(lNode);
+            iProcessingNodesMap.put(lNode.getProcessingNodeNumber(), lNode);
+        }
+
+        if (iMsfVersion == MsfVersion.VERSION1_3) {
+            //add the processing node Custom data fields
+            rs = stat.executeQuery("select * from CustomDataProcessingNodes");
+            while (rs.next()) {
+                if (iProcessingNodesMap.get(rs.getInt("ProcessingNodeNumber")) != null) {
+                    iProcessingNodesMap.get(rs.getInt("ProcessingNodeNumber")).addCustomDataField(rs.getInt("FieldID"), rs.getString("FieldValue"));
+                }
+            }
+            rs = stat.executeQuery("select fieldid from CustomDataProcessingNodes group by fieldid");
+            while (rs.next()) {
+                iProcessingNodeUsedCustomDataFields.add(iCustomDataFieldsMap.get(rs.getInt("FieldID")));
+            }
+        }
+
+        //add the processing node parameters to the processing node
+        rs = stat.executeQuery("select * from ProcessingNodeParameters");
+        while (rs.next()) {
+            ProcessingNodeParameter lNodeParameter = new ProcessingNodeParameter(rs.getInt("ProcessingNodeNumber"), rs.getInt("ProcessingNodeId"), rs.getString("ParameterName"), rs.getString("FriendlyName"), rs.getInt("IntendedPurpose"), rs.getString("PurposeDetails"), rs.getInt("Advanced"), rs.getString("Category"), rs.getInt("Position"), rs.getString("ParameterValue"), rs.getString("ValueDisplayString"));
+
+            if (iProcessingNodesMap.get(lNodeParameter.getProcessingNodeNumber()) != null) {
+                iProcessingNodesMap.get(lNodeParameter.getProcessingNodeNumber()).addProcessingNodeParameter(lNodeParameter);
             }
         }
 
@@ -251,33 +300,81 @@ public class Parser {
             iAminoAcids.add(lAA);
             iAminoAcidsMap.put(rs.getInt(1), lAA);
         }
-        //get all the modifications
-        rs = stat.executeQuery("select * from AminoAcidModifications");
-        while (rs.next()) {
-            Modification lMod = new Modification(rs.getInt(1), rs.getString(2), rs.getDouble(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getInt(7), rs.getInt(8), rs.getDouble(9), rs.getInt(10), rs.getInt(11));
-            iModifications.add(lMod);
-            iModificationsMap.put(rs.getInt(1), lMod);
+
+
+        Vector<Integer> fixedMods = new Vector<Integer>();
+        Vector<Integer> variableMods = new Vector<Integer>();
+        Vector<Integer> usedMods = new Vector<Integer>();
+        Map<Integer, List<String>> modsToAminoAcidNumbers = new HashMap<Integer, List<String>>();
+        // Process the parameters of processing nodes to extract the used modifications
+        for (Iterator<ProcessingNode> it = iProcessingNodes.iterator(); it.hasNext();) {
+            ProcessingNode node = it.next();
+            for (ProcessingNodeParameter parameter : node.getProcessingNodeParameters()) {
+                // TODO: add modNames for Z-Core, if they're not covered yet
+                String parName = parameter.getParameterName();
+                boolean modFound = false;
+                boolean isFixed = false;
+
+                if (parName.matches("(?:Static_\\d+|StatMod_\\d+)")) {
+                    if (parameter.getParameterValue().contains("#")) {
+                        modFound = true;
+                        isFixed = true;
+                    }
+                } else if (parName.matches("(?:DynModification_\\d+|DynMod_\\d+)")) {
+                    if (parameter.getParameterValue().contains("#")) {
+                        modFound = true;
+                    }
+                }
+
+                if (modFound) {
+                    System.out.println(parameter.getParameterName() + ":" + parameter.getParameterValue());
+                    String[] numbers = parameter.getParameterValue().split("#");
+                    int modnumber = Integer.parseInt(numbers[numbers.length - 1]);
+                    // Add the found amino acid references to add to the modifications later
+                    modsToAminoAcidNumbers.put(modnumber, Arrays.asList(numbers).subList(0, numbers.length-1));
+                    usedMods.add(modnumber);
+                    if (isFixed) {
+                        fixedMods.add(modnumber);
+                    } else {
+                        variableMods.add(modnumber);
+                    }
+                }
+            }
         }
+
+
+        //get the used modifications
+        rs = stat.executeQuery("select * from AminoAcidModifications where AminoAcidModificationID in (" + Joiner.join(usedMods, ",") + ")");
+        while (rs.next()) {
+            boolean fixedModification = fixedMods.contains(rs.getInt(1));
+            Modification lMod = new Modification(rs.getInt(1), rs.getString(2), rs.getDouble(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getInt(7), rs.getInt(8), rs.getDouble(9), rs.getInt(10), rs.getInt(11), fixedModification);
+            for (String aminoAcidNumber: modsToAminoAcidNumbers.get(rs.getInt(1))) {
+                lMod.getSelectedAminoAcids().add(iAminoAcidsMap.get(Integer.parseInt(aminoAcidNumber)));
+            }
+            
+            iModifications.add(lMod);
+            iModificationsMap.put(rs.getInt("AminoAcidModificationID"), lMod);
+        }
+        
         //add the amino acid to the modifications
         rs = stat.executeQuery("select * from AminoAcidModificationsAminoAcids");
         while (rs.next()) {
             int lModId = rs.getInt("AminoAcidModificationID");
             int lAaId = rs.getInt("AminoAcidID");
-            if(iAminoAcidsMap.get(lAaId) != null && iModificationsMap.get(lModId) != null){
+            if (iAminoAcidsMap.get(lAaId) != null && iModificationsMap.get(lModId) != null) {
                 iModificationsMap.get(lModId).addAminoAcid(iAminoAcidsMap.get(lAaId));
-                if(iMsfVersion == MsfVersion.VERSION1_3){
+                if (iMsfVersion == MsfVersion.VERSION1_3) {
                     iModificationsMap.get(lModId).addClassificationForAminoAcid(rs.getInt("Classification"));
                 }
             }
-
         }
-        if(iMsfVersion == MsfVersion.VERSION1_3){
+        if (iMsfVersion == MsfVersion.VERSION1_3) {
             //get the neutral losses
             rs = stat.executeQuery("select * from AminoAcidModificationsNeutralLosses");
             while (rs.next()) {
                 NeutralLoss lLoss = new NeutralLoss(rs.getInt("NeutralLossID"), rs.getString("Name"), rs.getDouble("MonoisotopicMass"), rs.getDouble("AverageMass"));
                 iNeutralLosses.add(lLoss);
-                iNeutralLossesMap.put(lLoss.getNeutralLossId(),lLoss);
+                iNeutralLossesMap.put(lLoss.getNeutralLossId(), lLoss);
             }
 
             //add the amino acid to the neutral losses
@@ -285,7 +382,7 @@ public class Parser {
             while (rs.next()) {
                 int lAaId = rs.getInt("AminoAcidID");
                 int lNlId = rs.getInt("NeutralLossID");
-                if(iAminoAcidsMap.get(lAaId) != null && iNeutralLossesMap.get(lNlId) != null){
+                if (iAminoAcidsMap.get(lAaId) != null && iNeutralLossesMap.get(lNlId) != null) {
                     iNeutralLossesMap.get(lNlId).addAminoAcid(iAminoAcidsMap.get(lAaId));
                 }
             }
@@ -294,7 +391,7 @@ public class Parser {
             while (rs.next()) {
                 int lModId = rs.getInt("AminoAcidModificationID");
                 int lNlId = rs.getInt("NeutralLossID");
-                if(iModificationsMap.get(lModId) != null && iNeutralLossesMap.get(lNlId) != null){
+                if (iModificationsMap.get(lModId) != null && iNeutralLossesMap.get(lNlId) != null) {
                     iModificationsMap.get(lModId).addNeutralLoss(iNeutralLossesMap.get(lNlId));
                 }
             }
@@ -315,8 +412,8 @@ public class Parser {
                 iEnzymesMap.get(lEnzymeId).setSpecificity(rs.getInt("Specificity"));
             }
         }
-        
-       
+
+
         //get the peptides
         rs = stat.executeQuery("select * from Peptides as p");
         while (rs.next()) {
@@ -328,7 +425,7 @@ public class Parser {
             iPeptides.add(lPeptide);
             iPeptidesMap.put(lPeptide.getPeptideId(), lPeptide);
         }
-        
+
         //get the fasta files
         rs = stat.executeQuery("select VirtualFileName as file from fastafiles");
         while (rs.next()) {
@@ -384,7 +481,7 @@ public class Parser {
                 iPeptidesDecoyMap.get(rs.getInt("PeptideID")).setScore(rs.getDouble("ScoreValue"), lScoreId, iScoreTypes);
             }
         }
-        
+
         if (iMsfVersion == MsfVersion.VERSION1_3) {
             //get the custom data fields
             rs = stat.executeQuery("select  * from  CustomDataFields ");
@@ -397,14 +494,14 @@ public class Parser {
             //add the custom data fields to the peptides
             rs = stat.executeQuery("select * from CustomDataPeptides ");
             while (rs.next()) {
-                if(iPeptidesMap.get(rs.getInt("PeptideID")) != null) {
-                    iPeptidesMap.get(rs.getInt("PeptideID")).addCustomDataField(rs.getInt("FieldID"),rs.getString("FieldValue"));
+                if (iPeptidesMap.get(rs.getInt("PeptideID")) != null) {
+                    iPeptidesMap.get(rs.getInt("PeptideID")).addCustomDataField(rs.getInt("FieldID"), rs.getString("FieldValue"));
                 }
             }
             rs = stat.executeQuery("select * from CustomDataPeptides_decoy ");
             while (rs.next()) {
-                if(iPeptidesDecoyMap.get(rs.getInt("PeptideID")) != null) {
-                    iPeptidesDecoyMap.get(rs.getInt("PeptideID")).addCustomDataField(rs.getInt("FieldID"),rs.getString("FieldValue"));
+                if (iPeptidesDecoyMap.get(rs.getInt("PeptideID")) != null) {
+                    iPeptidesDecoyMap.get(rs.getInt("PeptideID")).addCustomDataField(rs.getInt("FieldID"), rs.getString("FieldValue"));
                 }
             }
 
@@ -434,13 +531,13 @@ public class Parser {
             while (rs.next()) {
                 iSpectrumUsedCustomDataFields.add(iCustomDataFieldsMap.get(rs.getInt("FieldID")));
             }
-            
+
 
         }
-        
+
         // Get the modifications from the db
-        populateModifications(stat);   
-            
+        populateModifications(stat);
+
         //get the taxonomies
         rs = stat.executeQuery("select * from TaxonomyNodes");
         while (rs.next()) {
@@ -478,7 +575,7 @@ public class Parser {
                 }
             }
         }
-        
+
         rs = stat.executeQuery("select * from SpectrumScores");
         while (rs.next()) {
             int lSpectrumId = rs.getInt("SpectrumID");
@@ -491,13 +588,11 @@ public class Parser {
         while (rs.next()) {
             ScanEvent lScanEvent = new ScanEvent(rs.getInt("ScanEventID"), rs.getInt("MSLevel"), rs.getInt("Polarity"), rs.getInt("ScanType"), rs.getInt("Ionization"), rs.getInt("MassAnalyzer"), rs.getInt("ActivationType"));
             iScanEvents.add(lScanEvent);
+            iScanEventsMap.put(lScanEvent.getScanEventId(), lScanEvent);
         }
-        for (int i = 0; i < iSpectra.size(); i++) {
-            for (int j = 0; j < iScanEvents.size(); j++) {
-                if (iSpectra.get(i).getScanEventId() == iScanEvents.get(j).getScanEventId()) {
-                    iSpectra.get(j).setScanEvent(iScanEvents.get(j));
-                }
-            }
+        
+        for (Spectrum s : iSpectra) {
+            s.setScanEvent(iScanEventsMap.get(s.getScanEventId()));
         }
 
         //get the proteins
@@ -522,6 +617,8 @@ public class Parser {
                 iProteinsMap.get(rs.getInt("ProteinID")).setDescription(rs.getString("Description"));
             }
         }
+        //add the events to the protein
+        rs = stat.executeQuery("select * from events");
         //add the score to the protein
         rs = stat.executeQuery("select  * from  ProteinScores ");
         while (rs.next()) {
@@ -534,8 +631,20 @@ public class Parser {
             //add the protein group to the protein
             rs = stat.executeQuery("select  * from  ProteinsProteinGroups");
             while (rs.next()) {
+
                 if (iProteinsMap.get(rs.getInt("ProteinID")) != null) {
-                    iProteinsMap.get(rs.getInt("ProteinID")).setProteinGroupId(rs.getInt("ProteinGroupID"));
+                    Integer proteinGroupId = rs.getInt("ProteinGroupID");
+                    Protein protein = iProteinsMap.get(rs.getInt("ProteinID"));
+                    protein.setProteinGroupId(proteinGroupId);
+                    //create the group if it didn't exist before
+                    if (!proteinGroups.containsKey(proteinGroupId)) {
+                        proteinGroups.put(proteinGroupId, new ProteinGroup(proteinGroupId));
+                    }
+                    ProteinGroup group = proteinGroups.get(proteinGroupId);
+                    group.getProteins().add(protein);
+                    for (Peptide pep : protein.getPeptides()) {
+                        group.getPeptideIds().add(pep.getPeptideId());
+                    }
                 }
             }
 
@@ -564,7 +673,7 @@ public class Parser {
             }
         }
 
-        
+
 
         //get the quantification method
         rs = stat.executeQuery("select ParameterValue from ProcessingNodeParameters where ParameterName = 'QuantificationMethod'");
@@ -576,7 +685,7 @@ public class Parser {
         //get the workflow info
         rs = stat.executeQuery("select * from WorkflowInfo");
         while (rs.next()) {
-            iWorkFlowInfo = new WorkflowInfo(rs.getString("WorkflowName"), rs.getString("WorkflowDescription"), rs.getString("User"), rs.getString("WorkflowTemplate"), rs.getString("MachineName"));
+            iWorkFlowInfo = new WorkflowInfo(rs.getString("WorkflowName"), rs.getString("WorkflowDescription"), rs.getString("User"), rs.getString("WorkflowTemplate"), null);
         }
         //add the messages to the workflow info
         rs = stat.executeQuery("select * from WorkflowMessages");
@@ -589,46 +698,7 @@ public class Parser {
             iWorkFlowInfo.setMsfVersionInfo(new MsfVersionInfo(rs.getInt("Version"), rs.getString("SoftwareVersion")));
         }
 
-        //get the processing nodes
-        rs = stat.executeQuery("select * from ProcessingNodes");
-        while (rs.next()) {
-            ProcessingNode lNode = new ProcessingNode(rs.getInt("ProcessingNodeNumber"),
-                    rs.getInt("ProcessingNodeID"),
-                    rs.getString("ProcessingNodeParentNumber"),
-                    rs.getString("NodeName"),
-                    rs.getString("FriendlyName"),
-                    rs.getInt("MajorVersion"),
-                    rs.getInt("MinorVersion"),
-                    rs.getString("NodeComment"),
-                    rs.getString("NodeGUID"));
-            if (rs.getString("NodeGUID").equals(GUID.NODE_PTM_SCORER)) hasPhosphoRS = true;
-            iProcessingNodes.add(lNode);
-            iProcessingNodesMap.put(lNode.getProcessingNodeNumber(), lNode);
-        }
 
-        if (iMsfVersion == MsfVersion.VERSION1_3) {
-            //add the processing node Custom data fields
-            rs = stat.executeQuery("select * from CustomDataProcessingNodes");
-            while (rs.next()) {
-                if (iProcessingNodesMap.get(rs.getInt("ProcessingNodeNumber")) != null) {
-                    iProcessingNodesMap.get(rs.getInt("ProcessingNodeNumber")).addCustomDataField(rs.getInt("FieldID"), rs.getString("FieldValue"));
-                }
-            }
-            rs = stat.executeQuery("select fieldid from CustomDataProcessingNodes group by fieldid");
-            while (rs.next()) {
-                iProcessingNodeUsedCustomDataFields.add(iCustomDataFieldsMap.get(rs.getInt("FieldID")));
-            }
-        }
-
-        //add the processing node parameters to the processing node
-        rs = stat.executeQuery("select * from ProcessingNodeParameters");
-        while (rs.next()) {
-            ProcessingNodeParameter lNodeParameter = new ProcessingNodeParameter(rs.getInt("ProcessingNodeNumber"), rs.getInt("ProcessingNodeId"), rs.getString("ParameterName"), rs.getString("FriendlyName"), rs.getInt("IntendedPurpose"), rs.getString("PurposeDetails"), rs.getInt("Advanced"), rs.getString("Category"), rs.getInt("Position"), rs.getString("ParameterValue"), rs.getString("ValueDisplayString"));
-
-            if (iProcessingNodesMap.get(lNodeParameter.getProcessingNodeNumber()) != null) {
-                iProcessingNodesMap.get(lNodeParameter.getProcessingNodeNumber()).addProcessingNodeParameter(lNodeParameter);
-            }
-        }
         if (iMsfVersion == MsfVersion.VERSION1_2) {
 
             //get the filters
@@ -816,15 +886,16 @@ public class Parser {
 
     /**
      * Retrieve the modifications of a peptide
+     *
      * @param stat statement object for the database
-     * @throws SQLException 
+     * @throws SQLException
      */
     private void populateModifications(Statement stat) throws SQLException {
         ResultSet rs;
         Vector<Integer> pRSSiteProbabilityFieldIDs = new Vector<Integer>();
         Vector<Integer> pRSProbabilityFieldIDs = new Vector<Integer>();
         Vector<Integer> pRSScoreFieldIDs = new Vector<Integer>();
-        
+
         // pRS probabilities only for version 1.3 and greater
         if (iMsfVersion.compareTo(MsfVersion.VERSION1_3) >= 0) {
             // Obtain IDs for the pRS sequence probability in customdata
@@ -843,20 +914,20 @@ public class Parser {
                 pRSSiteProbabilityFieldIDs.add(rs.getInt("FieldID"));
             }
         }
- 
+
         //add the modifications to the peptides
         String[] modificationTypes = new String[]{"TerminalModification", "AminoAcidModification"};
         String[] decoySuffixes = new String[]{"", "_decoy"};
-        
+
         for (String decoySuffix : decoySuffixes) {
-            for (String modificationType: modificationTypes) {
+            for (String modificationType : modificationTypes) {
                 boolean isTerminalModification = modificationType.startsWith("Terminal"); //hacky but it saves some space
-                
+
                 rs = stat.executeQuery("select * from Peptides" + modificationType + "s" + decoySuffix);
                 while (rs.next()) {
                     Peptide pep = iPeptidesMap.get(rs.getInt("PeptideID"));
                     if (pep != null) {
-                        
+
                         if (iModificationsMap.get(rs.getInt(modificationType + "ID")) != null) {
                             Modification lMod = iModificationsMap.get(rs.getInt(modificationType + "ID"));
                             int location = 0;
@@ -870,31 +941,31 @@ public class Parser {
                             } else {
                                 location = rs.getInt("Position");
                             }
-                            
+
                             ModificationPosition lModPos = new ModificationPosition(location, isNterm, isCterm);
-                            
+
                             Float lpRSSiteProb = null;
                             boolean pRSProbabilitiesAdded = false;
                             if (!isNterm && !isCterm) {
                                 for (Integer fieldID : pRSSiteProbabilityFieldIDs) {
-                                    if(pep.getCustomDataFieldValues().containsKey(fieldID)) {
+                                    if (pep.getCustomDataFieldValues().containsKey(fieldID)) {
                                         Map<Integer, Float> probabilities = parsePRSIdentificationProbabilities(pep.getCustomDataFieldValues().get(fieldID));
                                         if (probabilities.containsKey(location)) {
                                             lpRSSiteProb = probabilities.get(location);
                                         }
                                     }
                                 }
-                                
+
                                 // pRS probability will only be present if there's a modification. Therefore, we can add it to the peptide here
                                 // For a little bit of optimization, only do it once
                                 if (!pRSProbabilitiesAdded) {
                                     for (Integer fieldID : pRSProbabilityFieldIDs) {
-                                        if (pep.getCustomDataFieldValues().containsKey(fieldID)){
+                                        if (pep.getCustomDataFieldValues().containsKey(fieldID)) {
                                             pep.setPhoshpoRSSequenceProbability(Float.parseFloat(pep.getCustomDataFieldValues().get(fieldID)));
                                         }
                                     }
                                     for (Integer fieldID : pRSScoreFieldIDs) {
-                                        if (pep.getCustomDataFieldValues().containsKey(fieldID)){
+                                        if (pep.getCustomDataFieldValues().containsKey(fieldID)) {
                                             pep.setPhosphoRSScore(Float.parseFloat(pep.getCustomDataFieldValues().get(fieldID)));
                                         }
                                     }
@@ -910,32 +981,35 @@ public class Parser {
             }
         }
     }
-    
+
     /**
-     * Create a map with position information and identification probabilities from a string obtained from the customdatapeptides* tables
-     * @param pRSString string from customdatapeptides pRS identification probabilities
+     * Create a map with position information and identification probabilities
+     * from a string obtained from the customdatapeptides* tables
+     *
+     * @param pRSString string from customdatapeptides pRS identification
+     * probabilities
      * @return map with peptide locations and probabilities
      */
     private Map<Integer, Float> parsePRSIdentificationProbabilities(String pRSString) {
         String[] parts = pRSString.split(";\\s?");
         HashMap<Integer, Float> probsPerSite = new HashMap<Integer, Float>();
         Pattern p = Pattern.compile(".*\\((\\d+)\\)\\s*?:\\s*?([0-9.]+)");
-        for(String part: parts) {
+        for (String part : parts) {
             Matcher m = p.matcher(part);
             if (m.matches()) {
-                probsPerSite.put(Integer.parseInt(m.group(1)) - 1, Float.parseFloat(m.group(2))/100f);
+                probsPerSite.put(Integer.parseInt(m.group(1)) - 1, Float.parseFloat(m.group(2)) / 100f);
             }
         }
         return probsPerSite;
     }
-    
+
     /**
      * Close the database connection
      */
     public void close() throws SQLException {
         iConnection.close();
     }
-    
+
     private Spectrum spectrumFromSpectrumheadersQuery(ResultSet rs) throws SQLException {
         Spectrum lSpectrum = new Spectrum(rs.getInt("SpectrumID"), rs.getInt("UniqueSpectrumID"), rs.getInt("MassPeakID"), rs.getInt("LastScan"), rs.getInt("FirstScan"), rs.getInt("ScanNumbers"), rs.getInt("Charge"), rs.getDouble("RetentionTime"), rs.getDouble("Mass"), rs.getInt("ScanEventID"), iConnection, this);
         return lSpectrum;
@@ -1014,7 +1088,9 @@ public class Parser {
     }
 
     /**
-     * This getter gives a vector with all the modifications found in the msf file
+     * This getter gives a vector with all the modifications found in the msf
+     * file
+     *
      * @return Vector with all the modifications found in the msf file
      */
     public Vector<Modification> getModifications() {
@@ -1034,6 +1110,7 @@ public class Parser {
 
     /**
      * This getter gives a vector with the amino acids found in the msf file
+     *
      * @return Vector with the amino acids found in the msf file
      */
     public Vector<AminoAcid> getAminoAcids() {
@@ -1041,7 +1118,9 @@ public class Parser {
     }
 
     /**
-     * This getter gives a hashmap with the amino acid id as key and the amino acid as value
+     * This getter gives a hashmap with the amino acid id as key and the amino
+     * acid as value
+     *
      * @return HashMap with the amino acid id as key and the amino acid as value
      */
     public HashMap<Integer, AminoAcid> getAminoAcidsMap() {
@@ -1050,6 +1129,7 @@ public class Parser {
 
     /**
      * This getter gives a vector with the enzymes found in the msf file
+     *
      * @return Vector with the enzymes found in the msf file
      */
     public Vector<Enzyme> getEnzymes() {
@@ -1068,6 +1148,7 @@ public class Parser {
 
     /**
      * This getter gives a vector with the peptides found in the msf file
+     *
      * @return Vector with the peptides found in the msf file
      */
     public Vector<Peptide> getPeptides() {
@@ -1086,6 +1167,7 @@ public class Parser {
 
     /**
      * This getter gives a vector with the taxonomies found in the msf file
+     *
      * @return Vector with the taxonomies found in the msf file
      */
     public Vector<Taxonomy> getTaxonomies() {
@@ -1104,6 +1186,7 @@ public class Parser {
 
     /**
      * This getter gives a vector with the spectra found in the msf file
+     *
      * @return Vector with the spectra found in the msf file
      */
     public Vector<Spectrum> getSpectra() {
@@ -1154,23 +1237,32 @@ public class Parser {
     }
 
     /**
-     * This getter gives a vector with the names of the different components (ex. Light, Heavy, ...) found in the msf file
-     * @return Vector with the names of the different components (ex. Light, Heavy, ...) found in the msf file
+     * This getter gives a vector with the names of the different components
+     * (ex. Light, Heavy, ...) found in the msf file
+     *
+     * @return Vector with the names of the different components (ex. Light,
+     * Heavy, ...) found in the msf file
      */
     public Vector<String> getComponents() {
         return iComponents;
     }
 
     /**
-     * This getter gives a vector with the channel ids of the different components (ex. Light => <b>1</b>, Heavy  => <b>2</b>, ...) found in the msf file
-     * @return Vector with the channel ids of the different components (ex. 1,2, ...) found in the msf file
+     * This getter gives a vector with the channel ids of the different
+     * components (ex. Light => <b>1</b>, Heavy => <b>2</b>, ...) found in the
+     * msf file
+     *
+     * @return Vector with the channel ids of the different components (ex. 1,2,
+     * ...) found in the msf file
      */
     public Vector<Integer> getChannelIds() {
         return iChannelIds;
     }
 
     /**
-     * This getter gives a vector with the different ratio types. This are created by the parsing the quantification xml
+     * This getter gives a vector with the different ratio types. This are
+     * created by the parsing the quantification xml
+     *
      * @return Vector with the different ratio types
      */
     public Vector<RatioType> getRatioTypes() {
@@ -1179,6 +1271,7 @@ public class Parser {
 
     /**
      * This getter gives a vector with the scan events found in the msf file
+     *
      * @return Vector with the scan events found in the msf file
      */
     public Vector<ScanEvent> getScanEvents() {
@@ -1187,6 +1280,7 @@ public class Parser {
 
     /**
      * This getter gives a vector with the score types found in the msf file
+     *
      * @return Vector with the score types found in the msf file
      */
     public Vector<ScoreType> getScoreTypes() {
@@ -1195,6 +1289,7 @@ public class Parser {
 
     /**
      * This getter gives a vector with the proteins found in the msf file
+     *
      * @return Vector with the proteins found in the msf file
      */
     public Vector<Protein> getProteins() {
@@ -1212,7 +1307,18 @@ public class Parser {
     }
 
     /**
-     * This getter gives a vector with the custom data fields found in the msf file
+     * Returns a map with proteingroup id as keys, groups as values
+     *
+     * @return proteingroup id as keys, groups as values
+     */
+    public Map<Integer, ProteinGroup> getProteinGroupsMap() {
+        return proteinGroups;
+    }
+
+    /**
+     * This getter gives a vector with the custom data fields found in the msf
+     * file
+     *
      * @return Vector with the custom data fields found in the msf file
      */
     public Vector<CustomDataField> getCustomDataFields() {
@@ -1231,7 +1337,9 @@ public class Parser {
     }
 
     /**
-     * This getter gives a vector with the custom data fields use by the peptides
+     * This getter gives a vector with the custom data fields use by the
+     * peptides
+     *
      * @return Vector with the custom data fields use by the peptides
      */
     public Vector<CustomDataField> getPeptideUsedCustomDataFields() {
@@ -1239,7 +1347,9 @@ public class Parser {
     }
 
     /**
-     * This getter gives a vector with the custom data fields use by the proteins
+     * This getter gives a vector with the custom data fields use by the
+     * proteins
+     *
      * @return Vector with the custom data fields use by the proteins
      */
     public Vector<CustomDataField> getProteinUsedCustomDataFields() {
@@ -1248,6 +1358,7 @@ public class Parser {
 
     /**
      * This getter gives a vector with the custom data fields use by the spectra
+     *
      * @return Vector with the custom data fields use by the spectra
      */
     public Vector<CustomDataField> getSpectrumUsedCustomDataFields() {
@@ -1265,6 +1376,7 @@ public class Parser {
 
     /**
      * This getter gives a vector with the filters found in the msf file
+     *
      * @return Vector with the filters found in the msf file
      */
     public Vector<Filter> getFilter() {
@@ -1284,6 +1396,7 @@ public class Parser {
 
     /**
      * This getter gives a vector with the quan results found in the msf file
+     *
      * @return Vector with the quan results found in the msf file
      */
     public Vector<QuanResult> getQuanResults() {
@@ -1303,6 +1416,7 @@ public class Parser {
 
     /**
      * This getter gives a vector with the raw files found in the msf file
+     *
      * @return Vector with the raw files found in the msf file
      */
     public Vector<RawFile> getRawFiles() {
@@ -1320,6 +1434,7 @@ public class Parser {
 
     /**
      * This getter gives a vector with the chromatograms found in the msf file
+     *
      * @return Vector with the chromatograms found in the msf file
      */
     public Vector<Chromatogram> getChromatograms() {
@@ -1360,5 +1475,4 @@ public class Parser {
     public Vector<String> getFastaFiles() {
         return iFastaFiles;
     }
-    
 }
