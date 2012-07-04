@@ -30,6 +30,10 @@ public enum GUID {
      */
     NODE_PTM_SCORER("0787547a-095f-4721-bbb2-83a59ea52e13", "phosphoRS"),
     /**
+     * Second version of phosphoRS
+     */
+    NODE_PTM_SCORER2("62846c02-f562-4cde-932d-27c1d22ad4cb", "phosphoRS2"),
+    /**
      * Top N Peaks Filter
      */
     NODE_TOP_N_PEAKS_FILTER("38cd4dcd-2bb4-4493-bc11-0bbd7f71701e", "Top N Peaks Filter"),
