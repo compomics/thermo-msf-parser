@@ -262,7 +262,7 @@ public class Parser {
                     rs.getInt("MinorVersion"),
                     rs.getString("NodeComment"),
                     rs.getString("NodeGUID"));
-            if (rs.getString("NodeGUID").equals(GUID.NODE_PTM_SCORER)) {
+            if (rs.getString("NodeGUID").equals(GUID.NODE_PTM_SCORER) || rs.getString("NodeGUID").equals(GUID.NODE_PTM_SCORER2)) {
                 hasPhosphoRS = true;
             }
             iProcessingNodes.add(lNode);
@@ -327,7 +327,6 @@ public class Parser {
                 }
 
                 if (modFound) {
-                    System.out.println(parameter.getParameterName() + ":" + parameter.getParameterValue());
                     String[] numbers = parameter.getParameterValue().split("#");
                     int modnumber = Integer.parseInt(numbers[numbers.length - 1]);
                     // Add the found amino acid references to add to the modifications later
