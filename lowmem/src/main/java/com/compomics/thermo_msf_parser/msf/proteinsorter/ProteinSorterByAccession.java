@@ -14,13 +14,13 @@ import java.util.Comparator;
 /**
  * This will sort proteins alphabetically 
  */
-public class ProteinSorterByAccession implements Comparator<Protein> {
+public class ProteinSorterByAccession implements Comparator<String> {
     private boolean iAtoZ;
 
     public ProteinSorterByAccession(boolean lAtoZ){
         this.iAtoZ = lAtoZ;
     }
-    public int compare(Protein o1, Protein o2) {
+    public int compare(String o1, String o2) {
         if(iAtoZ){
             return o1.toString().compareTo(o2.toString());
         } else {

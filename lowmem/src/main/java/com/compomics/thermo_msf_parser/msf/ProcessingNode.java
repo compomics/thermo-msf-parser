@@ -61,6 +61,17 @@ public class ProcessingNode {
      */
     private HashMap<Integer, String> iCustomDataFieldValues = new HashMap<Integer,String>();
 
+    public ProcessingNode(int iProcessingNodeNumber, int iProcessingNodeId, String iProcessingNodeParentNumber, String iNodeName, String iFriendlyName, int iMajorVersion, int iMinorVersion, String iNodeComment) {
+        this.iProcessingNodeNumber = iProcessingNodeNumber;
+        this.iProcessingNodeId = iProcessingNodeId;
+        this.iProcessingNodeParentNumber = iProcessingNodeParentNumber;
+        this.iNodeName = iNodeName;
+        this.iFriendlyName = iFriendlyName;
+        this.iMajorVersion = iMajorVersion;
+        this.iMinorVersion = iMinorVersion;
+        this.iNodeComment = iNodeComment;
+    }
+
     /**
      * The processingnode constructor
      * @param iProcessingNodeNumber  The processing node number

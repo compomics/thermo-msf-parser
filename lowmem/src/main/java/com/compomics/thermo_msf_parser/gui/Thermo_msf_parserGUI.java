@@ -1,9 +1,5 @@
 package com.compomics.thermo_msf_parser.gui;
 
-import com.compomics.util.examples.HelpWindow;
-import com.compomics.util.io.StartBrowser;
-import org.apache.log4j.Logger;
-
 import com.compomics.rover.general.enumeration.ReferenceSetEnum;
 import com.compomics.rover.general.enumeration.RoverSource;
 import com.compomics.rover.general.fileio.readers.MsfReader;
@@ -20,9 +16,8 @@ import com.compomics.rover.gui.wizard.LoadingPanel;
 import com.compomics.thermo_msf_parser.Parser;
 import com.compomics.thermo_msf_parser.msf.*;
 import com.compomics.thermo_msf_parser.msf.Event;
-import com.compomics.thermo_msf_parser.msf.proteinsorter.ProteinSorterByAccession;
-import com.compomics.thermo_msf_parser.msf.proteinsorter.ProteinSorterByNumberOfPeptides;
 import com.compomics.util.Util;
+import com.compomics.util.examples.HelpWindow;
 import com.compomics.util.experiment.biology.ions.PeptideFragmentIon;
 import com.compomics.util.gui.UtilitiesGUIDefaults;
 import com.compomics.util.gui.protein.ProteinSequencePane;
@@ -30,10 +25,12 @@ import com.compomics.util.gui.spectrum.ChromatogramPanel;
 import com.compomics.util.gui.spectrum.DefaultSpectrumAnnotation;
 import com.compomics.util.gui.spectrum.ReferenceArea;
 import com.compomics.util.gui.spectrum.SpectrumPanel;
-import no.uib.jsparklines.renderers.JSparklinesIntegerColorTableCellRenderer;
+import com.compomics.util.io.StartBrowser;
 import no.uib.jsparklines.renderers.JSparklinesBarChartTableCellRenderer;
+import no.uib.jsparklines.renderers.JSparklinesIntegerColorTableCellRenderer;
 import no.uib.jsparklines.renderers.JSparklinesIntervalChartTableCellRenderer;
 import no.uib.jsparklines.renderers.util.GradientColorCoding;
+import org.apache.log4j.Logger;
 import org.jfree.chart.plot.PlotOrientation;
 
 import javax.swing.*;
@@ -41,7 +38,10 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.table.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -377,7 +377,7 @@ public class Thermo_msf_parserGUI extends JFrame {
                             }
                             progressBar.setMaximum(lTotalSpecrtra + 1);
                             progressBar.setValue(0);
-                            progressBar.setString("Writting all spectra to " + lPath);
+                            progressBar.setString("Writing all spectra to " + lPath);
                             progressBar.setStringPainted(true);
                             progressBar.setVisible(true);
                             BufferedWriter out = new BufferedWriter(new FileWriter(lPath));
@@ -489,13 +489,13 @@ public class Thermo_msf_parserGUI extends JFrame {
         jbuttonAlphabeticalSort.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (jbuttonAlphabeticalSort.getText().startsWith("A")) {
-                    Collections.sort(iDisplayedProteins, new ProteinSorterByAccession(true));
+                    //Collections.sort(iDisplayedProteins, (new ProteinSorter()).compareProteinByAccession(true));
                     filterDisplayedProteins();
                     jbuttonAlphabeticalSort.setText("Z -> A");
                     proteinList.updateUI();
                     selectedProteinList.updateUI();
                 } else {
-                    Collections.sort(iDisplayedProteins, new ProteinSorterByAccession(false));
+                    //Collections.sort(iDisplayedProteins, (new ProteinSorter()).compareProteinByAccession(true));
                     filterDisplayedProteins();
                     jbuttonAlphabeticalSort.setText("A -> Z");
                     proteinList.updateUI();
@@ -507,13 +507,13 @@ public class Thermo_msf_parserGUI extends JFrame {
         jbuttonNumberSort.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (jbuttonNumberSort.getText().startsWith("1")) {
-                    Collections.sort(iDisplayedProteins, new ProteinSorterByNumberOfPeptides(false));
+                    //Collections.sort(iDisplayedProteins, new ProteinSorter());
                     filterDisplayedProteins();
                     jbuttonNumberSort.setText("20 -> 1");
                     proteinList.updateUI();
                     selectedProteinList.updateUI();
                 } else {
-                    Collections.sort(iDisplayedProteins, new ProteinSorterByNumberOfPeptides(true));
+                    //Collections.sort(iDisplayedProteins, new ProteinSorter());
                     filterDisplayedProteins();
                     jbuttonNumberSort.setText("1 -> 20");
                     proteinList.updateUI();
@@ -2282,6 +2282,7 @@ public class Thermo_msf_parserGUI extends JFrame {
                     lPeptideObject.add("");
                 }
             }
+
             for (int j = 0; j < iMergedCustomSpectrumData.size(); j++) {
                 if (lPeptide.getParentSpectrum().getCustomDataFieldValues().get(iMergedCustomSpectrumData.get(j).getFieldId()) != null) {
                     lPeptideObject.add(lPeptide.getParentSpectrum().getCustomDataFieldValues().get(iMergedCustomSpectrumData.get(j).getFieldId()));
@@ -2342,16 +2343,16 @@ public class Thermo_msf_parserGUI extends JFrame {
      */
     private void collectCustomPeptideData() {
         iMergedCustomPeptideData = new Vector<CustomDataField>();
-        for (int i = 0; i < iParsedMsfs.size(); i++) {
-            for (int j = 0; j < iParsedMsfs.get(i).getPeptideUsedCustomDataFields().size(); j++) {
+        for (Parser iParsedMsf : iParsedMsfs) {
+            for (int j = 0; j < iParsedMsf.getPeptideUsedCustomDataFields().size(); j++) {
                 boolean lFound = false;
-                for (int k = 0; k < iMergedCustomPeptideData.size(); k++) {
-                    if (iParsedMsfs.get(i).getPeptideUsedCustomDataFields().get(j).getName().equalsIgnoreCase(iMergedCustomPeptideData.get(k).getName())) {
+                for (CustomDataField anIMergedCustomPeptideData : iMergedCustomPeptideData) {
+                    if (iParsedMsf.getPeptideUsedCustomDataFields().get(j).getName().equalsIgnoreCase(anIMergedCustomPeptideData.getName())) {
                         lFound = true;
                     }
                 }
                 if (!lFound) {
-                    iMergedCustomPeptideData.add(iParsedMsfs.get(i).getPeptideUsedCustomDataFields().get(j));
+                    iMergedCustomPeptideData.add(iParsedMsf.getPeptideUsedCustomDataFields().get(j));
                 }
             }
         }
@@ -3255,7 +3256,7 @@ public class Thermo_msf_parserGUI extends JFrame {
 
 
     /**
-     * This method will load a protein. It will create the peptide table an format the protein sequence
+     * This method will load a protein. It will create the peptide table and format the protein sequence
      *
      * @param aFromInterestedList A boolean that indicates if the selected protein should come from the proteinList (FALSE)
      *                            or from the selectedProteinList (=TRUE)

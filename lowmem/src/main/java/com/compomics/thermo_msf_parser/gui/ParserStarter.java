@@ -4,6 +4,7 @@ import com.compomics.util.gui.UtilitiesGUIDefaults;
 import com.google.common.io.Resources;
 import org.apache.log4j.Logger;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -66,11 +67,27 @@ public class ParserStarter {
 
         String javaHome = System.getProperty("java.home") + File.separator +
                 "bin" + File.separator;
-
-        String cmdLine = javaHome + "java " + options + " -cp " + quote
+        Object[] choiceOptions = {"low memory usage (for big files)",
+                "high memory usage (for small files)",
+                "cancel"};
+        int n = JOptionPane.showOptionDialog(null,
+                "choose what instance of thermo-msf-parser you want to use",
+                "Momory Usage",
+                JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE,
+                null,
+                choiceOptions,
+                choiceOptions[2]);
+        String cmdLine = "";
+        if (n == JOptionPane.YES_OPTION){
+        cmdLine = javaHome + "java " + options + " -cp " + quote
                 + new File(path, jarFileName).getAbsolutePath()
                 + quote + " com.compomics.thermo_msf_parser.gui.Thermo_msf_parserGUI";
-
+        }
+        else if (n == JOptionPane.NO_OPTION){
+            cmdLine = javaHome + "java " + options + " -cp " + quote
+                    + new File(path, jarFileName).getAbsolutePath()
+                    + quote + " com.compomics.thermo_msf_parser.gui.Thermo_msf_parserGUILowMem";
+        }
         logger.info(cmdLine);
 
         try {

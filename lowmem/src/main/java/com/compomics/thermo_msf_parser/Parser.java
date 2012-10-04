@@ -1,9 +1,12 @@
 package com.compomics.thermo_msf_parser;
 
 import com.compomics.thermo_msf_parser.msf.*;
+import com.compomics.thermo_msf_parser.msf.Enzyme;
+import com.compomics.thermo_msf_parser.msf.Protein;
 import com.compomics.thermo_msf_parser.msf.enums.GUID;
 import com.compomics.thermo_msf_parser.msf.util.Joiner;
 
+import java.io.IOException;
 import java.sql.*;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -12,7 +15,7 @@ import java.util.regex.Pattern;
 /**
  * Created by IntelliJ IDEA. User: Niklaas Date: 18-Feb-2011 Time: 09:12:53
  */
-public class Parser {
+public class Parser implements  AminoAcidInterface,ModificationInterface,ChromatogramInterface,PeptideInterface,ProteinInterface,RatioTypesInterface,RawFileInterface,SpectrumInterface,EnzymeInterface,CustomDataInterface{
 
     /**
      * Obtain a list of fasta files used
@@ -790,10 +793,10 @@ public class Parser {
 
 
         //add the isotope patterns to the quan results
-        Collection iIsotopePatterns = iIsotopePatternMap.values();
-        Iterator lIsotopePatternIterator = iIsotopePatterns.iterator();
+        Collection<IsotopePattern> iIsotopePatterns = iIsotopePatternMap.values();
+        Iterator<IsotopePattern> lIsotopePatternIterator = iIsotopePatterns.iterator();
         while (lIsotopePatternIterator.hasNext()) {
-            IsotopePattern lIso = (IsotopePattern) lIsotopePatternIterator.next();
+            IsotopePattern lIso = lIsotopePatternIterator.next();
             if (iQuanResultsMap.get(lIso.getSharedQuanResultId()) != null) {
                 iQuanResultsMap.get(lIso.getSharedQuanResultId()).addIsotopePattern(lIso);
             }
@@ -1465,6 +1468,332 @@ public class Parser {
 
     public String getQuantificationMethodName() {
         return iQuantificationMethodName;
+    }
+
+    public Vector getAminoAcidsFromDb(Connection iConnection) throws SQLException {
+       PreparedStatement stat = iConnection.prepareStatement("select * from AminoAcids");
+       ResultSet rs = stat.executeQuery();
+        while (rs.next()) {
+            AminoAcid lAA = new AminoAcid(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getDouble(5), rs.getDouble(6), rs.getString(7));
+            iAminoAcids.add(lAA);
+            iAminoAcidsMap.put(rs.getInt(1), lAA);
+        }
+        rs.close();
+        stat.close();
+        return iAminoAcids;
+    }
+
+    public String addModificationsToPeptideSequence(Peptide peptide, HashMap modificationMap, Connection iConnection) throws SQLException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public HashMap createModificationMap(Connection iConnection) throws SQLException {
+        PreparedStatement stat = iConnection.prepareStatement("select * from AminoAcidModifications");
+        ResultSet rs = stat.executeQuery();
+        while (rs.next()) {
+            //Modification lMod = new Modification(rs.getInt(1), rs.getString(2), rs.getDouble(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getInt(7), rs.getInt(8), rs.getDouble(9), rs.getInt(10), rs.getInt(11));
+            //iModifications.add(lMod);
+            //iModificationsMap.put(rs.getInt(1), lMod);
+        }
+        rs = stat.executeQuery("select * from AminoAcidModificationsAminoAcids");
+        while (rs.next()) {
+            int lModId = rs.getInt("AminoAcidModificationID");
+            int lAaId = rs.getInt("AminoAcidID");
+            if(iAminoAcidsMap.get(lAaId) != null && iModificationsMap.get(lModId) != null){
+                iModificationsMap.get(lModId).addAminoAcid(iAminoAcidsMap.get(lAaId));
+                if(iMsfVersion == MsfVersion.VERSION1_3){
+                    iModificationsMap.get(lModId).addClassificationForAminoAcid(rs.getInt("Classification"));
+                }
+            }
+
+        }
+        if(iMsfVersion == MsfVersion.VERSION1_3){
+            //get the neutral losses
+            rs = stat.executeQuery("select * from AminoAcidModificationsNeutralLosses");
+            while (rs.next()) {
+                NeutralLoss lLoss = new NeutralLoss(rs.getInt("NeutralLossID"), rs.getString("Name"), rs.getDouble("MonoisotopicMass"), rs.getDouble("AverageMass"));
+                iNeutralLosses.add(lLoss);
+                iNeutralLossesMap.put(lLoss.getNeutralLossId(),lLoss);
+            }
+
+            //add the amino acid to the neutral losses
+            rs = stat.executeQuery("select * from AminoAcidModificationsAminoAcidsNL");
+            while (rs.next()) {
+                int lAaId = rs.getInt("AminoAcidID");
+                int lNlId = rs.getInt("NeutralLossID");
+                if(iAminoAcidsMap.get(lAaId) != null && iNeutralLossesMap.get(lNlId) != null){
+                    iNeutralLossesMap.get(lNlId).addAminoAcid(iAminoAcidsMap.get(lAaId));
+                }
+            }
+            //now add the neutral losses to the modification
+            rs = stat.executeQuery("select * from AminoAcidModificationsAminoAcidsNL");
+            while (rs.next()) {
+                int lModId = rs.getInt("AminoAcidModificationID");
+                int lNlId = rs.getInt("NeutralLossID");
+                if(iModificationsMap.get(lModId) != null && iNeutralLossesMap.get(lNlId) != null){
+                    iModificationsMap.get(lModId).addNeutralLoss(iNeutralLossesMap.get(lNlId));
+                }
+            }
+        }
+        rs.close();
+        stat.close();
+        return iModificationsMap;
+    }
+
+    public HashMap createEnzymeMap(Connection iConnection) throws SQLException {
+        PreparedStatement stat = iConnection.prepareStatement("select * from Enzymes");
+        ResultSet rs = stat.executeQuery();
+        while (rs.next()) {
+            Enzyme lEnzyme = new Enzyme(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getString(5), rs.getInt(6));
+            iEnzymes.add(lEnzyme);
+            iEnzymesMap.put(rs.getInt("EnzymeID"), lEnzyme);
+        }
+        //add the specificity to the enzymes
+        rs = stat.executeQuery("select * from EnzymesCleavageSpecificities");
+        while (rs.next()) {
+            int lEnzymeId = rs.getInt("EnzymeID");
+            if(iEnzymesMap.get(lEnzymeId) != null){
+                iEnzymesMap.get(lEnzymeId).setSpecificity(rs.getInt("Specificity"));
+            }
+        }
+        rs = stat.executeQuery("select * from EnzymesCleavageSpecificities");
+        while (rs.next()) {
+            int lEnzymeId = rs.getInt("EnzymeID");
+            if(iEnzymesMap.get(lEnzymeId) != null){
+                iEnzymesMap.get(lEnzymeId).setSpecificity(rs.getInt("Specificity"));
+            }
+        }
+        rs.close();
+        stat.close();
+        return iEnzymesMap;
+    }
+
+    public void getPeptides(Connection iConnection,MsfVersion iMsfVersion) throws SQLException {
+        PreparedStatement stat = iConnection.prepareStatement("");
+        ResultSet rs = stat.executeQuery("select * from Peptides as p");
+        while (rs.next()) {
+            Peptide lPeptide = new Peptide(rs.getInt("PeptideID"), rs.getInt("SpectrumID"), rs.getInt("ConfidenceLevel"), rs.getString("Sequence"), rs.getInt("TotalIonsCount"), rs.getInt("MatchedIonsCount"), rs.getString("Annotation"), rs.getInt("ProcessingNodeNumber"), iAminoAcids);
+            if(iMsfVersion ==  MsfVersion.VERSION1_3){
+                lPeptide.setMissedCleavage(rs.getInt("MissedCleavages"));
+                lPeptide.setUniquePeptideSequenceId(rs.getInt("UniquePeptideSequenceID"));
+            }
+            iPeptides.add(lPeptide);
+            iPeptidesMap.put(lPeptide.getPeptideId(), lPeptide);
+        }
+
+        //get the peptides
+        rs = stat.executeQuery("select * from Peptides_decoy as p");
+        while (rs.next()) {
+            Peptide lPeptide = new Peptide(rs.getInt("PeptideID"), rs.getInt("SpectrumID"), rs.getInt("ConfidenceLevel"), rs.getString("Sequence"), rs.getInt("TotalIonsCount"), rs.getInt("MatchedIonsCount"), "", rs.getInt("ProcessingNodeNumber"), iAminoAcids);
+            if(iMsfVersion ==  MsfVersion.VERSION1_3){
+                lPeptide.setMissedCleavage(rs.getInt("MissedCleavages"));
+                lPeptide.setUniquePeptideSequenceId(rs.getInt("UniquePeptideSequenceID"));
+                lPeptide.setAnnotation(rs.getString("Annotation"));
+            }
+            iPeptidesDecoy.add(lPeptide);
+            iPeptidesDecoyMap.put(lPeptide.getPeptideId(), lPeptide);
+        }
+        if(iMsfVersion == MsfVersion.VERSION1_3){
+            //add the processing node Custom data fields
+            rs = stat.executeQuery("select * from CustomDataPeptides_Decoy");
+            while (rs.next()) {
+                if(iPeptidesDecoyMap.get(rs.getInt("PeptideID")) != null){
+                    iPeptidesDecoyMap.get(rs.getInt("PeptideID")).addCustomDataField(rs.getInt("FieldID"),rs.getString("FieldValue"));
+                }
+            }
+            rs = stat.executeQuery("select fieldid from CustomDataPeptides_Decoy group by fieldid");
+            while (rs.next()) {
+                iPeptideDecoyUsedCustomDataFields.add(iCustomDataFieldsMap.get(rs.getInt("FieldID")));
+            }
+        }
+    }
+
+    public Vector<Peptide> getPeptidesForProtein(ProteinLowMem protein, Connection iConnection, MsfVersion iMsfVersion, Vector<AminoAcid> iAminoAcids) throws SQLException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public Vector<Peptide> getPeptidesForProtein(ProteinLowMem protein, MsfVersion iMsfVersion, Vector<AminoAcid> iAminoAcids) throws SQLException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public Vector<Peptide> getPeptidesForAccession(String lProteinAccession, MsfVersion iMsfVersion, Connection iConnection, Vector<AminoAcid> iAminoAcids) throws SQLException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public Vector getInformationForPeptide(int peptideID, Connection iConnection, boolean fullInfo) throws SQLException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public String getSpectrumXMLForPeptide(Peptide peptideOfInterest) throws IOException, SQLException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public Spectrum getSpectrumForPeptide(Peptide peptideOfInterest) throws SQLException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public String getSpectrumXMLForPeptide(Peptide peptideOfInterest, Connection iConnection) throws IOException, SQLException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public Spectrum getSpectrumForPeptide(Peptide peptideOfInterest, Connection iConnection) throws SQLException {
+        PreparedStatement stat = iConnection.prepareStatement("select s.*, m.FileID from spectrumheaders as s, masspeaks as m where m.masspeakid = s.masspeakid");
+        ResultSet rs = stat.executeQuery();
+        while (rs.next()) {
+            Spectrum lSpectrum = new Spectrum(rs.getInt("SpectrumID"), rs.getInt("UniqueSpectrumID"), rs.getInt("MassPeakID"), rs.getInt("LastScan"), rs.getInt("FirstScan"), rs.getInt("ScanNumbers"), rs.getInt("Charge"), rs.getDouble("RetentionTime"), rs.getDouble("Mass"), rs.getInt("ScanEventID"), iConnection, this);
+            lSpectrum.setFileId(rs.getInt("FileID"));
+            iSpectra.add(lSpectrum);
+            iSpectraMapByMassPeakId.put(lSpectrum.getMassPeakId(), lSpectrum);
+            iSpectraMapBySpectrumId.put(lSpectrum.getSpectrumId(), lSpectrum);
+            iSpectraMapByUniqueSpectrumId.put(lSpectrum.getUniqueSpectrumId(), lSpectrum);
+        }
+
+        if(!iLowMemory){
+            rs = stat.executeQuery("select * from Spectra");
+            while (rs.next()) {
+                int lSpectrumId =  rs.getInt("UniqueSpectrumID");
+                byte[] lZipped = rs.getBytes("Spectrum");
+                if(iSpectraMapByUniqueSpectrumId.get(lSpectrumId) != null){
+                    iSpectraMapByUniqueSpectrumId.get(lSpectrumId).setZippedBytes(lZipped);
+                }
+            }
+        }
+        rs = stat.executeQuery("select * from SpectrumScores");
+        while (rs.next()) {
+            int lSpectrumId =  rs.getInt("SpectrumID");
+            if(iSpectraMapBySpectrumId.get(lSpectrumId) != null){
+                iSpectraMapBySpectrumId.get(lSpectrumId).addSpectrumScore(rs.getDouble("Score"), rs.getInt("ProcessingNodeNumber"));
+            }
+        }
+        //get the scan events
+        rs = stat.executeQuery("select * from ScanEvents");
+        while (rs.next()) {
+            ScanEvent lScanEvent = new ScanEvent(rs.getInt("ScanEventID"), rs.getInt("MSLevel"), rs.getInt("Polarity"), rs.getInt("ScanType"), rs.getInt("Ionization"), rs.getInt("MassAnalyzer"), rs.getInt("ActivationType"));
+            iScanEvents.add(lScanEvent);
+        }
+        for(int i = 0; i<iSpectra.size(); i ++){
+            for(int j = 0; j<iScanEvents.size(); j ++){
+                if(iSpectra.get(i).getScanEventId() == iScanEvents.get(j).getScanEventId()){
+                    iSpectra.get(j).setScanEvent(iScanEvents.get(j));
+                }
+            }
+        }
+    return null;
+    }
+
+    public Iterator getAllProteins(Connection iConnection) throws SQLException {
+        PreparedStatement stat = iConnection.prepareStatement("select * from Proteins");
+        ResultSet rs = stat.executeQuery();
+        while (rs.next()) {
+            Protein lProtein = null;
+            if(iLowMemory){
+                lProtein = new Protein(rs.getInt("ProteinID"), this);
+                if(iMsfVersion == MsfVersion.VERSION1_3){
+                    lProtein.setMasterProtein(rs.getInt("IsMasterProtein"));
+                }
+            } else {
+                lProtein = new Protein(rs.getInt("ProteinID"), rs.getString("Sequence"));
+            }
+            iProteins.add(lProtein);
+            iProteinsMap.put(lProtein.getProteinId(), lProtein);
+        }
+        //add the description to the protein
+        rs = stat.executeQuery("select  * from  ProteinAnnotations ");
+        while (rs.next()) {
+            if(iProteinsMap.get(rs.getInt("ProteinID")) != null){
+                iProteinsMap.get(rs.getInt("ProteinID")).setDescription(rs.getString("Description"));
+            }
+        }
+        //add the score to the protein
+        rs = stat.executeQuery("select  * from  ProteinScores ");
+        while (rs.next()) {
+            if(iProteinsMap.get(rs.getInt("ProteinID")) != null){
+                iProteinsMap.get(rs.getInt("ProteinID")).addScore(rs.getDouble("ProteinScore"), rs.getInt("ProcessingNodeNumber"), rs.getDouble("Coverage"));
+            }
+        }
+
+        if(iMsfVersion == MsfVersion.VERSION1_3){
+            //add the protein group to the protein
+            rs = stat.executeQuery("select  * from  ProteinsProteinGroups");
+            while (rs.next()) {
+                if(iProteinsMap.get(rs.getInt("ProteinID")) != null){
+                    iProteinsMap.get(rs.getInt("ProteinID")).setProteinGroupId(rs.getInt("ProteinGroupID"));
+                }
+            }
+
+            rs = stat.executeQuery("select  * from  PtmAnnotationData");
+            while (rs.next()) {
+                Protein.PtmAnnotation lAnno = new Protein.PtmAnnotation(rs.getInt("PtmUnimodID"), rs.getInt("Position"));
+                if(iProteinsMap.get(rs.getInt("ProteinID")) != null){
+                    iProteinsMap.get(rs.getInt("ProteinID")).addPtmAnnotation(lAnno);
+                }
+            }
+
+            //add the custom data fields to the proteins
+            rs = stat.executeQuery("select  * from  CustomDataProteins_Decoy ");
+            while (rs.next()) {
+                if(iProteinsMap.get(rs.getInt("ProteinID")) != null){
+                    iProteinsMap.get(rs.getInt("ProteinID")).addDecoyCustomDataField(rs.getInt("FieldID"),rs.getString("FieldValue"));
+                }
+            }
+
+            //add the decoy score to the protein
+            rs = stat.executeQuery("select  * from  ProteinScores_Decoy");
+            while (rs.next()) {
+                if(iProteinsMap.get(rs.getInt("ProteinID")) != null){
+                    iProteinsMap.get(rs.getInt("ProteinID")).addDecoyScore(rs.getDouble("ProteinScore"), rs.getInt("ProcessingNodeNumber"), rs.getDouble("Coverage"));
+                }
+            }
+        }
+    return iProteins.iterator();
+    }
+
+    public ProteinLowMem getProteinFromAccession(String proteinAccession, Connection iConnection) throws SQLException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public String getAccessionFromProteinID(int proteinID, Connection iConnection) throws SQLException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public String getSequenceForProteinID(int proteinID, Connection iConnection) throws SQLException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public Vector<ProteinLowMem> getProteinsForPeptide(int PeptideID, Connection iConnection) throws SQLException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public Vector<RatioType> parseRatioTypes(Connection iConnection) throws SQLException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public String getRawFileNameForFileID(int fileID) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public String createSpectrumXMLForPeptide(int peptideID, Connection iConnection) throws SQLException, IOException {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public Vector<Peak> getMSMSPeaks(String lXml) throws Exception {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public Vector<Peak> getMSPeaks(String lXml) throws Exception {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public Peak getFragmentedMsPeak(String lXml) throws Exception {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public HashMap<Integer, String> getRawFileForFileID(int fileID, Connection iconn) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public String getRawFileNameForFileID(int FileID, Connection iConn) {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public boolean hasPhosphoRS() {
