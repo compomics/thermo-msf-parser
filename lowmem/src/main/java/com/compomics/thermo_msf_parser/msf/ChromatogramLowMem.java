@@ -21,11 +21,11 @@ public class ChromatogramLowMem implements ChromatogramInterface{
         this.fileNumber = newFileNumber;
     }
 
-    public int getiTraceTypeID(){
+    public int getTraceTypeID(){
         return iTraceTypeID;
     }
 
-    public void setiTraceTypeID(int newTraceTypeID){
+    public void setTraceTypeID(int newTraceTypeID){
         this.iTraceTypeID = newTraceTypeID;
     }
 

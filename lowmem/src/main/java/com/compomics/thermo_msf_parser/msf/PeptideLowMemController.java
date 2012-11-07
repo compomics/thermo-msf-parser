@@ -270,8 +270,6 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
                     lPeptide.getParentSpectrum().setFileId(rs.getInt("m.FileID"));
                     //lPeptide.getParentSpectrum().setZippedBytes(rs.getBytes("Spectrum"));
                     protIdToProt.get(rs.getInt("pp.ProteinID")).addPeptide(lPeptide);
-                    counter++;
-                    System.out.println(counter);
                     peptides.add(lPeptide.getSequence());
                 }
                 rs.close();

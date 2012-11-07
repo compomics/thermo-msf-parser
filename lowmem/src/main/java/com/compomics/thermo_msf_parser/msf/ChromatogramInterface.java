@@ -24,16 +24,16 @@ public interface ChromatogramInterface {
     public void setChromatogramFileNumber(int newFileNumber);
     
     /**
-    * returns the iTracetype id for the chromatogram
-    * @return the iTraceType id
+    * returns the Tracetype id for the chromatogram
+    * @return the TraceType id
     */
     
-    public int getiTraceTypeID();
+    public int getTraceTypeID();
     
     /**
-     * sets a new iTraceTypeID for the chromatogram
+     * sets a new TraceTypeID for the chromatogram
      * @param newTraceTypeID the new TraceType id for the chromatogram
      */
     
-    public void setiTraceTypeID(int newTraceTypeID);
+    public void setTraceTypeID(int newTraceTypeID);
 }
