@@ -5,13 +5,12 @@
     <groupId>com.compomics</groupId>
     <artifactId>thermo_msf_parser</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.8</version>
+    <version>2.0</version>
     <name>thermo_msf_parser</name>
     <url>http://code.google.com/p/thermo_msf_parser/</url>
 
     <!-- Set the version number for the whole project -->
     <properties>
-        <version.number>${version}</version.number>
         <logging.level.default>INFO</logging.level.default>
         <logging.file.path.name>thermo-msf-parser-log4j.log</logging.file.path.name>
         <logging.file.max.size>5000KB</logging.file.max.size>
@@ -189,12 +188,6 @@
     <!-- Repositores -->
     <repositories>
         <!-- UGent Genesis Maven 1 repository -->
-        <repository>
-            <id>genesis-maven-repository</id>
-            <name>Genesis repository</name>
-            <url>http://genesis.UGent.be/maven</url>
-            <layout>legacy</layout>
-        </repository>
         <!-- UGent Genesis Maven 2 repository -->
         <repository>
             <id>genesis-maven2-repository</id>
@@ -202,7 +195,6 @@
             <url>http://genesis.UGent.be/maven2</url>
             <layout>default</layout>
         </repository>
-
     </repositories>
 
     <!-- Dependencies -->
@@ -217,67 +209,8 @@
         <dependency>
             <groupId>com.compomics</groupId>
             <artifactId>utilities</artifactId>
-            <version>3.1.11</version>
+            <version>3.10.3</version>
             <type>jar</type>
-            <exclusions>
-                <exclusion>
-                    <artifactId>mascotdatfile</artifactId>
-                    <groupId>com.compomics</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>omssa-parser</artifactId>
-                    <groupId>de.proteinms.omxparser</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>xtandem-parser</artifactId>
-                    <groupId>de.proteinms.xtandemparser</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>ms-lims</artifactId>
-                    <groupId>com.compomics</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jmzml</artifactId>
-                    <groupId>uk.ac.ebi.jmzml</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>batik-all</artifactId>
-                    <groupId>batik</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>pdf-transcoder</artifactId>
-                    <groupId>batik</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>xercesImpl</artifactId>
-                    <groupId>xerces</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>com.compomics</groupId>
-            <artifactId>rover</artifactId>
-            <version>2.3</version>
-            <type>jar</type>
-            <exclusions>
-                <exclusion>
-                    <artifactId>mascotdatfile</artifactId>
-                    <groupId>com.compomics</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>thermo_msf_parser</artifactId>
-                    <groupId>com.compomics</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>ms-lims</artifactId>
-                    <groupId>com.compomics</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>mysql-connector-java</artifactId>
-                    <groupId>mysql</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <dependency>

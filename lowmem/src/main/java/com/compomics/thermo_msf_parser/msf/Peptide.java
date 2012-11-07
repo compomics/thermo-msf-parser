@@ -1,6 +1,5 @@
 package com.compomics.thermo_msf_parser.msf;
 
-import com.compomics.util.experiment.biology.ions.PeptideFragmentIon;
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;

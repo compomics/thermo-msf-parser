@@ -54,11 +54,12 @@ public class ModificationLowMemController implements ModificationInterface {
     }
 
     /**
-     *
+     * creates a modification Hashmap where the modificationid and the abbreviation of that modification are linked
      * @param iConnection: a connection to the msf database
      * @return hashmap containing the modifications from the msf file key: modificationid value: modificationstring
      * @throws SQLException
      */
+    
     public HashMap createModificationMap(Connection iConnection) throws SQLException {
         HashMap<Integer, String> modificationsMap = new HashMap<Integer, String>();
         PreparedStatement stat = iConnection.prepareStatement("select AminoAcidModificationID,Abbreviation from AminoAcidModifications");

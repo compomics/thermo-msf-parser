@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.logging.Level;
 
 /**
  * Created by IntelliJ IDEA.
@@ -25,7 +26,12 @@ public class ParserStarter {
      * Starts the launcher by calling the launch method. Use this as the main class in the jar file.
      */
     public ParserStarter() {
-        UtilitiesGUIDefaults.setLookAndFeel();
+        try {
+            UtilitiesGUIDefaults.setLookAndFeel();
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(ParserStarter.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
 
         try {
             launch();

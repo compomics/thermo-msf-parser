@@ -15,8 +15,6 @@ import java.util.Vector;
  */
 public class SpectrumLowMem {
 
-    byte[] lZippedSpectrumXml;
-
     private static Logger logger = Logger.getLogger(Spectrum.class);
     /**
      * The spectrum id
@@ -197,6 +195,10 @@ public class SpectrumLowMem {
 
     public QuanResultLowMem getQuanResult() {
         return iQuanResult;
+    }
+
+    public byte[] getZippedSpectrumXml(){
+        return iZippedSpectrumXml;
     }
 
     public void setFileId(int iFileId) {

@@ -1,6 +1,5 @@
 package com.compomics.thermo_msf_parser.msf;
 
-import com.compomics.util.experiment.biology.ions.PeptideFragmentIon;
 import org.apache.log4j.Logger;
 
 import java.sql.Connection;
@@ -16,7 +15,6 @@ import java.util.Vector;
  */
 public class PeptideLowMem {
 
-    ScoreTypeLowMem iScoreType = new ScoreTypeLowMem();
     int counter = 0;
 
     // Class specific log4j logger for Thermo_msf_parserGUI instances.
@@ -65,82 +63,130 @@ public class PeptideLowMem {
     /**
      * The proteins linked to this peptide
      */
+    
     private Vector<ProteinLowMem> iPeptideProteins = new Vector<ProteinLowMem>();
+    
     /**
      * The modifications linked to this peptide
      */
+    
     private Vector<Modification> iPeptideModifications = new Vector<Modification>();
+    
     /**
      * The modifications positions of the modifications in the iPeptideModifications Vector
      */
+    
     private Vector<ModificationPosition> iPeptideModificationPositions = new Vector<ModificationPosition>();
+    
     /**
      * The site probabilities of the Phospho modifications
      */
+    
     private Vector<Float> iPhosphoRSSiteProbabilities = new Vector<Float>();
+    
     /**
      * the phosphoRS p value for the current 'phosphorylation isoform'
      */
+    
     private Float phosphoRSScore = null;
+    
     /**
      * the phosphoRS probability of the sequence
      */
+    
     private Float phoshpoRSSequenceProbability = null;
+    
     /**
      * Boolean that indicates if this peptide is N-terminally modified
      */
+    
     private boolean iHasNTermModification = false;
+    
     /**
      * The modified sequence
      */
+    
     private String iModifiedPeptide = null;
+    
     /**
      * The channel
      */
+    
     private int iChannelId = 0;
+    
     /**
      * HashMap with the custom data field values. The key is the id of the custom data field
      */
+    
     private HashMap<Integer, String> iCustomDataFieldValues = new HashMap<Integer,String>();
+    
     /**
      * All the amino acids
      */
+    
     private Vector<AminoAcid> iAminoAcids;
+    
     /**
      * The fragment ions
      */
+    
     private Vector<PeptideFragmentIon> iTheoreticalFragmentIons;
+    
     /**
      * This vector holds the peptide sequence in amino acid objects
      */
+    
     private Vector<AminoAcid> iAminoAcidSequence = new Vector<AminoAcid>();
+    
     /**
      * The spectrum linked to this peptide
      */
+    
     private SpectrumLowMem iParentSpectrum;
+    
     /**
      * The processing node number
      */
+    
     private int iProcessingNodeNumber;
+    
     /**
      * Int that indicates if this peptide has a missed cleavage
      * WORKS ONLY FROM PROTEOME DISCOVERER VERSION 1.3
      */
+    
     private int iMissedCleavage;
+    
     /**
      * The unique peptide sequence id
      * WORKS ONLY FROM PROTEOME DISCOVERER VERSION 1.3
      */
+    
+    /**
+     * int of the unique peptide id
+     */
     private int iUniquePeptideSequenceId;
 
-
+    /**
+     * connection to the msf file
+     */
+    
     private Connection iConn;
 
-    //TODO switch out all business logic from class into controller
-    public PeptideLowMem(){
-
-    }
-
+     /**
+     * Constructor for a low memory instance peptide
+     * @param iPeptideId SQLite id for peptide
+     * @param iSpectrumId SQLite id for spectrum
+     * @param iConfidenceLevel the confidence level of the peptide
+     * @param iSequence the peptide sequence
+     * @param iTotalIonsCount the total ions counted for the peptide
+     * @param iMatchedIonsCount the matched ions for the peptide
+     * @param iAnnotation the peptide annotation
+     * @param iProcessingNodeNumber the procession number
+     * @param iAminoAcids Vector containing the amino acids used in the SQLite database. returned from the AminoAcidLowMem class
+     * @param aConn connection to the msf file
+     */
+    
     public PeptideLowMem(int iPeptideId, int iSpectrumId, int iConfidenceLevel, String iSequence, int iTotalIonsCount, int iMatchedIonsCount, String iAnnotation, int iProcessingNodeNumber, Vector<AminoAcid> iAminoAcids,Connection aConn) {
         this.iPeptideId = iPeptideId;
         this.iSpectrumId = iSpectrumId;
@@ -611,55 +657,92 @@ public class PeptideLowMem {
     public String toString(){
         return iSequence;
     }
-
+    /**
+     * 
+     * @param aMissedCleavage 
+     */
     public void setMissedCleavage(int aMissedCleavage) {
         this.iMissedCleavage = aMissedCleavage;
     }
-
+    /**
+     * 
+     * @param aUniquePeptideSequenceId 
+     */
     public void setUniquePeptideSequenceId(int aUniquePeptideSequenceId) {
         this.iUniquePeptideSequenceId = aUniquePeptideSequenceId;
     }
-
+/**
+ * 
+ * @return 
+ */
     public int getMissedCleavage() {
         return iMissedCleavage;
     }
-
+/**
+ * 
+ * @return 
+ */
     public int getUniquePeptideSequenceId() {
         return iUniquePeptideSequenceId;
     }
-
+/**
+ * 
+ * @param aProtein 
+ */
     public void addDecoyProtein(ProteinLowMem aProtein) {
         iPeptideProteins.add(aProtein);
         aProtein.addDecoyPeptide(this);
     }
-
+/**
+ * 
+ * @param aAnnotation 
+ */
     public void setAnnotation(String aAnnotation) {
         this.iAnnotation = aAnnotation;
     }
     public Connection getConnection(){
         return iConn;
     }
-
+/**
+ * 
+ * @param pRSScore 
+ */
     public void setPhosphoRSScore(Float pRSScore) {
         this.phosphoRSScore = pRSScore;
     }
-
+/**
+ * 
+ * @return 
+ */
     public Float getPhosphoRSScore() {
         return phosphoRSScore;
     }
-
+/**
+ * 
+ * @return 
+ */
     public Float getPhoshpoRSSequenceProbability() {
         return phoshpoRSSequenceProbability;
     }
-
+/**
+ * 
+ * @param phoshpoRSSequenceProbability 
+ */
     public void setPhoshpoRSSequenceProbability(Float phoshpoRSSequenceProbability) {
         this.phoshpoRSSequenceProbability = phoshpoRSSequenceProbability;
     }
-
+/**
+ * 
+ * @return 
+ */
     public Vector<Float> getPhosphoRSSiteProbabilities() {
         return iPhosphoRSSiteProbabilities;
     }
-
+/**
+ * 
+ * @param lCharge
+ * @return 
+ */
     public double getPeptideMassForCharge(int lCharge){
         double lCalculatedMass = 0.0;
         //calculate the peptide mass
@@ -676,5 +759,4 @@ public class PeptideLowMem {
         lCalculatedMass = (lCalculatedMass  + ((double)lCharge * 1.007825)) / (double)lCharge;
         return lCalculatedMass;
     }
-
 }

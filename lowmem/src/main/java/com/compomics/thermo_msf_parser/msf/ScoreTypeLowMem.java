@@ -91,7 +91,7 @@ public class ScoreTypeLowMem implements ScoreTypeInterface {
         return  peptideScores;
     }
 
-    public void addScoresToPeptide (Peptide peptide, Connection iConnection) throws SQLException {
+    public void addScoresToPeptide (PeptideLowMem peptide, Connection iConnection) throws SQLException {
         int scoreID;
         double scoreValue;
         Vector<ScoreType> scoreTypes = getScoreTypes(iConnection);
@@ -103,16 +103,24 @@ public class ScoreTypeLowMem implements ScoreTypeInterface {
             peptide.setScore(scoreValue,scoreID,scoreTypes);
         }
     }
-    public void addScoresToPeptide (PeptideLowMem peptide, Connection iConnection) throws SQLException {
-        int scoreID;
-        double scoreValue;
-        Vector<ScoreType> scoreTypes = getScoreTypes(iConnection);
-        PreparedStatement stat = iConnection.prepareStatement("select ScoreID,ScoreValue from PeptideScores where PeptideID = "+peptide.getPeptideId());
-        ResultSet rs = stat.executeQuery();
-        while(rs.next()){
-            scoreID = rs.getInt(1);
-            scoreValue = rs.getDouble(2);
-            peptide.setScore(scoreValue,scoreID,scoreTypes);
+
+    public void getScoresForPeptideVector(Vector<PeptideLowMem>peptideLowMemVector,Connection iConnection){
+        String listOfPeptideids = "";
+        HashMap<Integer,PeptideLowMem> pepidToPeptide = new HashMap<Integer,PeptideLowMem>();
+            for (PeptideLowMem aPeptide : peptideLowMemVector){
+                listOfPeptideids = ","+aPeptide.getPeptideId()+listOfPeptideids;
+                pepidToPeptide.put(aPeptide.getPeptideId(),aPeptide);
+            }
+        listOfPeptideids = listOfPeptideids.replaceFirst(",","");
+        try {
+            Vector<ScoreType> iScoreTypes = getScoreTypes(iConnection);
+            PreparedStatement stat = iConnection.prepareStatement("select PeptideID,ScoreID,ScoreValue from PeptideScores where PeptideID in ("+listOfPeptideids+")");
+            ResultSet rs = stat.executeQuery();
+            while (rs.next()){
+                pepidToPeptide.get(rs.getInt("PeptideID")).setScore(rs.getDouble("ScoreValue"),rs.getInt("ScoreID"),iScoreTypes);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 }

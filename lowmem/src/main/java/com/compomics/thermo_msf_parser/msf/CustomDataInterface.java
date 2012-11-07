@@ -9,6 +9,16 @@ package com.compomics.thermo_msf_parser.msf;
  */
 public interface CustomDataInterface {
 
+    /**
+     * returns the Custom datafield id stored in the SQLite db
+     * @return Field id
+     */
+    public int getFieldId();
 
-
+    
+    /**
+     * returns the name of the custom data field
+     * @return name of the custom data field
+     */
+    public String getName();
 }

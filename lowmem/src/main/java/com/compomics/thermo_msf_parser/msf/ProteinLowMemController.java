@@ -10,10 +10,11 @@ import java.util.*;
  * Time: 10:36 AM
  * To change this template use File | Settings | File Templates.
  */
-public class ProteinLowMemController  extends Observable implements ProteinInterface {
+public class ProteinLowMemController extends Observable implements ProteinInterface {
 
 
     private int proteinCounter;
+    private int internalcounter = 0;
 
     /**
      *
@@ -141,14 +142,21 @@ public class ProteinLowMemController  extends Observable implements ProteinInter
     public ArrayList<ProteinLowMem> getProteinsForConfidenceLevel(int confidenceLevel, Connection aConnection){
         ArrayList<ProteinLowMem> changedAccessions = new ArrayList<ProteinLowMem>();
         String proteinAccession;
+        proteinCounter = 0;
         try {
             Statement stat = aConnection.createStatement();
-            ResultSet rs = stat.executeQuery("select Proteins.ProteinID,Proteins.Sequence from PeptidesProteins,(select PeptideID from Peptides where ConfidenceLevel = "+confidenceLevel+") as pepid ,Proteins where pepid.PeptideID = PeptidesProteins.PeptideID and Proteins.ProteinID = PeptidesProteins.ProteinID");
+            ResultSet rs = stat.executeQuery("select Proteins.ProteinID from PeptidesProteins,Peptides,Proteins where Peptides.PeptideID = PeptidesProteins.PeptideID and Proteins.ProteinID = PeptidesProteins.ProteinID and Peptides.confidencelevel = "+confidenceLevel);
             while(rs.next()){
                 int lProteinID = rs.getInt(1);
-                //String lSequence = rs.getString(2);
                 proteinAccession = getAccessionFromProteinID(lProteinID,aConnection);
                 changedAccessions.add(new ProteinLowMem(proteinAccession,aConnection,lProteinID));
+                proteinCounter++;
+                internalcounter++;
+                if (internalcounter > 30) {
+                    internalcounter = 0;
+                    setChanged();
+                    notifyObservers();
+                }
             }
             rs.close();
             stat.close();

@@ -179,13 +179,13 @@ public class SpectrumLowMemController implements SpectrumInterface{
         String lXml;
         ResultSet rs;
         Statement stat = lSpectrum.getConnection().createStatement();
-        rs = stat.executeQuery("select Spectrum from Spectra where UniqueSpectrumID = "+lSpectrum.getSpectrumId()+")");
+        rs = stat.executeQuery("select Spectrum from Spectra where UniqueSpectrumID = "+lSpectrum.getSpectrumId());
         while (rs.next()) {
             lZippedSpectrumXml = rs.getBytes(1);
         }
 
         if (lZippedSpectrumXml == null) {
-
+        //TODO
         }
         File lZippedFile = File.createTempFile("zip",null);
         FileOutputStream fos = new FileOutputStream(lZippedFile);
@@ -214,5 +214,47 @@ public class SpectrumLowMemController implements SpectrumInterface{
         rs.close();
         stat.close();
         lSpectrum.addSpectrumXML(lXml);
+    }
+    public void unzipXMLforSpectrum(SpectrumLowMem spectrum){
+        File lZippedFile = null;
+        String lXml = "";
+        try {
+            if (spectrum.getZippedSpectrumXml() == null){
+                try {
+                    createSpectrumXMLForSpectrum(spectrum);
+                } catch (SQLException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+            } else{
+            byte[] lZippedSpectrumXml = spectrum.getZippedSpectrumXml();
+            lZippedFile = File.createTempFile("zip", null);
+            FileOutputStream fos = new FileOutputStream(lZippedFile);
+            fos.write(lZippedSpectrumXml);
+            fos.flush();
+            fos.close();
+            BufferedOutputStream out = null;
+            ZipInputStream in = new ZipInputStream(new BufferedInputStream(new FileInputStream(lZippedFile)));
+            ZipEntry entry;
+            byte[] ltest = new byte[0];
+            ByteArrayOutputStream lStream = new ByteArrayOutputStream(50);
+            while ((entry = in.getNextEntry()) != null) {
+                int count;
+                byte data[] = new byte[50];
+                out = new BufferedOutputStream(lStream, 50);
+                while ((count = in.read(data, 0, 50)) != -1) {
+                    out.write(data, 0, count);
+                }
+            }
+            in.close();
+            out.flush();
+            out.close();
+            lZippedFile.delete();
+            lXml = lStream.toString();
+            lStream.close();
+            spectrum.addSpectrumXML(lXml);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
     }
 }

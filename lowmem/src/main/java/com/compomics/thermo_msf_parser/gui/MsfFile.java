@@ -16,7 +16,7 @@ import java.util.Vector;
 public class MsfFile{
 
     private File msfFile;
-    private Connection iConnection;
+    private static Connection iConnection;
     private Vector<AminoAcid> iAminoAcid = new Vector<AminoAcid>();
 
     public MsfFile(File aMsfFile) throws ClassNotFoundException, SQLException {

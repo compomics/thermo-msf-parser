@@ -12,7 +12,12 @@ import java.util.HashMap;
  * To change this template use File | Settings | File Templates.
  */
 public interface EnzymeInterface {
-
-         public HashMap createEnzymeMap (Connection iConnection) throws SQLException;
+    /**
+     * creates a hashmap containing the enzymes
+     * @param iConnection
+     * @return
+     * @throws SQLException 
+     */    
+    public HashMap createEnzymeMap (Connection iConnection) throws SQLException;
 
 }

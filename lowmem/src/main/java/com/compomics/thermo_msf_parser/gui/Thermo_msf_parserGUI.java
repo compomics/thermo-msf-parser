@@ -1,30 +1,13 @@
 package com.compomics.thermo_msf_parser.gui;
 
-import com.compomics.rover.general.enumeration.ReferenceSetEnum;
-import com.compomics.rover.general.enumeration.RoverSource;
-import com.compomics.rover.general.fileio.readers.MsfReader;
-import com.compomics.rover.general.quantitation.QuantitativeProtein;
-import com.compomics.rover.general.quantitation.RatioGroup;
-import com.compomics.rover.general.quantitation.RatioGroupCollection;
-import com.compomics.rover.general.quantitation.ReferenceSet;
-import com.compomics.rover.general.quantitation.sorters.QuantitativeProteinSorterByAccession;
-import com.compomics.rover.general.quantitation.sorters.QuantitativeProteinSorterByRatioGroupNumbers;
-import com.compomics.rover.general.singelton.QuantitativeValidationSingelton;
-import com.compomics.rover.gui.MatchRatioWithComponent;
-import com.compomics.rover.gui.QuantitationValidationGUI;
-import com.compomics.rover.gui.wizard.LoadingPanel;
 import com.compomics.thermo_msf_parser.Parser;
 import com.compomics.thermo_msf_parser.msf.*;
 import com.compomics.thermo_msf_parser.msf.Event;
 import com.compomics.util.Util;
 import com.compomics.util.examples.HelpWindow;
-import com.compomics.util.experiment.biology.ions.PeptideFragmentIon;
 import com.compomics.util.gui.UtilitiesGUIDefaults;
 import com.compomics.util.gui.protein.ProteinSequencePane;
-import com.compomics.util.gui.spectrum.ChromatogramPanel;
 import com.compomics.util.gui.spectrum.DefaultSpectrumAnnotation;
-import com.compomics.util.gui.spectrum.ReferenceArea;
-import com.compomics.util.gui.spectrum.SpectrumPanel;
 import com.compomics.util.io.StartBrowser;
 import no.uib.jsparklines.renderers.JSparklinesBarChartTableCellRenderer;
 import no.uib.jsparklines.renderers.JSparklinesIntegerColorTableCellRenderer;
@@ -47,6 +30,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.logging.Level;
 
 /**
  * Created by IntelliJ IDEA.
@@ -114,7 +98,6 @@ public class Thermo_msf_parserGUI extends JFrame {
     private SpectrumPanel iMSMSspectrumPanel;
     private SpectrumPanel iMSspectrumPanel;
     private SpectrumPanel iQuantificationSpectrumPanel;
-    private QuantitationValidationGUI iRover = null;
 
     /**
      * A vector with the absolute pahts to the msf file
@@ -584,247 +567,6 @@ public class Thermo_msf_parserGUI extends JFrame {
 
 
             public void actionPerformed(ActionEvent e) {
-                com.compomics.util.sun.SwingWorker lRoverOpener = new com.compomics.util.sun.SwingWorker() {
-                    boolean lLoaded = false;
-
-                    public Boolean construct() {
-                        try {
-                            setGuiElementsResponsive(false);
-                            if (allRadioButton.isSelected()) {
-                                JOptionPane.showMessageDialog(getFrame(), "Please select \"Only Highest Scoring\" or \"Only Lowest Scoring\"!", "Deselect All", JOptionPane.INFORMATION_MESSAGE);
-                                return true;
-                            }
-
-                            String lQuestion = "Do you want to load Rover with the current peptide identification parameters?";
-                            int answer = JOptionPane.showConfirmDialog(new JFrame(), lQuestion, "Open Rover? ", JOptionPane.YES_NO_OPTION, JOptionPane.PLAIN_MESSAGE);
-                            if (answer == JOptionPane.YES_OPTION) {
-                                //load rover
-                                QuantitativeValidationSingelton iQuantitativeValidationSingelton = QuantitativeValidationSingelton.getInstance();
-                                iQuantitativeValidationSingelton.setUseOnlyValidRatioForProteinMean(true);
-
-                                //1.check the msf files
-                                Vector<MsfReader> lMsfFiles = new Vector<MsfReader>();
-
-                                //update progress bar
-                                progressBar.setVisible(true);
-                                progressBar.setMaximum(iParsedMsfs.size() + 1);
-                                progressBar.setValue(0);
-                                progressBar.setString("");
-                                progressBar.setStringPainted(true);
-                                progressBar.setIndeterminate(false);
-
-                                //1.check the datfiles
-                                int lConfidenceLevel = 0;
-                                if (chbHighConfident.isSelected()) {
-                                    lConfidenceLevel = 3;
-                                } else if (chbMediumConfident.isSelected()) {
-                                    lConfidenceLevel = 2;
-                                } else if (chbLowConfidence.isSelected()) {
-                                    lConfidenceLevel = 1;
-                                }
-                                for (int i = 0; i < iParsedMsfs.size(); i++) {
-                                    try {
-                                        lMsfFiles.add(new MsfReader(iParsedMsfs.get(i), iParsedMsfs.get(i).getFileName(), lConfidenceLevel, onlyHighestScoringRadioButton.isSelected(), onlyLowestScoringRadioButton.isSelected()));
-                                    } catch (Exception e) {
-                                        logger.info(e);
-                                    }
-
-                                    //update progress bar
-                                    progressBar.setValue(progressBar.getValue() + 1);
-                                    progressBar.setString("Parsed " + iParsedMsfs.get(i).getFileName() + ".");
-                                }
-
-                                //update progress bar
-                                progressBar.setIndeterminate(true);
-
-                                //3.match ids to quantitations
-
-                                //update progress bar
-                                progressBar.setString("");
-                                progressBar.setStringPainted(true);
-                                progressBar.setIndeterminate(false);
-                                progressBar.setMaximum(lMsfFiles.size() + 1);
-                                progressBar.setValue(0);
-
-                                Vector<RatioGroupCollection> lRatioGroupCollection = new Vector<RatioGroupCollection>();
-                                for (int i = 0; i < lMsfFiles.size(); i++) {
-
-                                    //update progress bar
-                                    progressBar.setValue(progressBar.getValue() + 1);
-                                    progressBar.setString("Creating ratio information for " + (i + 1) + " of " + lMsfFiles.size() + " msf files");
-
-                                    RatioGroupCollection lTemp = lMsfFiles.get(i).getRatioGroupCollection();
-                                    if (lTemp != null) {
-                                        lRatioGroupCollection.add(lTemp);
-                                    }
-
-                                    //_____Do garbage collection______
-                                    System.gc();
-                                }
-
-                                //update progress bar
-                                progressBar.setString("");
-                                progressBar.setStringPainted(false);
-                                progressBar.setIndeterminate(true);
-
-                                //6. get all the protein accessions from the identifications
-                                Vector<String> lProteinAccessions = new Vector<String>();
-                                for (int i = 0; i < lRatioGroupCollection.size(); i++) {
-                                    if (i == 0) {
-                                        iQuantitativeValidationSingelton.setRatioTypes(lRatioGroupCollection.get(i).getRatioTypes());
-                                        iQuantitativeValidationSingelton.setComponentTypes(lRatioGroupCollection.get(i).getComponentTypes());
-                                    }
-
-                                    lRatioGroupCollection.get(i).setRoverSource(RoverSource.THERMO_MSF_FILES);
-
-                                    for (int j = 0; j < lRatioGroupCollection.get(i).size(); j++) {
-                                        RatioGroup lRatioGroup = lRatioGroupCollection.get(i).get(j);
-
-                                        String[] lAccessionsForRatioGroup = lRatioGroup.getProteinAccessions();
-                                        for (int k = 0; k < lAccessionsForRatioGroup.length; k++) {
-                                            //check if it's a new accession
-                                            boolean lNewAccession = true;
-                                            for (int l = 0; l < lProteinAccessions.size(); l++) {
-                                                if (lProteinAccessions.get(l).equalsIgnoreCase(lAccessionsForRatioGroup[k])) {
-                                                    lNewAccession = false;
-                                                }
-                                            }
-                                            if (lNewAccession) {
-                                                lProteinAccessions.add(lAccessionsForRatioGroup[k]);
-                                            }
-                                        }
-                                    }
-                                }
-
-                                if (lRatioGroupCollection.isEmpty()) {
-                                    //show gui
-                                    JOptionPane.showMessageDialog(getFrame(), "No quantitative data could be found!\n The program will close.", "INFO", JOptionPane.INFORMATION_MESSAGE);
-                                }
-
-                                //7.A get the types of the ratios from the first distiller ratio collecion
-                                Vector<String> lRatioList = lRatioGroupCollection.get(0).getRatioTypes();
-                                String[] lRatioTypes = new String[lRatioList.size()];
-                                lRatioList.toArray(lRatioTypes);
-
-                                //7.B get the types of the ratios from the first distiller ratio collecion
-                                Vector<String> lComponentList = lRatioGroupCollection.get(0).getComponentTypes();
-                                String[] lComponentTypes = new String[lComponentList.size()];
-                                lComponentList.toArray(lComponentTypes);
-
-
-                                //8. create all the distiller proteins
-                                Vector<QuantitativeProtein> lFoundProtein = new Vector<QuantitativeProtein>();
-                                for (int i = 0; i < lProteinAccessions.size(); i++) {
-                                    lFoundProtein.add(new QuantitativeProtein(lProteinAccessions.get(i), lRatioTypes));
-                                }
-
-                                //9. couple the distiller ratio groups to the distiller proteins
-                                for (int i = 0; i < lRatioGroupCollection.size(); i++) {
-                                    for (int j = 0; j < lRatioGroupCollection.get(i).size(); j++) {
-                                        //get the ratio group
-                                        RatioGroup lRatioGroup = lRatioGroupCollection.get(i).get(j);
-                                        //get all the protein accession linked to this ratiogroup
-                                        String[] lAccessions = lRatioGroup.getProteinAccessions();
-                                        for (int k = 0; k < lAccessions.length; k++) {
-                                            for (int l = 0; l < lFoundProtein.size(); l++) {
-                                                if (lAccessions[k].equalsIgnoreCase(lFoundProtein.get(l).getAccession())) {
-                                                    //add the ratio group to the protein if the accession is the same
-                                                    lFoundProtein.get(l).addRatioGroup(lRatioGroup);
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-
-                                LoadingPanel.calculateRazorPeptides(lFoundProtein);
-                                iQuantitativeValidationSingelton.setAllProteins(lFoundProtein);
-
-                                //10. create a reference set with the "household" proteins with the most ratiogroups
-                                ReferenceSet lReferenceSet = new ReferenceSet(new ArrayList<QuantitativeProtein>(), lRatioTypes, lComponentTypes);
-
-                                MatchRatioWithComponent lMatch = new MatchRatioWithComponent(true);
-                                while (lRatioTypes.length > iQuantitativeValidationSingelton.getMatchedRatioTypes().size()) {
-                                    try {
-                                        Thread.sleep(1000);
-                                    } catch (InterruptedException e) {
-                                        //sleep failed
-                                    }
-                                }
-
-                                //sort by the ratio group numbers
-                                Collections.sort(lFoundProtein, new QuantitativeProteinSorterByRatioGroupNumbers());
-
-                                //get the reference set size from the singelton
-                                int lReferenceSetSize = lFoundProtein.size();
-
-                                for (int i = 0; i < lReferenceSetSize; i++) {
-                                    lReferenceSet.addReferenceProtein(lFoundProtein.get(i));
-                                }
-                                iQuantitativeValidationSingelton.setReferenceSet(lReferenceSet);
-
-                                iQuantitativeValidationSingelton.setReferenceSetEnum(ReferenceSetEnum.ALL);
-                                iQuantitativeValidationSingelton.setCalibratedStdev(0.14277725);
-                                iQuantitativeValidationSingelton.setNormalization(false);
-                                iQuantitativeValidationSingelton.setMultipleSources(false);
-                                iQuantitativeValidationSingelton.setUseOnlyValidRatioForProteinMean(true);
-                                HashMap<String, String> lProteinAccessionSequenceMap = new HashMap<String, String>();
-                                progressBar.setMaximum(iProteins.size());
-                                progressBar.setValue(0);
-                                progressBar.setIndeterminate(false);
-                                progressBar.setString("Retrieving protein sequences");
-                                progressBar.setStringPainted(true);
-                                for (int p = 0; p < iProteins.size(); p++) {
-                                    progressBar.setValue(p);
-                                    lProteinAccessionSequenceMap.put(iProteins.get(p).getUtilAccession(), iProteins.get(p).getSequence());
-                                }
-                                for (int p = 0; p < lFoundProtein.size(); p++) {
-                                    if (lProteinAccessionSequenceMap.get(lFoundProtein.get(p).getAccession()) != null) {
-                                        lFoundProtein.get(p).setSequence(lProteinAccessionSequenceMap.get(lFoundProtein.get(p).getAccession()));
-                                        lFoundProtein.get(p).setSequenceLength(lFoundProtein.get(p).getSequence().length());
-                                    } else {
-                                        System.out.println("cd");
-                                    }
-                                }
-
-                                //sort by the protein accession
-                                Collections.sort(lFoundProtein, new QuantitativeProteinSorterByAccession());
-
-                                //_____Do garbage collection______
-                                System.gc();
-
-                                //show gui
-                                JOptionPane.showMessageDialog(getFrame(), "All the data is loaded, ready to validate!", "INFO", JOptionPane.INFORMATION_MESSAGE);
-                                iRover = new QuantitationValidationGUI(lFoundProtein, null, false);
-                                while (jSuperTabbedPane.getComponentCount() > 1) {
-                                    jSuperTabbedPane.remove(1);
-                                }
-                                jSuperTabbedPane.add("Rover", iRover.getContentPane());
-                                jSuperTabbedPane.setSelectedIndex(1);
-                                //gui.setVisible(true);
-                                progressBar.setVisible(false);
-                                progressBar.setString("");
-                                progressBar.setStringPainted(false);
-                                return true;
-
-                            } else {
-                                //cancel pressed
-                                setGuiElementsResponsive(true);
-                            }
-
-
-                        } catch (Exception e1) {
-                            logger.info(e1);
-                            progressBar.setVisible(false);
-                        }
-                        return true;
-                    }
-
-                    public void finished() {
-                        setGuiElementsResponsive(true);
-                    }
-
-                };
-                lRoverOpener.start();
             }
         });
     }
@@ -3049,7 +2791,11 @@ public class Thermo_msf_parserGUI extends JFrame {
      * @param args no arguments are expected
      */
     public static void main(String[] args) {
-        UtilitiesGUIDefaults.setLookAndFeel();
+        try {
+            UtilitiesGUIDefaults.setLookAndFeel();
+        } catch (IOException ex) {
+            java.util.logging.Logger.getLogger(Thermo_msf_parserGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
         new Thermo_msf_parserGUI(true);
     }
 
@@ -3267,7 +3013,7 @@ public class Thermo_msf_parserGUI extends JFrame {
         } else {
             iSelectedProtein = (Protein) proteinList.getSelectedValue();
         }
-        if (iRover != null) {
+        /*if (iRover != null) {
             for (int i = 0; i < iRover.getProteinList().getModel().getSize(); i++) {
                 QuantitativeProtein lProtein = (QuantitativeProtein) iRover.getProteinList().getModel().getElementAt(i);
                 if (lProtein.getAccession().equalsIgnoreCase(iSelectedProtein.getUtilAccession())) {
@@ -3275,7 +3021,7 @@ public class Thermo_msf_parserGUI extends JFrame {
                     iRover.loadProtein(true);
                 }
             }
-        }
+        }*/
         createPeptideTable(iSelectedProtein);
         formatProteinSequence(iSelectedProtein);
         jtablePeptides.updateUI();

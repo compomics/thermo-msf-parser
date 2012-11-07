@@ -12,7 +12,6 @@ import java.util.*;
  */
 public class ProcessingNodeLowMem {
 
-    public ProcessingNodeLowMem(){}
 
     public ArrayList<ProcessingNode> getAllProcessingNodes(Connection aConnection, MsfVersion iMsfVersion) throws SQLException {
         HashMap<Integer, ProcessingNode> allNodesMap = new HashMap<Integer, ProcessingNode>();

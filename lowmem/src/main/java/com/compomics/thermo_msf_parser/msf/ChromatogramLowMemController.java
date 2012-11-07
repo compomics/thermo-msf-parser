@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -17,16 +19,27 @@ import java.util.zip.ZipInputStream;
  * To change this template use File | Settings | File Templates.
  */
 public class ChromatogramLowMemController {
-
-    public Vector<Chromatogram> getChromatogramFileForPeptideID(int peptideID,Connection iConnection) throws SQLException, IOException {
+    /**
+     * returns the chromatogram for a given peptide ID in the SQLite db
+     * @param peptideID the id of the peptide
+     * @param iConnection connection to the msf SQLite file
+     * @return a vector containing the chromatogram files
+     */
+    //TODO check of this returns one or multiple files
+    public Vector<Chromatogram> getChromatogramFileForPeptideID(int peptideID,Connection iConnection) {
         Vector<Chromatogram> chromatogramFiles = new Vector<Chromatogram>();
-        PreparedStatement stat = iConnection.prepareStatement("select chro.Chromatogram,chro.TraceType,chro.FileID from Chromatograms as chro,MassPeaks,SpectrumHeaders,Peptides where chro.fileID = MassPeaks.fileID and MassPeaks.MassPeakID = SpectrumHeaders.MassPeakID and SpectrumHeaders.SpectrumID = Peptides.SpectrumID and Peptides.PeptideID ="+peptideID);
-        ResultSet rs = stat.executeQuery();
-        while (rs.next()) {
-            chromatogramFiles.add(new Chromatogram(rs.getInt("FileID"), rs.getInt("TraceType"), rs.getBytes("Chromatogram")));
+            
+        try {
+            PreparedStatement stat = iConnection.prepareStatement("select chro.Chromatogram,chro.TraceType,chro.FileID from Chromatograms as chro,MassPeaks,SpectrumHeaders,Peptides where chro.fileID = MassPeaks.fileID and MassPeaks.MassPeakID = SpectrumHeaders.MassPeakID and SpectrumHeaders.SpectrumID = Peptides.SpectrumID and Peptides.PeptideID ="+peptideID);
+            ResultSet rs = stat.executeQuery();
+            while (rs.next()) {
+                chromatogramFiles.add(new Chromatogram(rs.getInt("FileID"), rs.getInt("TraceType"), rs.getBytes("Chromatogram")));
+            }
+            rs.close();
+            stat.close();
+        } catch (SQLException ex) {
+            ;
         }
-        rs.close();
-        stat.close();
         return chromatogramFiles;
     }
 
@@ -34,38 +47,43 @@ public class ChromatogramLowMemController {
      *
      * @param zippedChromatogramXML the zipped chromatogram xml file retrieved by getChromatogramFileForPeptideID
      * @return the unzipped chromatogram file in a string
-     * @throws IOException
      */
-    public String getUnzippedChromatogramXml(byte[] zippedChromatogramXML) throws IOException {
-        String iUnzippedChromatogramXml;
-        File lZippedFile = File.createTempFile("zip",null);
-        FileOutputStream fos = new FileOutputStream(lZippedFile);
-        fos.write(zippedChromatogramXML);
-        fos.flush();
-        fos.close();
-        BufferedOutputStream out = null;
-        ZipInputStream in = new ZipInputStream(new BufferedInputStream(new FileInputStream(lZippedFile)));
-        ZipEntry entry;
-        ByteArrayOutputStream lStream = new ByteArrayOutputStream(50);
-        while ((entry = in.getNextEntry()) != null) {
-            int count;
-            byte data[] = new byte[50];
-            out = new BufferedOutputStream(lStream, 50);
-            while ((count = in.read(data, 0, 50)) != -1) {
-                out.write(data, 0, count);
+    
+    public String getUnzippedChromatogramXml(byte[] zippedChromatogramXML) {
+        String iUnzippedChromatogramXml = "";
+        try {
+            File lZippedFile = File.createTempFile("zip",null);
+            FileOutputStream fos = new FileOutputStream(lZippedFile);
+            fos.write(zippedChromatogramXML);
+            fos.flush();
+            fos.close();
+            BufferedOutputStream out = null;
+            ZipInputStream in = new ZipInputStream(new BufferedInputStream(new FileInputStream(lZippedFile)));
+            ZipEntry entry;
+            ByteArrayOutputStream lStream = new ByteArrayOutputStream(50);
+            while ((entry = in.getNextEntry()) != null) {
+                int count;
+                byte data[] = new byte[50];
+                out = new BufferedOutputStream(lStream, 50);
+                while ((count = in.read(data, 0, 50)) != -1) {
+                    out.write(data, 0, count);
+                }
             }
+            in.close();
+            out.flush();
+            out.close();
+            lZippedFile.delete();
+            iUnzippedChromatogramXml = lStream.toString();
+            lStream.close();
+            
+        } catch (IOException ex) {
+            Logger.getLogger(ChromatogramLowMemController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        in.close();
-        out.flush();
-        out.close();
-        lZippedFile.delete();
-        iUnzippedChromatogramXml = lStream.toString();
-        lStream.close();
         return iUnzippedChromatogramXml;
     }
 
     /**
-     *
+     * returns a vector containing Point objects extracted from the chromatogram XML file
      * @param chromatogramXML the unzipped chromatogram xml file retrieved from getUnzippedChromatogramXml
      * @return a vector containing all the point objects retrieved from the xml file
      */
@@ -79,6 +97,10 @@ public class ChromatogramLowMemController {
         }
         return lPoints;
     }
+    
+    /**
+     * inner class Point
+     */
     public class Point{
         /**
          * Time
