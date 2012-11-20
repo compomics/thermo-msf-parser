@@ -11,7 +11,7 @@ import java.util.Vector;
  * Time: 3:23 PM
  * To change this template use File | Settings | File Templates.
  */
-public interface RatioTypesInterface {
+public interface RatioTypeInterface {
 
     /**
      *
@@ -20,6 +20,6 @@ public interface RatioTypesInterface {
      * @throws java.sql.SQLException if something went wrong with the retrieving
      */
 
-    public Vector<RatioType> parseRatioTypes(Connection iConnection) throws SQLException;
+    public Vector<RatioTypeLowMem> parseRatioTypes(Connection iConnection) throws SQLException;
 
 }

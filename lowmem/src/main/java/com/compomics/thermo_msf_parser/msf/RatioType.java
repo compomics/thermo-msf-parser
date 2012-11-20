@@ -59,6 +59,10 @@ public class RatioType {
     }
 
 
+    public RatioType(){
+    
+    }
+    
     //getters
 
     public String getRatioType() {

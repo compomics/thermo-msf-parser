@@ -161,7 +161,7 @@ public class QuanResultLowMem {
      * @param lType The ratio type
      * @return double with the ratio
      */
-    public Double getRatioByRatioType(RatioType lType){
+    public Double getRatioByRatioType(RatioTypeLowMem lType){
         Double lNumValue = null;
         Double lDenValue = null;
         for(int i = 0; i<iQuanChannelIds.size(); i ++){
@@ -185,7 +185,7 @@ public class QuanResultLowMem {
      * @param lType The ratio type
      * @return double with the numerator
      */
-    public Double getNumeratorByRatioType(RatioType lType){
+    public Double getNumeratorByRatioType(RatioTypeLowMem lType){
         Double lNumValue = null;
         Double lDenValue = null;
         for(int i = 0; i<iQuanChannelIds.size(); i ++){
@@ -204,7 +204,7 @@ public class QuanResultLowMem {
      * @param lType The ratio type
      * @return double with the denominator
      */
-    public Double getDenominatorByRatioType(RatioType lType){
+    public Double getDenominatorByRatioType(RatioTypeLowMem lType){
         Double lNumValue = null;
         Double lDenValue = null;
         for(int i = 0; i<iQuanChannelIds.size(); i ++){

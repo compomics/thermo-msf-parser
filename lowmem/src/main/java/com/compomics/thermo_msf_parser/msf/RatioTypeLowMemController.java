@@ -1,26 +1,28 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package com.compomics.thermo_msf_parser.msf;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Vector;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Davy
- * Date: 4/30/12
- * Time: 1:24 PM
- * To change this template use File | Settings | File Templates.
+ *
+ * @author Davy
  */
-public class RatioTypesLowMem implements RatioTypesInterface{
-
-    Vector<RatioType> lRatiotypes;
-    private Vector<Integer> iQuanChannelIds;
-    private Vector<Double> iIntensities;
-    Vector<String> iComponents = new Vector<String>();
+public class RatioTypeLowMemController implements RatioTypeInterface {
+    private Vector iComponents;
+    private Vector iQuanChannelIds;
     HashMap<Integer,String> quanChannelID = new HashMap<Integer, String>();
-
-    public Vector<RatioType> parseRatioTypes(Connection iConnection) throws SQLException {
-        String iQuantitationMethod;
+    
+    public Vector<RatioTypeLowMem> parseRatioTypes(Connection iConnection) throws SQLException {
+     Vector<RatioTypeLowMem> lRatioTypes = new Vector<RatioTypeLowMem>();
+    String iQuantitationMethod;
         String iQuantitationMethodName = "";
         PreparedStatement stat = iConnection.prepareStatement("select ParameterValue from ProcessingNodeParameters where ParameterName like 'QuantificationMethod'");
        ResultSet rs = stat.executeQuery();
@@ -54,7 +56,7 @@ public class RatioTypesLowMem implements RatioTypesInterface{
                         String lNumerator = lNextNumeratorLine.substring(lNextNumeratorLine.indexOf("or\">") + 4, lNextNumeratorLine.indexOf("</"));
                         String lDenominator = lNextDenominatorLine.substring(lNextDenominatorLine.indexOf("or\">") + 4, lNextDenominatorLine.indexOf("</"));
 
-                        lRatiotypes.add(new RatioType(lRatioType, lNumerator, lDenominator, iQuanChannelIds, iComponents));
+                        lRatioTypes.add(new RatioTypeLowMem(lRatioType, lNumerator, lDenominator, iQuanChannelIds, iComponents));
                     }
                 }
                 if(lLine.startsWith("<MethodPart name=\"RatioReporting\"")){
@@ -62,6 +64,6 @@ public class RatioTypesLowMem implements RatioTypesInterface{
                 }
             }
         }
-    return lRatiotypes;
+    return lRatioTypes;
     }
 }

@@ -117,6 +117,5 @@ public class ProteinLowMem {
     
     public void addDecoyPeptide(PeptideLowMem peptideLowMem) {
 
-
     }
 }

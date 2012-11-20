@@ -46,7 +46,7 @@ public class PeptideLowMem {
     /**
      * The scoretype
      */
-    private Vector<ScoreType> iScoreTypes = new Vector<ScoreType>();
+    private Vector<ScoreTypeLowMem> iScoreTypes = new Vector<ScoreTypeLowMem>();
     /**
      * The total ions count
      */
@@ -263,7 +263,7 @@ public class PeptideLowMem {
      * Getter for the score type. These score type are linked to the scores
      * @return Vector with the score type
      */
-    public Vector<ScoreType> getScoreTypes() {
+    public Vector<ScoreTypeLowMem> getScoreTypes() {
         return iScoreTypes;
     }
 
@@ -377,7 +377,7 @@ public class PeptideLowMem {
      * @param lScoreType The score type of the requested score
      * @return double with the score
      */
-    public Double getScoreByScoreType(ScoreType lScoreType){
+    public Double getScoreByScoreType(ScoreTypeLowMem lScoreType){
         Double lScore = null;
 
         for(int i = 0; i<iScoreTypes.size(); i ++){
@@ -408,7 +408,7 @@ public class PeptideLowMem {
      * @param iScoreTypeid the score type id the added score
      * @param lScoreTypes The different score types found in the msf file
      */
-    public void setScore(double iScore, int iScoreTypeid, Vector<ScoreType> lScoreTypes) {
+    public void setScore(double iScore, int iScoreTypeid, Vector<ScoreTypeLowMem> lScoreTypes) {
         this.iScores.add(iScore);
         this.iScoreTypeIds.add(iScoreTypeid);
         boolean added = false;

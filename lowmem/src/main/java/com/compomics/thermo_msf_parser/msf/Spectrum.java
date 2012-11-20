@@ -425,7 +425,6 @@ public class Spectrum {
         }
 
         return lRawFile + "_" + iSpectrumId + "_" + iFirstScan + "_" + iCharge;
-
     }
 
      public String getUniqueSpectrumTitle() {

@@ -53,12 +53,10 @@ public class ParserStarter {
          * given in the pom file.
          */
         String jarFileName = "thermo_msf_parser-" + getVersion() + ".jar";
-        System.out.println(jarFileName);
         // Get the jarFile path.
         String path;
         path = this.getClass().getResource("Thermo_msf_parserGUI.class").getPath();
         //logger.debug(path);
-        System.out.println(path);
         path = path.substring(5, path.indexOf(jarFileName));
         //logger.debug(path);
         path = path.replace("%20", " ");

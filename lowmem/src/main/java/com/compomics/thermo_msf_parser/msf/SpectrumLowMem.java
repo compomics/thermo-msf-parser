@@ -265,7 +265,7 @@ public class SpectrumLowMem {
         return iConnection;
     }
 
-    public boolean isHighestScoring(PeptideLowMem iSelectedPeptide, Vector<ScoreType> scoreTypes) {
+    public boolean isHighestScoring(PeptideLowMem iSelectedPeptide, Vector<ScoreTypeLowMem> scoreTypes) {
         Boolean lIsHighestScore = null;
         for(int l = 0; l<scoreTypes.size(); l++){
             if (iSelectedPeptide.getScoreByScoreType(scoreTypes.get(l)) != null) {
@@ -294,7 +294,7 @@ public class SpectrumLowMem {
         return lIsHighestScore;
     }
 
-    public boolean isLowestScoring(PeptideLowMem iSelectedPeptide, Vector<ScoreType> scoreTypes) {
+    public boolean isLowestScoring(PeptideLowMem iSelectedPeptide, Vector<ScoreTypeLowMem> scoreTypes) {
         Boolean lIsLowestScore = null;
         for(int i = 0; i<scoreTypes.size(); i ++){
             if (iSelectedPeptide.getScoreByScoreType(scoreTypes.get(i)) != null) {

@@ -14,11 +14,7 @@ import java.util.Vector;
  */
 public interface ScoreTypeInterface {
 
-    /*
 
-    */
-
-    public void setScoreTypes(Vector<ScoreType> scoreTypes);
 
     /**
     method to fetch the score types stored in the msf file
@@ -28,6 +24,6 @@ public interface ScoreTypeInterface {
      * @throws java.sql.SQLException if something went wrong with the retrieving
     */
 
-    public Vector<ScoreType> getScoreTypes(Connection iConnection) throws SQLException;
+    public Vector<ScoreTypeLowMem> getScoreTypes(Connection iConnection) throws SQLException;
 
 }

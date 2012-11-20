@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 /**
  * Created by IntelliJ IDEA. User: Niklaas Date: 18-Feb-2011 Time: 09:12:53
  */
-public class Parser implements  AminoAcidInterface,ModificationInterface,ChromatogramInterface,PeptideInterface,ProteinInterface,RatioTypesInterface,RawFileInterface,SpectrumInterface,EnzymeInterface,CustomDataInterface{
+public class Parser implements  AminoAcidInterface,ModificationInterface,ChromatogramInterface,PeptideInterface,ProteinInterface,RatioTypeInterface,RawFileInterface,SpectrumInterface,EnzymeInterface,CustomDataInterface{
 
     /**
      * Obtain a list of fasta files used
@@ -1764,7 +1764,7 @@ public class Parser implements  AminoAcidInterface,ModificationInterface,Chromat
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public Vector<RatioType> parseRatioTypes(Connection iConnection) throws SQLException {
+    public Vector<RatioTypeLowMem> parseRatioTypes(Connection iConnection) throws SQLException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
