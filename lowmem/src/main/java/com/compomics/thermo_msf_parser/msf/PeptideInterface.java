@@ -14,42 +14,67 @@ import java.util.Vector;
 public interface PeptideInterface {
 
     /**
-    query the msf file for the peptides of a given Protein object
-
     @param  protein: a Protein object
-    @param  iMsfVersion: enmueration object containing the version number of the current Msf file
+    @param  iMsfVersion: enumeration object containing the version number of the current Msf file
     @param iAminoAcids a Vector containing the objects returned from the AminoAcid
-    @return a Vector containing all the peptides connected to the given Protein
-    @throws SQLException if something went wrong with the retrieving
+    @return a Vector containing all the peptides connected to the given Protein, empty if none are found
     */
-
+    
     public Vector getPeptidesForProtein(ProteinLowMem protein,MsfVersion iMsfVersion,Vector<AminoAcid> iAminoAcids) throws SQLException;
 
    /**
-   query the msf file for the peptides of a given Protein object
-
    @param lProteinAccession: a string containing the accession of the protein
-   @param iConnection: a connection to the SQLite database
+   @param aConnection: a connection to the SQLite database
    @param iMsfVersion: enumeration object containing the version number of the current Msf file
    @param iAminoAcids a Vector containing the objects returned from the AminoAcid
-   @return a Vector containing all the peptides connected to the given protein accession
-   @throws SQLException if something went wrong with the retrieving
+   @return a Vector containing all the peptides connected to the given protein accession, empty if none are found
    */
 
-    public Vector getPeptidesForAccession(String lProteinAccession,MsfVersion iMsfVersion,Connection iConnection,Vector<AminoAcid> iAminoAcids) throws SQLException;
+    public Vector getPeptidesForAccession(String lProteinAccession,MsfVersion iMsfVersion,Connection aConnection,Vector<AminoAcid> iAminoAcids);
 
     /**
-    get the information relevant to the peptide from the msf file
-
     @param peptideID: the peptide ID in the sqlite database
-    @param iConnection: a connection to the SQLite database
-    @param fullInfo if the returned information should be consise or not
-    @return a vector containing the different values to present in the thermo-msf-parser
-    @throws SQLException if something went wrong with the retrieving
+    @param aConnection: a connection to the SQLite database
+    @param fullInfo if the returned information should be concise or not
+    @return a vector containing the different values to present in the thermo-msf-parser, empty if none are found
     */
 
+    public Vector getInformationForPeptide(int peptideID,Connection aConnection,boolean fullInfo);
 
-    public Vector getInformationForPeptide(int peptideID,Connection iConnection,boolean fullInfo) throws SQLException;
+    
+     /**
+     *
+     * @param confidenceLevel the confidence level of the peptides wanted
+     * @param aConnection connection to the msf file
+     * @param iMsfVersion the version with which the msf file is made
+     * @param iAminoAcids vector with the amino acids fetched from the amino acid lowmem class
+     * @return a vector containing the peptides identified and the specified confidence level, empty if none are found
+     */
+    public Vector<PeptideLowMem> getPeptidesWithConfidenceLevel(int confidenceLevel, Connection aConnection, MsfVersion iMsfVersion, Vector<AminoAcid> iAminoAcids);
+        
 
-
+    /**
+     * @param confidenceLevel the confidence level of the peptides wanted
+     * @param aConnection connection to the msf file
+     */
+    
+    public int getNumberOfPeptidesForConfidenceLevel(int confidenceLevel, Connection aConnection);
+    
+    /**
+     * @param proteinLowMemVector a vector containing the protein objects we want to retrieve the peptides for
+     * @param aConnection a connection to the msf file
+     * @param iAminoAcids a vector of the amino acids retrieved from the msf file
+     * @param iMsfVersion the msf file version
+     * @param confidenceLevel the confidence level we want to retrieve the peptides at
+     */
+    public void getPeptidesForProteinVector(Vector<ProteinLowMem> proteinLowMemVector, Connection aConnection, Vector<AminoAcid> iAminoAcids, MsfVersion iMsfVersion,int confidenceLevel);
+    
+    /**
+     * @param proteinLowMemVector a vector containing the protein objects we want to retrieve the peptides for
+     * @param aConnection a connection to the msf file
+     * @param iAminoAcids a vector of the amino acids retrieved from the msf file
+     * @param iMsfVersion the msf file version
+     */
+    public void getPeptidesForProteinVector(Vector<ProteinLowMem> proteinLowMemVector, Connection aConnection, Vector<AminoAcid> iAminoAcids, MsfVersion iMsfVersion);
+    
 }

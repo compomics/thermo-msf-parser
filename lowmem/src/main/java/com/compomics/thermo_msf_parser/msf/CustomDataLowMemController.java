@@ -17,10 +17,11 @@ public class CustomDataLowMemController {
     private HashMap<Integer,CustomDataField> customDataFieldHashMap = new HashMap<Integer, CustomDataField>();
 
     /**
-     * retriever for the Custom data fields
+     * 
      * @param iConnection a connection to the msf file
      * @return a hashmap containing the custom fields key: fieldid in the db value: displayname given in the db
      */
+    
     public HashMap<Integer,CustomDataField> getCustomFieldMap(Connection iConnection){
         try {
             PreparedStatement stat = iConnection.prepareStatement("select * from CustomDataFields");
@@ -38,7 +39,7 @@ public class CustomDataLowMemController {
     }
 
     /**
-     * retriever for the custom peptide data
+     * 
      * @param iConnection a connection to the msf file
      * @return a hashmap with the custom peptide data key: proteinid value:hashmap with key:the custom field id value: the field value
      */
@@ -65,7 +66,7 @@ public class CustomDataLowMemController {
      * @throws SQLException
      */
 
-    public void getCustomProteinsData(ProteinLowMem protein, Connection iConnection){
+    public void addCustomProteinsData(ProteinLowMem protein, Connection iConnection){
         try {
             PreparedStatement stat = iConnection.prepareStatement("select FieldValue,FieldID from CustomDataProteins where ProteinID = "+ protein.getProteinID());
             ResultSet rs = stat.executeQuery();
@@ -80,7 +81,7 @@ public class CustomDataLowMemController {
     }
     
     /**
-     * retriever for the custom spectra data stored in the SQLite db
+     * 
      * @param iConnection connection to the msf file
      * @return an arraylist with the custom spectra data
      * @throws SQLException

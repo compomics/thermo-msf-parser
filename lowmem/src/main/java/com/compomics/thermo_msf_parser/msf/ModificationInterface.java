@@ -23,7 +23,7 @@ public interface ModificationInterface {
      @throws SQLException if something went wrong with the retrieving
      */
 
-    public String addModificationsToPeptideSequence(Peptide peptide,HashMap modificationMap,Connection iConnection) throws SQLException;
+    public String addModificationsToPeptideSequence(Peptide peptide,HashMap modificationMap,Connection iConnection);
 
     /**
     a method to create a hashmap containing the modifications stored in the msf file
@@ -33,5 +33,5 @@ public interface ModificationInterface {
     @throws SQLException if something went wrong with the retrieving
     */
 
-    public HashMap createModificationMap(Connection iConnection) throws SQLException;
+    public HashMap createModificationMap(Connection iConnection);
 }

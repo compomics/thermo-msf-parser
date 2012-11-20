@@ -12,7 +12,7 @@ import java.util.HashMap;
  */
 public interface RawFileInterface {
     
-    public HashMap<Integer,String> getRawFileForFileID(int fileID,Connection iconn);
+    public HashMap<Integer,String> getRawFileForFileID(int fileID,Connection aConnection);
 
-    public String getRawFileNameForFileID(int FileID, Connection iConn);
+    public String getRawFileNameForFileID(int FileID, Connection aConnection);
 }

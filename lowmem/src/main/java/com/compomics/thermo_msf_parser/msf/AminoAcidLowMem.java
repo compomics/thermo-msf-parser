@@ -15,9 +15,15 @@ import java.util.Vector;
  */
 public class AminoAcidLowMem implements AminoAcidInterface{
 
-    public Vector getAminoAcidsFromDb(Connection iConnection) throws SQLException {
+    /**
+     * 
+     * @param aConnection a connection to the msf file
+     * @return a vector containing all the amino acids in the database
+     * @throws SQLException 
+     */
+    public Vector getAminoAcidsFromDb(Connection aConnection) throws SQLException {
         Vector<AminoAcid> iAminoAcids = new Vector<AminoAcid>();
-        PreparedStatement stat = iConnection.prepareStatement("select * from AminoAcids");
+        PreparedStatement stat = aConnection.prepareStatement("select * from AminoAcids");
         ResultSet rs = stat.executeQuery();
         while (rs.next()) {
             AminoAcid lAA = new AminoAcid(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getDouble(5), rs.getDouble(6), rs.getString(7));

@@ -26,11 +26,11 @@ public class ChromatogramLowMemController {
      * @return a vector containing the chromatogram files
      */
     //TODO check of this returns one or multiple files
-    public Vector<Chromatogram> getChromatogramFileForPeptideID(int peptideID,Connection iConnection) {
-        Vector<Chromatogram> chromatogramFiles = new Vector<Chromatogram>();
-            
+    
+    public Vector<Chromatogram> getChromatogramFileForPeptideID(int peptideID,Connection aConnection) {
+        Vector<Chromatogram> chromatogramFiles = new Vector<Chromatogram>();   
         try {
-            PreparedStatement stat = iConnection.prepareStatement("select chro.Chromatogram,chro.TraceType,chro.FileID from Chromatograms as chro,MassPeaks,SpectrumHeaders,Peptides where chro.fileID = MassPeaks.fileID and MassPeaks.MassPeakID = SpectrumHeaders.MassPeakID and SpectrumHeaders.SpectrumID = Peptides.SpectrumID and Peptides.PeptideID ="+peptideID);
+            PreparedStatement stat = aConnection.prepareStatement("select chro.Chromatogram,chro.TraceType,chro.FileID from Chromatograms as chro,MassPeaks,SpectrumHeaders,Peptides where chro.fileID = MassPeaks.fileID and MassPeaks.MassPeakID = SpectrumHeaders.MassPeakID and SpectrumHeaders.SpectrumID = Peptides.SpectrumID and Peptides.PeptideID ="+peptideID);
             ResultSet rs = stat.executeQuery();
             while (rs.next()) {
                 chromatogramFiles.add(new Chromatogram(rs.getInt("FileID"), rs.getInt("TraceType"), rs.getBytes("Chromatogram")));
@@ -135,26 +135,14 @@ public class ChromatogramLowMemController {
             }
         }
 
-        /**
-         * Getter for the t (time) value
-         * @return double with the time
-         */
         public double getT() {
             return iT;
         }
 
-        /**
-         * Getter for the y (intensity) value
-         * @return double with the intensity
-         */
         public double getY() {
             return iY;
         }
 
-        /**
-         * Getter for the scan
-         * @return int with the scan
-         */
         public int getScan() {
             return iScan;
         }

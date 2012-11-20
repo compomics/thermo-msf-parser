@@ -14,15 +14,17 @@ import java.util.Vector;
  */
 public interface SpectrumInterface {
 
-    /**
+    
+        /**
      *
-     * @param peptideID the ID of the peptide the XML file is needed from in the Msf File
-     * @param iConnection an SQLite Connection to the Msf File
-     * @return a String containing the unzipped spectrum XML
-     * @throws SQLException Exception thrown if something went wrong with the retrieving of the zipped XML File
-     * @throws IOException Exception thrown if something went wrong with the unzipping of the XML File
+     * @param peptideID the id of the peptide we want the spectrum xml for
+     * @param aConnection connection to the msf file
+     * @return the unzipped XML file in a string object
+     * @throws java.sql.SQLException
+     * @throws java.io.IOException
      */
-    public String createSpectrumXMLForPeptide(int peptideID,Connection iConnection) throws SQLException, IOException;
+    
+    public String createSpectrumXMLForPeptide(int peptideID,Connection aConnection) throws SQLException, IOException;
 
     /**
      *
@@ -50,12 +52,35 @@ public interface SpectrumInterface {
     public Peak getFragmentedMsPeak(String lXml) throws Exception;
 
     /**
-     *get a Spectrum object for a given Peptide object
-     @param peptideOfInterestID: a Peptide object
-     @param aConnectionToMsfFile SQLite connection to the Msf File where the peptide is stored
-     @return a Spectrum object
-     @throws SQLException if something went wrong with the retrieving
+     * 
+     * @param peptideOfInterestID the id of the peptide of which we want the spectrum from 
+     * @param aConnection a connection to the msf file
+     * @return a spectrum object
      */
+    public SpectrumLowMem getSpectrumForPeptideID(int peptideOfInterestID,Connection aConnection);
+    
+    
+    /**
+     *
+     * @param rawFileName the raw file name connected to the spectrum
+     * @param lspectrum the spectrum object we want the title from
+     * @return a processed title
+     */
+    public String getSpectrumTitle(String rawFileName, SpectrumLowMem lspectrum);
+    
+     /**
+     *
+     * @param lSpectrum the spectrum to which we want to add the zipped xml spectrum file
+     * @throws java.sql.SQLException
+     * @throws java.io.IOException
+     */
+    public void createSpectrumXMLForSpectrum(SpectrumLowMem lSpectrum) throws SQLException, IOException;
+    
+    /**
+     * fetches the zipped xml (if not yet added to the spectrum object) ,unzips it and adds it to the spectrum object
+     * @param spectrum the spectrum of which we want the unzipped xml file
+     */
+    public void unzipXMLforSpectrum(SpectrumLowMem spectrum);
+    
 
-    //public Spectrum getSpectrumForPeptideID(int peptideOfInterestID,Connection aConnectionToMsfFile) throws SQLException;
 }

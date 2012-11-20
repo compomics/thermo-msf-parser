@@ -183,7 +183,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
     /**
      * instance ProcessingNodeLowMem
      */
-    private ProcessingNodeLowMem processingNodeLowMemInstance = new ProcessingNodeLowMem();
+    private ProcessingNodeLowMemController processingNodeLowMemInstance = new ProcessingNodeLowMemController();
     /**
      * instance peptideLowMem
      */
@@ -206,7 +206,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
     private ChromatogramLowMemController chromatogramLowMemInstance = new ChromatogramLowMemController();
     private HashMap<Integer, CustomDataField> customData;
     private RawFileLowMemController rawFileLowMemInstance = new RawFileLowMemController();
-    private ProcessingNodeLowMem ProcessingNodeLowMemInstance = new ProcessingNodeLowMem();
+    private ProcessingNodeLowMemController ProcessingNodeLowMemInstance = new ProcessingNodeLowMemController();
     private ProgressBarMiddleMan progressBarIntFiller = new ProgressBarMiddleMan(peptideLowMemInstance, proteinLowMemInstance);
 
     /**

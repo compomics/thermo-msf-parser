@@ -15,11 +15,11 @@ public interface RatioTypeInterface {
 
     /**
      *
-     * @param iConnection connection to the SQLite db
+     * @param aConnection connection to the SQLite db
      * @return vector containing the ratio types
      * @throws java.sql.SQLException if something went wrong with the retrieving
      */
 
-    public Vector<RatioTypeLowMem> parseRatioTypes(Connection iConnection) throws SQLException;
+    public Vector<RatioTypeLowMem> parseRatioTypes(Connection aConnection);
 
 }

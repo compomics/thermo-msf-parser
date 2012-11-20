@@ -3,6 +3,8 @@ package com.compomics.thermo_msf_parser.msf;
 import java.io.*;
 import java.sql.*;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -15,19 +17,12 @@ import java.util.zip.ZipInputStream;
  */
 public class SpectrumLowMemController implements SpectrumInterface{
 
-    /**
-     *
-     * @param peptideID the id of the peptide we want the spectrum xml for
-     * @param iConnection connection to the msf file
-     * @return the unzipped XML file in a string object
-     * @throws java.sql.SQLException
-     * @throws java.io.IOException
-     */
-    public String createSpectrumXMLForPeptide(int peptideID,Connection iConnection) throws SQLException, IOException {
+
+    public String createSpectrumXMLForPeptide(int peptideID,Connection aConnection) throws SQLException, IOException {
         byte[] lZippedSpectrumXml = null;
         String lXml;
         ResultSet rs;
-        Statement stat = iConnection.createStatement();
+        Statement stat = aConnection.createStatement();
         rs = stat.executeQuery("select Spectrum from Spectra where UniqueSpectrumID = (select SpectrumID from Peptides where Peptides.PeptideID = "+peptideID+")");
         while (rs.next()) {
             lZippedSpectrumXml = rs.getBytes(1);
@@ -124,16 +119,16 @@ public class SpectrumLowMemController implements SpectrumInterface{
     }
     /**
      *
-     * @param iConnection connection to the msf file
+     * @param aConnection connection to the msf file
      * @return a vector containing all the spectra (in spectrum objects) stored in the msf file
      * @throws SQLException
      */
-    public Vector<SpectrumLowMem> getAllSpectra(Connection iConnection) throws SQLException {
+    public Vector<SpectrumLowMem> getAllSpectra(Connection aConnection) throws SQLException {
         Vector<SpectrumLowMem> iSpectra = new Vector<SpectrumLowMem>();
-        PreparedStatement stat = iConnection.prepareStatement("select s.*, m.FileID from spectrumheaders as s, masspeaks as m where m.masspeakid = s.masspeakid");
+        PreparedStatement stat = aConnection.prepareStatement("select s.*, m.FileID from spectrumheaders as s, masspeaks as m where m.masspeakid = s.masspeakid");
         ResultSet rs = stat.executeQuery();
         while (rs.next()) {
-            SpectrumLowMem lSpectrum = new SpectrumLowMem(rs.getInt("SpectrumID"), rs.getInt("UniqueSpectrumID"), rs.getInt("MassPeakID"), rs.getInt("LastScan"), rs.getInt("FirstScan"), rs.getInt("ScanNumbers"), rs.getInt("Charge"), rs.getDouble("RetentionTime"), rs.getDouble("Mass"), rs.getInt("ScanEventID"), iConnection);
+            SpectrumLowMem lSpectrum = new SpectrumLowMem(rs.getInt("SpectrumID"), rs.getInt("UniqueSpectrumID"), rs.getInt("MassPeakID"), rs.getInt("LastScan"), rs.getInt("FirstScan"), rs.getInt("ScanNumbers"), rs.getInt("Charge"), rs.getDouble("RetentionTime"), rs.getDouble("Mass"), rs.getInt("ScanEventID"), aConnection);
             lSpectrum.setFileId(rs.getInt("FileID"));
             iSpectra.add(lSpectrum);
         }
@@ -142,18 +137,23 @@ public class SpectrumLowMemController implements SpectrumInterface{
         return iSpectra;
     }
 
-    public SpectrumLowMem getSpectrumForPeptideID(int peptideOfInterestID,Connection iConnection) throws SQLException {
-        Statement stat = iConnection.createStatement();
-        ResultSet rs;
-        rs = stat.executeQuery("select s.*, m.FileID from spectrumheaders as s, masspeaks as m,(select SpectrumID from Peptides where Peptideid = "+ peptideOfInterestID + ") as specid where m.masspeakid = s.masspeakid and s.SpectrumID = specid.SpectrumID");
-        rs.next();
-        SpectrumLowMem returnSpectrum = new SpectrumLowMem(rs.getInt("SpectrumID"), rs.getInt("UniqueSpectrumID"), rs.getInt("MassPeakID"), rs.getInt("LastScan"), rs.getInt("FirstScan"), rs.getInt("ScanNumbers"), rs.getInt("Charge"), rs.getDouble("RetentionTime"), rs.getDouble("Mass"), rs.getInt("ScanEventID"), iConnection);
-        returnSpectrum.setFileId(rs.getInt("m.FileID"));
-        rs = stat.executeQuery("select * from CustomDataSpectra where SpectrumID = "+returnSpectrum.getSpectrumId());
-        while(rs.next())
-            returnSpectrum.addCustomDataField(rs.getInt("FieldID"),rs.getString("FieldValue"));
-        rs.close();
-        stat.close();
+    public SpectrumLowMem getSpectrumForPeptideID(int peptideOfInterestID,Connection aConnection){
+        SpectrumLowMem returnSpectrum = null;
+        try {
+            Statement stat = aConnection.createStatement();
+            ResultSet rs;
+            rs = stat.executeQuery("select s.*, m.FileID from spectrumheaders as s, masspeaks as m,(select SpectrumID from Peptides where Peptideid = "+ peptideOfInterestID + ") as specid where m.masspeakid = s.masspeakid and s.SpectrumID = specid.SpectrumID");
+            rs.next();
+            returnSpectrum = new SpectrumLowMem(rs.getInt("SpectrumID"), rs.getInt("UniqueSpectrumID"), rs.getInt("MassPeakID"), rs.getInt("LastScan"), rs.getInt("FirstScan"), rs.getInt("ScanNumbers"), rs.getInt("Charge"), rs.getDouble("RetentionTime"), rs.getDouble("Mass"), rs.getInt("ScanEventID"), aConnection);
+            returnSpectrum.setFileId(rs.getInt("m.FileID"));
+            rs = stat.executeQuery("select * from CustomDataSpectra where SpectrumID = "+returnSpectrum.getSpectrumId());
+            while(rs.next())
+                returnSpectrum.addCustomDataField(rs.getInt("FieldID"),rs.getString("FieldValue"));
+            rs.close();
+            stat.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(SpectrumLowMemController.class.getName()).log(Level.SEVERE, null, ex);
+        }
         return returnSpectrum;
     }
 
@@ -167,6 +167,7 @@ public class SpectrumLowMemController implements SpectrumInterface{
         String spectrumTitle = rawFileName.substring(0, rawFileName.toLowerCase().indexOf(".raw"));
         return spectrumTitle + "_" + lspectrum.getSpectrumId() + "_" + lspectrum.getFirstScan() + "_" + lspectrum.getCharge();
     }
+  
     /**
      *
      * @param lSpectrum
@@ -182,10 +183,6 @@ public class SpectrumLowMemController implements SpectrumInterface{
         rs = stat.executeQuery("select Spectrum from Spectra where UniqueSpectrumID = "+lSpectrum.getSpectrumId());
         while (rs.next()) {
             lZippedSpectrumXml = rs.getBytes(1);
-        }
-
-        if (lZippedSpectrumXml == null) {
-        //TODO
         }
         File lZippedFile = File.createTempFile("zip",null);
         FileOutputStream fos = new FileOutputStream(lZippedFile);
@@ -215,6 +212,7 @@ public class SpectrumLowMemController implements SpectrumInterface{
         stat.close();
         lSpectrum.addSpectrumXML(lXml);
     }
+    
     public void unzipXMLforSpectrum(SpectrumLowMem spectrum){
         File lZippedFile = null;
         String lXml = "";
@@ -223,7 +221,7 @@ public class SpectrumLowMemController implements SpectrumInterface{
                 try {
                     createSpectrumXMLForSpectrum(spectrum);
                 } catch (SQLException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    e.printStackTrace();
                 }
             } else{
             byte[] lZippedSpectrumXml = spectrum.getZippedSpectrumXml();
