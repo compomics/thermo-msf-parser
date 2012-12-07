@@ -265,7 +265,7 @@ public class Parser implements  AminoAcidInterface,ModificationInterface,Chromat
                     rs.getInt("MinorVersion"),
                     rs.getString("NodeComment"),
                     rs.getString("NodeGUID"));
-            if (rs.getString("NodeGUID").equals(GUID.NODE_PTM_SCORER) || rs.getString("NodeGUID").equals(GUID.NODE_PTM_SCORER2)) {
+            if (rs.getString("NodeGUID").equals(GUID.NODE_PTM_SCORER) || rs.getString("NodeGUID").equals(GUID.NODE_PTM_SCORER2) || rs.getString("NodeGUID").equals(GUID.NODE_PTM_SCORER3)) {
                 hasPhosphoRS = true;
             }
             iProcessingNodes.add(lNode);
@@ -972,7 +972,7 @@ public class Parser implements  AminoAcidInterface,ModificationInterface,Chromat
                                         }
                                     }
 
-                                    pRSProbabilitiesAdded = true; // If it was not actually added, it won't also happen on a next try
+                                    pRSProbabilitiesAdded = true; // Let's not do the same work several times
                                 }
                             }
 
