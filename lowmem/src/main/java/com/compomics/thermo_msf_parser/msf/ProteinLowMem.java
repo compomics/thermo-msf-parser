@@ -85,6 +85,7 @@ public class ProteinLowMem {
 
     }
 
+    @Override
     public String toString(){
     return accession;
     }

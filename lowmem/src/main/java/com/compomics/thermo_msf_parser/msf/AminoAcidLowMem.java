@@ -29,6 +29,8 @@ public class AminoAcidLowMem implements AminoAcidInterface{
             AminoAcid lAA = new AminoAcid(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getDouble(5), rs.getDouble(6), rs.getString(7));
             iAminoAcids.add(lAA);
         }
+        rs.close();
+        stat.close();
         return iAminoAcids;
     }
 }

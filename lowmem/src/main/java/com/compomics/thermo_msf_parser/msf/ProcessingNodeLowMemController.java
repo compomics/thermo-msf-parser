@@ -13,7 +13,7 @@ import java.util.logging.Logger;
  * To change this template use File | Settings | File Templates.
  */
 public class ProcessingNodeLowMemController {
-
+    private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(QuanResult.class);
     /**
     * @param aConnection a connection to the msf file
     * @param iMsfVersion the version of the msf file
@@ -44,7 +44,7 @@ public class ProcessingNodeLowMemController {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e);
         }
         return  new ArrayList<ProcessingNode>(allNodesMap.values());
     }
@@ -62,7 +62,7 @@ public class ProcessingNodeLowMemController {
                 iQuantitationMethod = rs.getString(1);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e);
         }
         return iQuantitationMethod;
     }
@@ -96,7 +96,7 @@ public class ProcessingNodeLowMemController {
                 processingNodeToReturn.addProcessingNodeParameter(lNodeParameter);
             }    
         } catch (SQLException ex) {
-            Logger.getLogger(ProcessingNodeLowMemController.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
         }    
         return processingNodeToReturn;
     

@@ -21,8 +21,6 @@ public class QuanResultLowMem {
         this.iQuanResultId = iQuanResultId;
     }
 
-
-    private static Logger logger = Logger.getLogger(QuanResult.class);
     /**
      * The quan result id
      */
@@ -187,13 +185,9 @@ public class QuanResultLowMem {
      */
     public Double getNumeratorByRatioType(RatioTypeLowMem lType){
         Double lNumValue = null;
-        Double lDenValue = null;
         for(int i = 0; i<iQuanChannelIds.size(); i ++){
             if(lType.getNumeratorChannelId() ==  iQuanChannelIds.get(i)){
                 lNumValue = iIntensities.get(i);
-            }
-            if(lType.getDenominatorChannelId() ==  iQuanChannelIds.get(i)){
-                lDenValue = iIntensities.get(i);
             }
         }
         return lNumValue;
@@ -205,12 +199,8 @@ public class QuanResultLowMem {
      * @return double with the denominator
      */
     public Double getDenominatorByRatioType(RatioTypeLowMem lType){
-        Double lNumValue = null;
         Double lDenValue = null;
         for(int i = 0; i<iQuanChannelIds.size(); i ++){
-            if(lType.getNumeratorChannelId() ==  iQuanChannelIds.get(i)){
-                lNumValue = iIntensities.get(i);
-            }
             if(lType.getDenominatorChannelId() ==  iQuanChannelIds.get(i)){
                 lDenValue = iIntensities.get(i);
             }

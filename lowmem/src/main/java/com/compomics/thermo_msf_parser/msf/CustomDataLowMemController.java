@@ -23,6 +23,7 @@ public class CustomDataLowMemController {
      */
     
     public HashMap<Integer,CustomDataField> getCustomFieldMap(Connection iConnection){
+        
         try {
             PreparedStatement stat = iConnection.prepareStatement("select * from CustomDataFields");
             ResultSet rs = stat.executeQuery();
@@ -68,7 +69,8 @@ public class CustomDataLowMemController {
 
     public void addCustomProteinsData(ProteinLowMem protein, Connection iConnection){
         try {
-            PreparedStatement stat = iConnection.prepareStatement("select FieldValue,FieldID from CustomDataProteins where ProteinID = "+ protein.getProteinID());
+            PreparedStatement stat = iConnection.prepareStatement("select FieldValue,FieldID from CustomDataProteins where ProteinID = ?");
+            stat.setInt(1, protein.getProteinID());
             ResultSet rs = stat.executeQuery();
         while (rs.next()) {
             protein.addCustomDataField(rs.getInt(2),rs.getString(1));

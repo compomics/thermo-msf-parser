@@ -38,7 +38,7 @@ public class ChromatogramLowMemController {
             rs.close();
             stat.close();
         } catch (SQLException ex) {
-            ;
+            Logger.getLogger(ChromatogramLowMemController.class.getName()).log(Level.SEVERE, null, ex);
         }
         return chromatogramFiles;
     }
@@ -57,10 +57,10 @@ public class ChromatogramLowMemController {
             fos.write(zippedChromatogramXML);
             fos.flush();
             fos.close();
-            BufferedOutputStream out = null;
+            ByteArrayOutputStream lStream = new ByteArrayOutputStream(50);
+            BufferedOutputStream out = new BufferedOutputStream(lStream, 50);
             ZipInputStream in = new ZipInputStream(new BufferedInputStream(new FileInputStream(lZippedFile)));
             ZipEntry entry;
-            ByteArrayOutputStream lStream = new ByteArrayOutputStream(50);
             while ((entry = in.getNextEntry()) != null) {
                 int count;
                 byte data[] = new byte[50];
@@ -101,7 +101,13 @@ public class ChromatogramLowMemController {
     /**
      * inner class Point
      */
-    public class Point{
+    private class Point{
+        
+         /* 
+         * from this point on, the inner class methods are public only for semantic reasons. the vm does not enforce visibility rules here so they are still private on compile.
+         * this only matters if the inner class should ever be converted to an outer class.
+         */
+        
         /**
          * Time
          */
@@ -115,6 +121,7 @@ public class ChromatogramLowMemController {
          */
         int iScan;
 
+        
         /**
          * The Point constructor
          * @param lLine An xml line that will be parsed

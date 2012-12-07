@@ -16,6 +16,8 @@ import java.util.logging.Logger;
  * this template use File | Settings | File Templates.
  */
 public class PeptideLowMemController extends Observable implements PeptideInterface {
+    
+    private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(PeptideLowMemController.class);
 
     private ScoreTypeLowMemController scoreTypeInstance = new ScoreTypeLowMemController();
     private int counter;
@@ -164,7 +166,7 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
                 counter = 0;
             }
         } catch (SQLException sqle) {
-            sqle.printStackTrace();
+            Logger.getLogger(PeptideLowMemController.class.getName()).log(Level.SEVERE, null, sqle);
         }
         return confidenceLevelPeptides;
     }
@@ -177,7 +179,7 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
             ResultSet rs = stat.executeQuery("select count(PeptideID) from Peptides where ConfidenceLevel = " + confidenceLevel);
             numberOfPeptides = rs.getInt(1);
         } catch (SQLException e) {
-            e.printStackTrace();
+            Logger.getLogger(PeptideLowMemController.class.getName()).log(Level.SEVERE, null, e);
         }
         return numberOfPeptides;
     }
@@ -262,7 +264,6 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
                 }
             }
         } catch (SQLException ex) {
-            Logger.getLogger(PeptideLowMemController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

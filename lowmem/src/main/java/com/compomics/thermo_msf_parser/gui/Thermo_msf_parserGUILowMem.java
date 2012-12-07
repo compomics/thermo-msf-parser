@@ -34,6 +34,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
+import java.util.logging.Level;
 
 /**
  * Created by IntelliJ IDEA. User: Davy Date: 4/25/12 Time: 1:45 PM
@@ -316,8 +317,9 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                 com.compomics.util.sun.SwingWorker lCsvSaver = new com.compomics.util.sun.SwingWorker() {
                     public Boolean construct() {
                         //create the writer
+                        BufferedWriter out = null;
                         try {
-                            BufferedWriter out = new BufferedWriter(new FileWriter(lPath));
+                            out = new BufferedWriter(new FileWriter(lPath));
 
                             //write column headers
                             String lLine = "";
@@ -343,9 +345,17 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                             logger.info(e1);
                             JOptionPane.showMessageDialog(new JFrame(), "There was a problem saving your data!", "Problem saving", JOptionPane.ERROR_MESSAGE);
                         }
+                        finally{
+                            try {
+                                out.close();
+                            } catch (IOException ex) {
+                                java.util.logging.Logger.getLogger(Thermo_msf_parserGUILowMem.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
                         return true;
                     }
 
+                    @Override
                     public void finished() {
                         JOptionPane.showMessageDialog(new JFrame(), "Saving done", "Info", JOptionPane.INFORMATION_MESSAGE);
 
@@ -391,26 +401,46 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                             progressBar.setStringPainted(true);
                             progressBar.setVisible(true);
                             BufferedWriter out = new BufferedWriter(new FileWriter(lPath));
+                            StringBuilder stringBuffer = new StringBuilder();
                             //if works use counting for this
                             for (MsfFile iParsedMsf : iParsedMsfs) {
                                 for (SpectrumLowMem lSpectrum : lTotalSpectra) {
-                                    String lSpectrumLine = "BEGIN IONS\nTITLE=" + spectrumLowMemInstance.getSpectrumTitle(rawFileLowMemInstance.getRawFileNameForFileID(lSpectrum.getFileId(), iParsedMsf.getConnection()), lSpectrum) + "\n";
+                                    stringBuffer.append("BEGIN IONS\nTITLE=");
+                                    stringBuffer.append(spectrumLowMemInstance.getSpectrumTitle(rawFileLowMemInstance.getRawFileNameForFileID(lSpectrum.getFileId(), iParsedMsf.getConnection()), lSpectrum));
+                                    stringBuffer.append("\n");
                                     spectrumLowMemInstance.createSpectrumXMLForSpectrum(lSpectrum);
                                     Peak lMono = spectrumLowMemInstance.getFragmentedMsPeak(lSpectrum.getSpectrumXML());
-                                    lSpectrumLine = lSpectrumLine + "PEPMASS=" + lMono.getX() + "\t" + lMono.getY() + "\n";
-                                    lSpectrumLine = lSpectrumLine + "CHARGE=" + lSpectrum.getCharge() + "+\n";
-                                    lSpectrumLine = lSpectrumLine + "RTINSECONDS=" + (lSpectrum.getRetentionTime() / 60.0) + "\n";
+                                    stringBuffer.append("PEPMASS=");
+                                    stringBuffer.append(lMono.getX());
+                                    stringBuffer.append("\t");
+                                    stringBuffer.append(lMono.getY());
+                                    stringBuffer.append("\n");
+                                    stringBuffer.append("CHARGE=");
+                                    stringBuffer.append(lSpectrum.getCharge());
+                                    stringBuffer.append("\n");
+                                    stringBuffer.append("RTINSECONDS=");
+                                    stringBuffer.append(lSpectrum.getRetentionTime() / 60.0);
+                                    stringBuffer.append("\n");
                                     if (lSpectrum.getFirstScan() != lSpectrum.getFirstScan()) {
-                                        lSpectrumLine = lSpectrumLine + "SCANS=" + lSpectrum.getFirstScan() + "." + lSpectrum.getLastScan() + "\n";
+                                        stringBuffer.append("SCANS="); 
+                                        stringBuffer.append(lSpectrum.getFirstScan());
+                                        stringBuffer.append("."); 
+                                        stringBuffer.append(lSpectrum.getLastScan()); 
+                                        stringBuffer.append("\n");
                                     } else {
-                                        lSpectrumLine = lSpectrumLine + "SCANS=" + lSpectrum.getFirstScan() + "\n";
+                                        stringBuffer.append("SCANS="); 
+                                        stringBuffer.append(lSpectrum.getFirstScan());
+                                        stringBuffer.append("\n");
                                     }
                                     Vector<Peak> lMSMS = spectrumLowMemInstance.getMSMSPeaks(lSpectrum.getSpectrumXML());
                                     for (Peak lMSM : lMSMS) {
-                                        lSpectrumLine = lSpectrumLine + lMSM.getX() + "\t" + lMSM.getY() + "\n";
+                                        stringBuffer.append(lMSM.getX());
+                                        stringBuffer.append("\t");
+                                        stringBuffer.append(lMSM.getY());
+                                        stringBuffer.append("\n");
                                     }
-                                    lSpectrumLine = lSpectrumLine + "END IONS\n\n";
-                                    out.write(lSpectrumLine);
+                                    stringBuffer.append("END IONS\n\n");
+                                    out.write(stringBuffer.toString());
                                     progressBar.setValue(progressBar.getValue() + 1);
                                 }
                             }
@@ -424,6 +454,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                         return true;
                     }
 
+                    @Override
                     public void finished() {
                         JOptionPane.showMessageDialog(new JFrame(), "Saving done", "Info", JOptionPane.INFORMATION_MESSAGE);
                         progressBar.setVisible(false);
@@ -590,6 +621,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
         progressBar.setVisible(false);
         //add a closing window listener
         addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(WindowEvent evt) {
                 closeMethod();
             }
@@ -627,7 +659,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
         }
     }
 
-    public void loadData(boolean lReopen) {
+    private void loadData(boolean lReopen) {
         final boolean lReOpen = lReopen;
         //open a new thread to parse the files found by the file chooser
         com.compomics.util.sun.SwingWorker lParser = new com.compomics.util.sun.SwingWorker() {
@@ -708,7 +740,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                     progressBar.setMaximum(iMsfFileLocations.size() + 1);
                     progressBar.setIndeterminate(false);
                     //parse the msf files
-                    int confidencelevel = 3;
+                    /*int confidencelevel = 3;
                     if (chbHighConfident.isSelected()) {
                         confidencelevel = 3;
 
@@ -720,7 +752,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                     if (chbLowConfident.isSelected()) {
                         confidencelevel = 1;
 
-                    }
+                    }*/
                     for (int i = 0; i < iMsfFileLocations.size(); i++) {
                         msfFile = new MsfFile(iMsfFileLocations.get(i));
                         progressBar.setValue(i + 1);
@@ -863,7 +895,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                     }
                     int totalNumberOfPeptides = 0;
                     for (MsfFile iParsedMsf : iParsedMsfs) {
-                        totalNumberOfPeptides = totalNumberOfPeptides + peptideLowMemInstance.getNumberOfPeptidesForConfidenceLevel(3, iParsedMsf.getConnection());
+                        totalNumberOfPeptides += peptideLowMemInstance.getNumberOfPeptidesForConfidenceLevel(3, iParsedMsf.getConnection());
                     }
                     progressBar.setIndeterminate(false);
                     progressBar.setValue(0);
@@ -889,6 +921,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                 return true;
             }
 
+            @Override
             public void finished() {
                 setGuiElementsResponsive(true);
                 if (iQuantitationFound) {
@@ -1059,7 +1092,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
 
         if (peptideInformationChb.isSelected()) {
             //get the custom peptide data and add it as columns
-            if (iMergedCustomPeptideData.size() == 0) {
+            if (iMergedCustomPeptideData.isEmpty()) {
                 this.collectCustomPeptideData();
             }
             for (CustomDataField anIMergedCustomPeptideData : iMergedCustomPeptideData) {
@@ -1069,7 +1102,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
             }
 
             //get the custom spectra data and add it as columns
-            if (iMergedCustomSpectrumData.size() == 0) {
+            if (iMergedCustomSpectrumData.isEmpty()) {
                 this.collectCustomSpectrumData();
             }
             for (CustomDataField anIMergedCustomSpectrumData : iMergedCustomSpectrumData) {
@@ -1147,7 +1180,6 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
 
         for (Object[] lPeptide1 : lPeptides) {
             PeptideLowMem lPeptide = (PeptideLowMem) lPeptide1[2];
-            try {
                 SpectrumLowMem spectrumOfPeptide = spectrumLowMemInstance.getSpectrumForPeptideID(lPeptide.getPeptideId(), lPeptide.getConnection());
                 if (lLowRT > spectrumOfPeptide.getRetentionTime()) {
                     lLowRT = spectrumOfPeptide.getRetentionTime();
@@ -1155,11 +1187,8 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                 if (lHighRT < spectrumOfPeptide.getRetentionTime()) {
                     lHighRT = spectrumOfPeptide.getRetentionTime();
                 }
-            } catch (SQLException sqle) {
-                logger.error(sqle);
-            }
         }
-        lLowRT = lLowRT - 1.0;
+        lLowRT -= 1.0;
         double widthOfMarker = (lHighRT / lLowRT) / 4;
 
         JSparklinesIntervalChartTableCellRenderer lRTCellRenderer = new JSparklinesIntervalChartTableCellRenderer(
@@ -1195,7 +1224,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                         }
                     }
                 }
-                lLowScore = lLowScore - 1.0;
+                lLowScore -= 1.0;
                 JSparklinesBarChartTableCellRenderer lScoreCellRenderer;
                 lScoreCellRenderer = new JSparklinesBarChartTableCellRenderer(PlotOrientation.HORIZONTAL, lLowScore, lHighScore, Color.RED, Color.GREEN);
                 lScoreCellRenderer.setGradientColoring(GradientColorCoding.ColorGradient.BlueBlackGreen);
@@ -1823,8 +1852,9 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
         progressBar.setValue(progressBarIntFiller.progressBarReturn());
     }
 
-    public class ProcessingNodeRenderer extends DefaultTableCellRenderer {
+    private class ProcessingNodeRenderer extends DefaultTableCellRenderer {
 
+        @Override
         public Component getTableCellRendererComponent(JTable table, Object lProcessingNodeObject, boolean isSelected, boolean hasFocus, int row, int column) {
             ProcessingNode lProcessingNode = (ProcessingNode) lProcessingNodeObject;
             /*String lToolTipHtml = "<html><b>" + lProcessingNode.getFriendlyName() + "</b>";
@@ -1859,7 +1889,6 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
      * @return Vector with the peptide line objects
      */
     private Vector<Object[]> collectPeptidesFromProtein(Vector<Object[]> lPeptides, ProteinLowMem lProtein) {
-        try {
             Vector<PeptideLowMem> peptides = peptideLowMemInstance.getPeptidesForProtein(lProtein, iMsfVersion, iAminoAcids);
             for (PeptideLowMem lPeptide : peptides) {
                 int lConfidenceLevel = lPeptide.getConfidenceLevel();
@@ -1888,9 +1917,6 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                     lPeptides.add(createPeptideLine(lPeptide));
                 }
             }
-        } catch (SQLException e) {
-            logger.error(e);
-        }
         return lPeptides;
     }
 
@@ -1903,7 +1929,6 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
      */
     private Vector<Object[]> collectPeptides(Vector<Object[]> lPeptideLines) {
         progressBar.setString("fetching proteins and populating peptide table");
-        ArrayList<ProteinLowMem> lCoupledProteins;
         Vector<PeptideLowMem> lPeptides = new Vector<PeptideLowMem>();
         boolean lCreateProteins = false;
         if (iDisplayedProteins.isEmpty()) {
@@ -1915,19 +1940,19 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
         if (chbHighConfident.isSelected()) {
             confidencelevel = 3;
             for (MsfFile iParsedMsf : iParsedMsfs) {
-                totalNumberOfPeptides = totalNumberOfPeptides + peptideLowMemInstance.getNumberOfPeptidesForConfidenceLevel(confidencelevel, iParsedMsf.getConnection());
+                totalNumberOfPeptides += peptideLowMemInstance.getNumberOfPeptidesForConfidenceLevel(confidencelevel, iParsedMsf.getConnection());
             }
         }
         if (chbMediumConfident.isSelected()) {
             confidencelevel = 2;
             for (MsfFile iParsedMsf : iParsedMsfs) {
-                totalNumberOfPeptides = totalNumberOfPeptides + peptideLowMemInstance.getNumberOfPeptidesForConfidenceLevel(confidencelevel, iParsedMsf.getConnection());
+                totalNumberOfPeptides += peptideLowMemInstance.getNumberOfPeptidesForConfidenceLevel(confidencelevel, iParsedMsf.getConnection());
             }
         }
         if (chbLowConfident.isSelected()) {
             confidencelevel = 1;
             for (MsfFile iParsedMsf : iParsedMsfs) {
-                totalNumberOfPeptides = totalNumberOfPeptides + peptideLowMemInstance.getNumberOfPeptidesForConfidenceLevel(confidencelevel, iParsedMsf.getConnection());
+                totalNumberOfPeptides += peptideLowMemInstance.getNumberOfPeptidesForConfidenceLevel(confidencelevel, iParsedMsf.getConnection());
             }
         }
         progressBar.setMaximum(totalNumberOfPeptides);
@@ -2044,7 +2069,6 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
     public Object[] createPeptideLine(PeptideLowMem lPeptide) {
         Vector<Object> lPeptideObject = new Vector<Object>();
         lPeptideObject.add(lPeptide.getConfidenceLevel());
-        try {
             SpectrumLowMem spectrumOfPeptide = lPeptide.getParentSpectrum();
             lPeptideObject.add(spectrumLowMemInstance.getSpectrumTitle(rawFileLowMemInstance.getRawFileNameForFileID(spectrumOfPeptide.getFileId(), lPeptide.getConnection()), spectrumOfPeptide));
             lPeptideObject.add(lPeptide);
@@ -2104,9 +2128,6 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                 }
                 lPeptideObject.add(ProcessingNodeLowMemInstance.getAllProcessingNodes(spectrumOfPeptide.getConnection(), iMsfVersion).get(lPeptide.getProcessingNodeNumber()));
             }
-        } catch (SQLException sqle) {
-            logger.error(sqle);
-        }
         return lPeptideObject.toArray();
     }
 
@@ -2117,7 +2138,6 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
         iMergedPeptidesScores = new Vector<ScoreTypeLowMem>();
         Vector<ScoreTypeLowMem> tempvector;
         for (MsfFile iParsedMsf : iParsedMsfs) {
-            try {
                 if (iMergedPeptidesScores.isEmpty()) {
                     iMergedPeptidesScores = scoreTypeLowMemInstance.getScoreTypes(iParsedMsf.getConnection());
                 } else {
@@ -2128,9 +2148,6 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                         }
                     }
                 }
-            } catch (SQLException e) {
-                logger.error(e);
-            }
         }
     }
 
@@ -2139,7 +2156,6 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
      */
     private void collectRatioTypes() {
         Vector<RatioTypeLowMem> tempRatioTypes;
-        try {
             for (MsfFile iParsedMsf : iParsedMsfs) {
                 tempRatioTypes = ratioTypeLowMemInstance.parseRatioTypes(iParsedMsf.getConnection());
                 if (iMergedRatioTypes.isEmpty()) {
@@ -2152,9 +2168,6 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                     }
                 }
             }
-        } catch (SQLException sqle) {
-            logger.error(sqle);
-        }
     }
 
     /**
@@ -2270,7 +2283,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
         }
 
         for (int i = 0; i < lFragmentIons.size(); i++) {
-            DefaultSpectrumAnnotation lAnno = null;
+            DefaultSpectrumAnnotation lAnno;
             PeptideFragmentIon lIon = lFragmentIons.get(i);
 
             String label = lIon.getIonType() + lIon.getNumber() + chargeAsString + lIon.getNeutralLoss();
@@ -2288,7 +2301,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
      *
      * @return the version number of the thermo-msf parser
      */
-    public String getVersion() {
+    public final String getVersion() {
         Properties p = new Properties();
         try {
             InputStream is = this.getClass().getClassLoader().getResourceAsStream("thermo_msf_parser.properties");
@@ -2360,11 +2373,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
         int[] coverage = new int[lCleanProteinSequence.length() + 1];
 
         Vector<PeptideLowMem> lPeptides = null;
-        try {
             lPeptides = peptideLowMemInstance.getPeptidesForProtein(lProtein, iMsfVersion, iAminoAcids);
-        } catch (SQLException e) {
-            logger.error(e);
-        }
         // iterate the peptide table and store the coverage for each peptide
         for (PeptideLowMem lPeptide : lPeptides) {
             int lConfidenceLevel = lPeptide.getConfidenceLevel();

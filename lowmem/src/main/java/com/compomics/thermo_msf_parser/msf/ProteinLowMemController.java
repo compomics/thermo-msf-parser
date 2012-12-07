@@ -10,6 +10,7 @@ import java.util.logging.Logger;
  * this template use File | Settings | File Templates.
  */
 public class ProteinLowMemController extends Observable implements ProteinInterface {
+    
 
     private int proteinCounter;
     private int internalcounter = 0;
@@ -35,7 +36,6 @@ public class ProteinLowMemController extends Observable implements ProteinInterf
             }
             rs.close();
             stat.close();
-            protein = null;
         } catch (SQLException ex) {
             Logger.getLogger(ProteinLowMemController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -113,7 +113,7 @@ public class ProteinLowMemController extends Observable implements ProteinInterf
                         iUtilProtein = new com.compomics.util.protein.Protein(lFasta);
                         accession = (iUtilProtein.getHeader().toString().substring(lFasta.indexOf("ENS"), lFasta.indexOf("pep") - 1));
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        Logger.getLogger(PeptideLowMemController.class.getName()).log(Level.SEVERE, null, e);
                     }
 
                 } else {
@@ -152,7 +152,7 @@ public class ProteinLowMemController extends Observable implements ProteinInterf
                         iUtilProtein = new com.compomics.util.protein.Protein(lFasta);
                         accession = (iUtilProtein.getHeader().toString().substring(lFasta.indexOf("ENS"), lFasta.indexOf("pep") - 1));
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        Logger.getLogger(PeptideLowMemController.class.getName()).log(Level.SEVERE, null, e);
                     }
 
                 } else {
@@ -181,7 +181,6 @@ public class ProteinLowMemController extends Observable implements ProteinInterf
             ResultSet rs = stat.executeQuery();
             while (rs.next()) {
                 int lProteinID = rs.getInt("ProteinID");
-                String lSequence = rs.getString("Sequence");
                 proteinAccession = getAccessionFromProteinID(lProteinID, aConnection);
                 allProteinAccessions.put(proteinAccession, new ProteinLowMem(proteinAccession, aConnection, lProteinID));
                 internalCounter++;
@@ -196,7 +195,7 @@ public class ProteinLowMemController extends Observable implements ProteinInterf
             rs.close();
             stat.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            Logger.getLogger(PeptideLowMemController.class.getName()).log(Level.SEVERE, null, e);
         }
 
         return allProteinAccessions;
@@ -244,7 +243,7 @@ public class ProteinLowMemController extends Observable implements ProteinInterf
                 rs.close();
                 stat.close();
             } catch (SQLException sqle) {
-                sqle.printStackTrace();
+                Logger.getLogger(PeptideLowMemController.class.getName()).log(Level.SEVERE, null, sqle);
             }
         } else {
             proteinCounter = 0;
@@ -260,7 +259,7 @@ public class ProteinLowMemController extends Observable implements ProteinInterf
                 rs.close();
                 stat.close();
             } catch (SQLException sqle) {
-                sqle.printStackTrace();
+                Logger.getLogger(PeptideLowMemController.class.getName()).log(Level.SEVERE, null, sqle);
             }
         }
         return changedAccessions;

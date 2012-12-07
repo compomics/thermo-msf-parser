@@ -33,7 +33,7 @@ public class ModificationLowMemController implements ModificationInterface {
 
                 } else {
                     modifiedSequence = "NH2-"+modifiedSequence;
-                    lengthChanged=lengthChanged+4;
+                    lengthChanged+=4;
                 }
                 //do the middle
                 rs = stat.executeQuery("select Position,Abbreviation from PeptidesAminoAcidModifications,AminoAcidModifications where PeptidesAminoAcidModifications.AminoAcidModificationID = AminoAcidModificationID and PeptideID ="+peptide.getPeptideId()+"order by ASC Position");
@@ -42,7 +42,9 @@ public class ModificationLowMemController implements ModificationInterface {
                     lengthChanged = lengthChanged+ rs.getString(2).length()+2;
                 }
                 //do the C terminus
-                modifiedSequence = modifiedSequence + "-COOH";
+                modifiedSequence += "-COOH";
+                rs.close();
+                stat.close();
         } catch (SQLException ex) {
             Logger.getLogger(ModificationLowMemController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -50,7 +52,7 @@ public class ModificationLowMemController implements ModificationInterface {
     }
 
 
-    public HashMap createModificationMap(Connection iConnection){
+    public HashMap<Integer, String> createModificationMap(Connection iConnection){
         HashMap<Integer, String> modificationsMap = new HashMap<Integer, String>();
         try {
             PreparedStatement stat = iConnection.prepareStatement("select AminoAcidModificationID,Abbreviation from AminoAcidModifications");

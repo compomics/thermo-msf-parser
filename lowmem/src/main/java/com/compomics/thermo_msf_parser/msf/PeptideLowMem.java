@@ -15,7 +15,7 @@ import java.util.Vector;
  */
 public class PeptideLowMem {
 
-    int counter = 0;
+    private int counter = 0;
 
     // Class specific log4j logger for Thermo_msf_parserGUI instances.
     private static Logger logger = Logger.getLogger(Peptide.class);
@@ -472,18 +472,20 @@ public class PeptideLowMem {
             }
             //do the middle
             for (int c = 0; c < iSequence.length(); c++) {
-                iModifiedPeptide = iModifiedPeptide + iSequence.charAt(c);
+                iModifiedPeptide += iSequence.charAt(c);
                 for (int m = 0; m < iPeptideModifications.size(); m++) {
                     if (iPeptideModificationPositions.get(m).getPosition() == c && !iPeptideModificationPositions.get(m).isNterm()) {
 
                         iModifiedPeptide = iModifiedPeptide + "<" + iPeptideModifications.get(m).getAbbreviation();
-                        if (iPhosphoRSSiteProbabilities.get(m) != null) iModifiedPeptide += ":"+(iPhosphoRSSiteProbabilities.get(m)*100) + "%";
+                        if (iPhosphoRSSiteProbabilities.get(m) != null) {
+                            iModifiedPeptide += ":"+(iPhosphoRSSiteProbabilities.get(m)*100) + "%";
+                        }
                         iModifiedPeptide += ">";
                     }
                 }
             }
             //do the C terminus
-            iModifiedPeptide = iModifiedPeptide + "-COOH";
+            iModifiedPeptide += "-COOH";
 
         }
         return iModifiedPeptide;
@@ -543,21 +545,21 @@ public class PeptideLowMem {
 
                 // Each peptide mass is added to the b ion mass
                 for (int j = 0; j <= i; j++) {
-                    bMass = bMass + iAminoAcidSequence.get(j).getMonoisotopicMass();
+                    bMass += iAminoAcidSequence.get(j).getMonoisotopicMass();
                     //check if it is not modified
                     for(int m = 0; m<iPeptideModificationPositions.size(); m ++){
                         if(iPeptideModificationPositions.get(m).getPosition() == j){
-                            bMass = bMass + iPeptideModifications.get(m).getDeltaMass();
+                            bMass += iPeptideModifications.get(m).getDeltaMass();
                         }
                     }
 
                 }
                 // Each peptide mass is added to the y ion mass, taking the reverse direction (from the C terminal end)
                 for (int j = 0; j <= i; j++) {
-                    yMass = yMass + iAminoAcidSequence.get((iAminoAcidSequence.size() - 1) - j).getMonoisotopicMass();
+                    yMass += iAminoAcidSequence.get((iAminoAcidSequence.size() - 1) - j).getMonoisotopicMass();
                     for(int m = 0; m<iPeptideModificationPositions.size(); m ++){
                         if(iPeptideModificationPositions.get(m).getPosition() == (iAminoAcidSequence.size() - 1) - j){
-                            yMass = yMass + iPeptideModifications.get(m).getDeltaMass();
+                            yMass += iPeptideModifications.get(m).getDeltaMass();
                         }
                     }
                 }
@@ -747,16 +749,30 @@ public class PeptideLowMem {
         double lCalculatedMass = 0.0;
         //calculate the peptide mass
         for (int j = 0; j < iAminoAcidSequence.size(); j++) {
-            lCalculatedMass = lCalculatedMass + iAminoAcidSequence.get(j).getMonoisotopicMass();
+            lCalculatedMass += iAminoAcidSequence.get(j).getMonoisotopicMass();
             //check if it is not modified
             for(int m = 0; m<iPeptideModificationPositions.size(); m ++){
                 if(iPeptideModificationPositions.get(m).getPosition() == j){
-                    lCalculatedMass = lCalculatedMass + iPeptideModifications.get(m).getDeltaMass();
+                    lCalculatedMass += iPeptideModifications.get(m).getDeltaMass();
                 }
             }
         }
         lCalculatedMass = lCalculatedMass + 1.007825 + 15.994910 + 1.007825;
         lCalculatedMass = (lCalculatedMass  + ((double)lCharge * 1.007825)) / (double)lCharge;
         return lCalculatedMass;
+    }
+
+    /**
+     * @return the counter
+     */
+    public int getCounter() {
+        return counter;
+    }
+
+    /**
+     * @param counter the counter to set
+     */
+    public void setCounter(int counter) {
+        this.counter = counter;
     }
 }

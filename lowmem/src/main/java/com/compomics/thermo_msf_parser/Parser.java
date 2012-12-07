@@ -9,14 +9,15 @@ import com.compomics.thermo_msf_parser.msf.util.Joiner;
 import java.io.IOException;
 import java.sql.*;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * Created by IntelliJ IDEA. User: Niklaas Date: 18-Feb-2011 Time: 09:12:53
  */
-public class Parser implements  AminoAcidInterface,ModificationInterface,ChromatogramInterface,PeptideInterface,ProteinInterface,RatioTypeInterface,RawFileInterface,SpectrumInterface,EnzymeInterface,CustomDataInterface{
-
+public class Parser {
     /**
      * Obtain a list of fasta files used
      */
@@ -1483,60 +1484,64 @@ public class Parser implements  AminoAcidInterface,ModificationInterface,Chromat
         return iAminoAcids;
     }
 
-    public String addModificationsToPeptideSequence(Peptide peptide, HashMap modificationMap, Connection iConnection) throws SQLException {
+    public String addModificationsToPeptideSequence(Peptide peptide, HashMap modificationMap, Connection iConnection){
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public HashMap createModificationMap(Connection iConnection) throws SQLException {
-        PreparedStatement stat = iConnection.prepareStatement("select * from AminoAcidModifications");
-        ResultSet rs = stat.executeQuery();
-        while (rs.next()) {
-            //Modification lMod = new Modification(rs.getInt(1), rs.getString(2), rs.getDouble(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getInt(7), rs.getInt(8), rs.getDouble(9), rs.getInt(10), rs.getInt(11));
-            //iModifications.add(lMod);
-            //iModificationsMap.put(rs.getInt(1), lMod);
-        }
-        rs = stat.executeQuery("select * from AminoAcidModificationsAminoAcids");
-        while (rs.next()) {
-            int lModId = rs.getInt("AminoAcidModificationID");
-            int lAaId = rs.getInt("AminoAcidID");
-            if(iAminoAcidsMap.get(lAaId) != null && iModificationsMap.get(lModId) != null){
-                iModificationsMap.get(lModId).addAminoAcid(iAminoAcidsMap.get(lAaId));
-                if(iMsfVersion == MsfVersion.VERSION1_3){
-                    iModificationsMap.get(lModId).addClassificationForAminoAcid(rs.getInt("Classification"));
-                }
-            }
-
-        }
-        if(iMsfVersion == MsfVersion.VERSION1_3){
-            //get the neutral losses
-            rs = stat.executeQuery("select * from AminoAcidModificationsNeutralLosses");
+    public HashMap createModificationMap(Connection iConnection){
+        try {
+            PreparedStatement stat = iConnection.prepareStatement("select * from AminoAcidModifications");
+            ResultSet rs = stat.executeQuery();
             while (rs.next()) {
-                NeutralLoss lLoss = new NeutralLoss(rs.getInt("NeutralLossID"), rs.getString("Name"), rs.getDouble("MonoisotopicMass"), rs.getDouble("AverageMass"));
-                iNeutralLosses.add(lLoss);
-                iNeutralLossesMap.put(lLoss.getNeutralLossId(),lLoss);
+                //Modification lMod = new Modification(rs.getInt(1), rs.getString(2), rs.getDouble(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getInt(7), rs.getInt(8), rs.getDouble(9), rs.getInt(10), rs.getInt(11));
+                //iModifications.add(lMod);
+                //iModificationsMap.put(rs.getInt(1), lMod);
             }
-
-            //add the amino acid to the neutral losses
-            rs = stat.executeQuery("select * from AminoAcidModificationsAminoAcidsNL");
-            while (rs.next()) {
-                int lAaId = rs.getInt("AminoAcidID");
-                int lNlId = rs.getInt("NeutralLossID");
-                if(iAminoAcidsMap.get(lAaId) != null && iNeutralLossesMap.get(lNlId) != null){
-                    iNeutralLossesMap.get(lNlId).addAminoAcid(iAminoAcidsMap.get(lAaId));
-                }
-            }
-            //now add the neutral losses to the modification
-            rs = stat.executeQuery("select * from AminoAcidModificationsAminoAcidsNL");
+            rs = stat.executeQuery("select * from AminoAcidModificationsAminoAcids");
             while (rs.next()) {
                 int lModId = rs.getInt("AminoAcidModificationID");
-                int lNlId = rs.getInt("NeutralLossID");
-                if(iModificationsMap.get(lModId) != null && iNeutralLossesMap.get(lNlId) != null){
-                    iModificationsMap.get(lModId).addNeutralLoss(iNeutralLossesMap.get(lNlId));
+                int lAaId = rs.getInt("AminoAcidID");
+                if(iAminoAcidsMap.get(lAaId) != null && iModificationsMap.get(lModId) != null){
+                    iModificationsMap.get(lModId).addAminoAcid(iAminoAcidsMap.get(lAaId));
+                    if(iMsfVersion == MsfVersion.VERSION1_3){
+                        iModificationsMap.get(lModId).addClassificationForAminoAcid(rs.getInt("Classification"));
+                    }
+                }
+
+            }
+            if(iMsfVersion == MsfVersion.VERSION1_3){
+                //get the neutral losses
+                rs = stat.executeQuery("select * from AminoAcidModificationsNeutralLosses");
+                while (rs.next()) {
+                    NeutralLoss lLoss = new NeutralLoss(rs.getInt("NeutralLossID"), rs.getString("Name"), rs.getDouble("MonoisotopicMass"), rs.getDouble("AverageMass"));
+                    iNeutralLosses.add(lLoss);
+                    iNeutralLossesMap.put(lLoss.getNeutralLossId(),lLoss);
+                }
+
+                //add the amino acid to the neutral losses
+                rs = stat.executeQuery("select * from AminoAcidModificationsAminoAcidsNL");
+                while (rs.next()) {
+                    int lAaId = rs.getInt("AminoAcidID");
+                    int lNlId = rs.getInt("NeutralLossID");
+                    if(iAminoAcidsMap.get(lAaId) != null && iNeutralLossesMap.get(lNlId) != null){
+                        iNeutralLossesMap.get(lNlId).addAminoAcid(iAminoAcidsMap.get(lAaId));
+                    }
+                }
+                //now add the neutral losses to the modification
+                rs = stat.executeQuery("select * from AminoAcidModificationsAminoAcidsNL");
+                while (rs.next()) {
+                    int lModId = rs.getInt("AminoAcidModificationID");
+                    int lNlId = rs.getInt("NeutralLossID");
+                    if(iModificationsMap.get(lModId) != null && iNeutralLossesMap.get(lNlId) != null){
+                        iModificationsMap.get(lModId).addNeutralLoss(iNeutralLossesMap.get(lNlId));
+                    }
                 }
             }
+            rs.close();
+            stat.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(Parser.class.getName()).log(Level.SEVERE, null, ex);
         }
-        rs.close();
-        stat.close();
         return iModificationsMap;
     }
 
@@ -1616,11 +1621,11 @@ public class Parser implements  AminoAcidInterface,ModificationInterface,Chromat
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public Vector<Peptide> getPeptidesForAccession(String lProteinAccession, MsfVersion iMsfVersion, Connection iConnection, Vector<AminoAcid> iAminoAcids) throws SQLException {
+    public Vector<Peptide> getPeptidesForAccession(String lProteinAccession, MsfVersion iMsfVersion, Connection iConnection, Vector<AminoAcid> iAminoAcids){
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public Vector getInformationForPeptide(int peptideID, Connection iConnection, boolean fullInfo) throws SQLException {
+    public Vector getInformationForPeptide(int peptideID, Connection iConnection, boolean fullInfo) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -1764,7 +1769,7 @@ public class Parser implements  AminoAcidInterface,ModificationInterface,Chromat
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public Vector<RatioTypeLowMem> parseRatioTypes(Connection iConnection) throws SQLException {
+    public Vector<RatioTypeLowMem> parseRatioTypes(Connection iConnection){
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -1825,6 +1830,38 @@ public class Parser implements  AminoAcidInterface,ModificationInterface,Chromat
     }
 
     public void setTraceTypeID(int newTraceTypeID) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public Vector<PeptideLowMem> getPeptidesWithConfidenceLevel(int confidenceLevel, Connection aConnection, MsfVersion iMsfVersion, Vector<AminoAcid> iAminoAcids) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public int getNumberOfPeptidesForConfidenceLevel(int confidenceLevel, Connection aConnection) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public void getPeptidesForProteinVector(Vector<ProteinLowMem> proteinLowMemVector, Connection aConnection, Vector<AminoAcid> iAminoAcids, MsfVersion iMsfVersion, int confidenceLevel) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public void getPeptidesForProteinVector(Vector<ProteinLowMem> proteinLowMemVector, Connection aConnection, Vector<AminoAcid> iAminoAcids, MsfVersion iMsfVersion) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public SpectrumLowMem getSpectrumForPeptideID(int peptideOfInterestID, Connection aConnection) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public String getSpectrumTitle(String rawFileName, SpectrumLowMem lspectrum) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public void createSpectrumXMLForSpectrum(SpectrumLowMem lSpectrum) throws SQLException, IOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public void unzipXMLforSpectrum(SpectrumLowMem spectrum) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
