@@ -34,6 +34,7 @@ public class Parser {
      * The amino acids
      */
     private Vector<AminoAcid> iAminoAcids = new Vector<AminoAcid>();
+    private Map<Character, AminoAcid> iAminoAcidsLetterMap = new HashMap<Character, AminoAcid>();
     /**
      * The neutral losses
      */
@@ -303,6 +304,7 @@ public class Parser {
             AminoAcid lAA = new AminoAcid(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getDouble(5), rs.getDouble(6), rs.getString(7));
             iAminoAcids.add(lAA);
             iAminoAcidsMap.put(rs.getInt(1), lAA);
+            iAminoAcidsLetterMap.put(lAA.getOneLetterCode().toUpperCase().charAt(0), lAA);
         }
 
 
@@ -420,8 +422,7 @@ public class Parser {
         //get the peptides
         rs = stat.executeQuery("select * from Peptides as p");
         while (rs.next()) {
-            Peptide lPeptide = new Peptide(rs.getInt("PeptideID"), rs.getInt("SpectrumID"), rs.getInt("ConfidenceLevel"), rs.getString("Sequence"), rs.getInt("TotalIonsCount"), rs.getInt("MatchedIonsCount"), rs.getString("Annotation"), rs.getInt("ProcessingNodeNumber"), iAminoAcids);
-            if (iMsfVersion == MsfVersion.VERSION1_3) {
+            Peptide lPeptide = new Peptide(rs.getInt("PeptideID"), rs.getInt("SpectrumID"), rs.getInt("ConfidenceLevel"), rs.getString("Sequence"), rs.getInt("TotalIonsCount"), rs.getInt("MatchedIonsCount"), rs.getString("Annotation"), rs.getInt("ProcessingNodeNumber"), iAminoAcidsLetterMap);            if (iMsfVersion == MsfVersion.VERSION1_3) {
                 lPeptide.setMissedCleavage(rs.getInt("MissedCleavages"));
                 lPeptide.setUniquePeptideSequenceId(rs.getInt("UniquePeptideSequenceID"));
             }
@@ -439,7 +440,7 @@ public class Parser {
         //get the peptides
         rs = stat.executeQuery("select * from Peptides_decoy as p");
         while (rs.next()) {
-            Peptide lPeptide = new Peptide(rs.getInt("PeptideID"), rs.getInt("SpectrumID"), rs.getInt("ConfidenceLevel"), rs.getString("Sequence"), rs.getInt("TotalIonsCount"), rs.getInt("MatchedIonsCount"), "", rs.getInt("ProcessingNodeNumber"), iAminoAcids);
+            Peptide lPeptide = new Peptide(rs.getInt("PeptideID"), rs.getInt("SpectrumID"), rs.getInt("ConfidenceLevel"), rs.getString("Sequence"), rs.getInt("TotalIonsCount"), rs.getInt("MatchedIonsCount"), "", rs.getInt("ProcessingNodeNumber"), iAminoAcidsLetterMap);
             if (iMsfVersion == MsfVersion.VERSION1_3) {
                 lPeptide.setMissedCleavage(rs.getInt("MissedCleavages"));
                 lPeptide.setUniquePeptideSequenceId(rs.getInt("UniquePeptideSequenceID"));
@@ -1577,7 +1578,7 @@ public class Parser {
         PreparedStatement stat = iConnection.prepareStatement("");
         ResultSet rs = stat.executeQuery("select * from Peptides as p");
         while (rs.next()) {
-            Peptide lPeptide = new Peptide(rs.getInt("PeptideID"), rs.getInt("SpectrumID"), rs.getInt("ConfidenceLevel"), rs.getString("Sequence"), rs.getInt("TotalIonsCount"), rs.getInt("MatchedIonsCount"), rs.getString("Annotation"), rs.getInt("ProcessingNodeNumber"), iAminoAcids);
+            Peptide lPeptide = new Peptide(rs.getInt("PeptideID"), rs.getInt("SpectrumID"), rs.getInt("ConfidenceLevel"), rs.getString("Sequence"), rs.getInt("TotalIonsCount"), rs.getInt("MatchedIonsCount"), rs.getString("Annotation"), rs.getInt("ProcessingNodeNumber"), iAminoAcidsLetterMap);
             if(iMsfVersion ==  MsfVersion.VERSION1_3){
                 lPeptide.setMissedCleavage(rs.getInt("MissedCleavages"));
                 lPeptide.setUniquePeptideSequenceId(rs.getInt("UniquePeptideSequenceID"));
@@ -1589,7 +1590,7 @@ public class Parser {
         //get the peptides
         rs = stat.executeQuery("select * from Peptides_decoy as p");
         while (rs.next()) {
-            Peptide lPeptide = new Peptide(rs.getInt("PeptideID"), rs.getInt("SpectrumID"), rs.getInt("ConfidenceLevel"), rs.getString("Sequence"), rs.getInt("TotalIonsCount"), rs.getInt("MatchedIonsCount"), "", rs.getInt("ProcessingNodeNumber"), iAminoAcids);
+            Peptide lPeptide = new Peptide(rs.getInt("PeptideID"), rs.getInt("SpectrumID"), rs.getInt("ConfidenceLevel"), rs.getString("Sequence"), rs.getInt("TotalIonsCount"), rs.getInt("MatchedIonsCount"), "", rs.getInt("ProcessingNodeNumber"), iAminoAcidsLetterMap);
             if(iMsfVersion ==  MsfVersion.VERSION1_3){
                 lPeptide.setMissedCleavage(rs.getInt("MissedCleavages"));
                 lPeptide.setUniquePeptideSequenceId(rs.getInt("UniquePeptideSequenceID"));

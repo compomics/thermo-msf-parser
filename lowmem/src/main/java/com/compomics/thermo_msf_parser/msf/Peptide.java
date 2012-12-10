@@ -3,17 +3,16 @@ package com.compomics.thermo_msf_parser.msf;
 import org.apache.log4j.Logger;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Niklaas
- * Date: 18-Feb-2011
- * Time: 09:17:23
+ * Created by IntelliJ IDEA. User: Niklaas Date: 18-Feb-2011 Time: 09:17:23
  */
 public class Peptide {
     // Class specific log4j logger for Thermo_msf_parserGUI instances.
-	 private static Logger logger = Logger.getLogger(Peptide.class);
+
+    private static Logger logger = Logger.getLogger(Peptide.class);
     /**
      * The peptide id
      */
@@ -54,7 +53,6 @@ public class Peptide {
      * The peptide annotation
      */
     private String iAnnotation;
-
     /**
      * The proteins linked to this peptide
      */
@@ -64,7 +62,8 @@ public class Peptide {
      */
     private Vector<Modification> iPeptideModifications = new Vector<Modification>();
     /**
-     * The modifications positions of the modifications in the iPeptideModifications Vector
+     * The modifications positions of the modifications in the
+     * iPeptideModifications Vector
      */
     private Vector<ModificationPosition> iPeptideModificationPositions = new Vector<ModificationPosition>();
     /**
@@ -88,17 +87,18 @@ public class Peptide {
      */
     private String iModifiedPeptide = null;
     /**
-     * The channel 
+     * The channel
      */
     private int iChannelId = 0;
     /**
-     * HashMap with the custom data field values. The key is the id of the custom data field
+     * HashMap with the custom data field values. The key is the id of the
+     * custom data field
      */
-    private HashMap<Integer, String> iCustomDataFieldValues = new HashMap<Integer,String>();
+    private HashMap<Integer, String> iCustomDataFieldValues = new HashMap<Integer, String>();
     /**
      * All the amino acids
      */
-    private Vector<AminoAcid> iAminoAcids;
+    private Map<Character, AminoAcid> iAminoAcids;
     /**
      * The fragment ions
      */
@@ -116,18 +116,19 @@ public class Peptide {
      */
     private int iProcessingNodeNumber;
     /**
-     * Int that indicates if this peptide has a missed cleavage
-     * WORKS ONLY FROM PROTEOME DISCOVERER VERSION 1.3
+     * Int that indicates if this peptide has a missed cleavage WORKS ONLY FROM
+     * PROTEOME DISCOVERER VERSION 1.3
      */
     private int iMissedCleavage;
     /**
-     * The unique peptide sequence id
-     * WORKS ONLY FROM PROTEOME DISCOVERER VERSION 1.3
+     * The unique peptide sequence id WORKS ONLY FROM PROTEOME DISCOVERER
+     * VERSION 1.3
      */
     private int iUniquePeptideSequenceId;
 
     /**
      * Constructor for the peptide
+     *
      * @param iPeptideId The peptide id
      * @param iSpectrumId The spectrum id
      * @param iConfidenceLevel The confidence level
@@ -138,7 +139,7 @@ public class Peptide {
      * @param iProcessingNodeNumber
      * @param iAminoAcids The amino acids found in the msf file
      */
-    public Peptide(int iPeptideId, int iSpectrumId, int iConfidenceLevel, String iSequence, int iTotalIonsCount, int iMatchedIonsCount, String iAnnotation, int iProcessingNodeNumber, Vector<AminoAcid> iAminoAcids) {
+    public Peptide(int iPeptideId, int iSpectrumId, int iConfidenceLevel, String iSequence, int iTotalIonsCount, int iMatchedIonsCount, String iAnnotation, int iProcessingNodeNumber, Map<Character, AminoAcid> iAminoAcids) {
         this.iPeptideId = iPeptideId;
         this.iSpectrumId = iSpectrumId;
         this.iConfidenceLevel = iConfidenceLevel;
@@ -150,16 +151,11 @@ public class Peptide {
         this.iProcessingNodeNumber = iProcessingNodeNumber;
         iAminoAcidSequence = new Vector<AminoAcid>();
         for (int i = 0; i < iSequence.length(); i++) {
-            String lAaOneLetterCode = String.valueOf(iSequence.charAt(i));
-            for(int a = 0; a< iAminoAcids.size(); a ++){
-                if(iAminoAcids.get(a).getOneLetterCode() != null){
-                    if(iAminoAcids.get(a).getOneLetterCode().equalsIgnoreCase(lAaOneLetterCode)){
-                        iAminoAcidSequence.add(iAminoAcids.get(a));
-                    }
-                }
-            }
+            Character lAaOneLetterCode = iSequence.toUpperCase().charAt(i);
+            iAminoAcidSequence.add(iAminoAcids.get(lAaOneLetterCode));
         }
-        if(iAminoAcidSequence.size() != iSequence.length()){
+
+        if (iAminoAcidSequence.size() != iSequence.length()) {
             //error
             System.out.println("ERROR " + iSequence);
         }
@@ -168,28 +164,30 @@ public class Peptide {
 
     /**
      * This method will calculate the mass based on the charge
+     *
      * @param lCharge The charge
      * @return double with the mass
      */
-    public double getPeptideMassForCharge(int lCharge){
+    public double getPeptideMassForCharge(int lCharge) {
         double lCalculatedMass = 0.0;
         //calculate the peptide mass
         for (int j = 0; j < iAminoAcidSequence.size(); j++) {
             lCalculatedMass = lCalculatedMass + iAminoAcidSequence.get(j).getMonoisotopicMass();
             //check if it is not modified
-            for(int m = 0; m<iPeptideModificationPositions.size(); m ++){
-                if(iPeptideModificationPositions.get(m).getPosition() == j){
+            for (int m = 0; m < iPeptideModificationPositions.size(); m++) {
+                if (iPeptideModificationPositions.get(m).getPosition() == j) {
                     lCalculatedMass = lCalculatedMass + iPeptideModifications.get(m).getDeltaMass();
                 }
             }
         }
         lCalculatedMass = lCalculatedMass + 1.007825 + 15.994910 + 1.007825;
-        lCalculatedMass = (lCalculatedMass  + ((double)lCharge * 1.007825)) / (double)lCharge;
+        lCalculatedMass = (lCalculatedMass + ((double) lCharge * 1.007825)) / (double) lCharge;
         return lCalculatedMass;
     }
 
     /**
      * Getter for the peptide id
+     *
      * @return int with the peptide id
      */
     public int getPeptideId() {
@@ -198,6 +196,7 @@ public class Peptide {
 
     /**
      * Getter for the spectrum id
+     *
      * @return int with the spectrum id
      */
     public int getSpectrumId() {
@@ -206,6 +205,7 @@ public class Peptide {
 
     /**
      * Getter for the confidence level
+     *
      * @return int with the confidence level
      */
     public int getConfidenceLevel() {
@@ -214,6 +214,7 @@ public class Peptide {
 
     /**
      * Getter for the sequence
+     *
      * @return String with the sequence
      */
     public String getSequence() {
@@ -222,6 +223,7 @@ public class Peptide {
 
     /**
      * Getter for the scores
+     *
      * @return Vector with the scores (double)
      */
     public Vector<Double> getScores() {
@@ -229,7 +231,9 @@ public class Peptide {
     }
 
     /**
-     * Getter for the score type ids. These score type ids represent the score types
+     * Getter for the score type ids. These score type ids represent the score
+     * types
+     *
      * @return Vector with the score type ids
      */
     public Vector<Integer> getScoreTypeIds() {
@@ -238,6 +242,7 @@ public class Peptide {
 
     /**
      * Getter for the score type. These score type are linked to the scores
+     *
      * @return Vector with the score type
      */
     public Vector<ScoreType> getScoreTypes() {
@@ -246,6 +251,7 @@ public class Peptide {
 
     /**
      * Getter for the total ion count
+     *
      * @return int with the number of ions counted
      */
     public int getTotalIonsCount() {
@@ -254,6 +260,7 @@ public class Peptide {
 
     /**
      * Getter for the number of matched ions
+     *
      * @return int with the number of matched ions
      */
     public int getMatchedIonsCount() {
@@ -262,6 +269,7 @@ public class Peptide {
 
     /**
      * Getter for the annotation
+     *
      * @return String with the annotation
      */
     public String getAnnotation() {
@@ -270,6 +278,7 @@ public class Peptide {
 
     /**
      * Getter of the proteins linked to this peptide
+     *
      * @return vector with the linked proteins
      */
     public Vector<Protein> getPeptideProteins() {
@@ -278,6 +287,7 @@ public class Peptide {
 
     /**
      * Getter for the modifications linked to this peptide
+     *
      * @return vector with the linked modifications
      */
     public Vector<Modification> getPeptideModifications() {
@@ -286,6 +296,7 @@ public class Peptide {
 
     /**
      * Getter for the modification positions linked to this peptide
+     *
      * @return vector with the linked modification positions
      */
     public Vector<ModificationPosition> getPeptideModificationPositions() {
@@ -293,16 +304,20 @@ public class Peptide {
     }
 
     /**
-     * Getter for a boolean that indicates if this peptide has an N terminal modifcation
-     * @return boolean that indicates if this peptide has an N terminal modifcation
+     * Getter for a boolean that indicates if this peptide has an N terminal
+     * modifcation
+     *
+     * @return boolean that indicates if this peptide has an N terminal
+     * modifcation
      */
     public boolean isHasNTermModification() {
         return iHasNTermModification;
     }
 
     /**
-     * Getter for the custom data fields linked to this peptide. The key is
-     * the id of the custom data field and the value is the data field value
+     * Getter for the custom data fields linked to this peptide. The key is the
+     * id of the custom data field and the value is the data field value
+     *
      * @return hashmap
      */
     public HashMap<Integer, String> getCustomDataFieldValues() {
@@ -311,14 +326,16 @@ public class Peptide {
 
     /**
      * Getter for the amino acids found in the msf file
+     *
      * @return vector with all the amino acids found in the msf file
      */
     public Vector<AminoAcid> getAminoAcids() {
-        return iAminoAcids;
+        return new Vector(iAminoAcids.values());
     }
 
     /**
      * Getter for a vector with all theoretical fragment ions
+     *
      * @return vector with all theoretical fragment ions
      */
     public Vector<PeptideFragmentIon> getTheoreticalFragmentIons() {
@@ -327,6 +344,7 @@ public class Peptide {
 
     /**
      * Getter for the vector with the amino acid sequence
+     *
      * @return vector with the amino acid sequence
      */
     public Vector<AminoAcid> getAminoAcidSequence() {
@@ -335,6 +353,7 @@ public class Peptide {
 
     /**
      * Getter for the parent spectrum
+     *
      * @return The parent spectrum
      */
     public Spectrum getParentSpectrum() {
@@ -343,22 +362,24 @@ public class Peptide {
 
     /**
      * Setter for the parent spectrum
+     *
      * @param lSpectrum The parent spectrum to set
      */
-    public void setParentSpectrum(Spectrum lSpectrum){
+    public void setParentSpectrum(Spectrum lSpectrum) {
         this.iParentSpectrum = lSpectrum;
     }
 
     /**
      * Getter for a score by score type
+     *
      * @param lScoreType The score type of the requested score
      * @return double with the score
      */
-    public Double getScoreByScoreType(ScoreType lScoreType){
+    public Double getScoreByScoreType(ScoreType lScoreType) {
         Double lScore = null;
 
-        for(int i = 0; i<iScoreTypes.size(); i ++){
-            if(lScoreType.getDescription().equalsIgnoreCase(iScoreTypes.get(i).getDescription())){
+        for (int i = 0; i < iScoreTypes.size(); i++) {
+            if (lScoreType.getDescription().equalsIgnoreCase(iScoreTypes.get(i).getDescription())) {
                 lScore = iScores.get(i);
             }
         }
@@ -367,12 +388,13 @@ public class Peptide {
 
     /**
      * Getter for the main score
+     *
      * @return double with the score
      */
-    public Double getMainScore(){
+    public Double getMainScore() {
         Double lScore = null;
-        for(int i = 0; i<iScoreTypes.size(); i ++){
-            if(iScoreTypes.get(i).getIsMainScore() == 1){
+        for (int i = 0; i < iScoreTypes.size(); i++) {
+            if (iScoreTypes.get(i).getIsMainScore() == 1) {
                 lScore = iScores.get(i);
             }
         }
@@ -380,7 +402,9 @@ public class Peptide {
     }
 
     /**
-     * This method will add a score (with a specific score type id) to this peptide
+     * This method will add a score (with a specific score type id) to this
+     * peptide
+     *
      * @param iScore double with the score
      * @param iScoreTypeid the score type id the added score
      * @param lScoreTypes The different score types found in the msf file
@@ -389,19 +413,20 @@ public class Peptide {
         this.iScores.add(iScore);
         this.iScoreTypeIds.add(iScoreTypeid);
         boolean added = false;
-        for(int i = 0; i<lScoreTypes.size(); i ++){
-            if(lScoreTypes.get(i).getScoreTypeId() == iScoreTypeid){
+        for (int i = 0; i < lScoreTypes.size(); i++) {
+            if (lScoreTypes.get(i).getScoreTypeId() == iScoreTypeid) {
                 iScoreTypes.add(lScoreTypes.get(i));
                 added = true;
             }
         }
-        if(!added){
+        if (!added) {
             iScoreTypes.add(null);
         }
     }
 
     /**
      * This method will add a protein to this peptide
+     *
      * @param lProtein The protein to add
      */
     public void addProtein(Protein lProtein) {
@@ -411,6 +436,7 @@ public class Peptide {
 
     /**
      * This method will add an amino acid modification to this peptide
+     *
      * @param lMod The modification
      * @param lModPos The modification position
      */
@@ -425,6 +451,7 @@ public class Peptide {
 
     /**
      * Getter for the proteins linked to this peptide
+     *
      * @return Vector with the proteins linked to this peptide
      */
     public Vector<Protein> getProteins() {
@@ -433,6 +460,7 @@ public class Peptide {
 
     /**
      * Getter for the modified peptide
+     *
      * @return String with the modified peptide
      */
     public String getModifiedPeptide() {
@@ -452,9 +480,11 @@ public class Peptide {
                 iModifiedPeptide = iModifiedPeptide + iSequence.charAt(c);
                 for (int m = 0; m < iPeptideModifications.size(); m++) {
                     if (iPeptideModificationPositions.get(m).getPosition() == c && !iPeptideModificationPositions.get(m).isNterm()) {
-                        
+
                         iModifiedPeptide = iModifiedPeptide + "<" + iPeptideModifications.get(m).getAbbreviation();
-                        if (iPhosphoRSSiteProbabilities.get(m) != null) iModifiedPeptide += ":"+(iPhosphoRSSiteProbabilities.get(m)*100) + "%";
+                        if (iPhosphoRSSiteProbabilities.get(m) != null) {
+                            iModifiedPeptide += ":" + (iPhosphoRSSiteProbabilities.get(m) * 100) + "%";
+                        }
                         iModifiedPeptide += ">";
                     }
                 }
@@ -468,6 +498,7 @@ public class Peptide {
 
     /**
      * Setter for the channel id
+     *
      * @param lChannelId int with the channel id to set
      */
     public void setChannelId(int lChannelId) {
@@ -476,15 +507,16 @@ public class Peptide {
 
     /**
      * Getter for the channel id
+     *
      * @return int with the channel id
      */
     public int getChannelId() {
         return iChannelId;
     }
 
-
     /**
      * Getter for the processing node number
+     *
      * @return int with the processing node number
      */
     public int getProcessingNodeNumber() {
@@ -492,19 +524,22 @@ public class Peptide {
     }
 
     /**
-     * This method will add a value in the custom data field map by the id off the custom data field
+     * This method will add a value in the custom data field map by the id off
+     * the custom data field
+     *
      * @param lId The custom data field id
      * @param lValue The value to add
      */
-    public void addCustomDataField(int lId, String lValue){
+    public void addCustomDataField(int lId, String lValue) {
         iCustomDataFieldValues.put(lId, lValue);
     }
 
     /**
      * This code is adapted from the X!tandem parser code
+     *
      * @param iSpectrumCharge The maximum charge of the fragement ions
      */
-    public void calculateFragmentions(int iSpectrumCharge){
+    public void calculateFragmentions(int iSpectrumCharge) {
 
         iTheoreticalFragmentIons = new Vector<PeptideFragmentIon>();
         double lHydrogenMass = 1.007825;
@@ -522,8 +557,8 @@ public class Peptide {
                 for (int j = 0; j <= i; j++) {
                     bMass = bMass + iAminoAcidSequence.get(j).getMonoisotopicMass();
                     //check if it is not modified
-                    for(int m = 0; m<iPeptideModificationPositions.size(); m ++){
-                        if(iPeptideModificationPositions.get(m).getPosition() == j){
+                    for (int m = 0; m < iPeptideModificationPositions.size(); m++) {
+                        if (iPeptideModificationPositions.get(m).getPosition() == j) {
                             bMass = bMass + iPeptideModifications.get(m).getDeltaMass();
                         }
                     }
@@ -532,8 +567,8 @@ public class Peptide {
                 // Each peptide mass is added to the y ion mass, taking the reverse direction (from the C terminal end)
                 for (int j = 0; j <= i; j++) {
                     yMass = yMass + iAminoAcidSequence.get((iAminoAcidSequence.size() - 1) - j).getMonoisotopicMass();
-                    for(int m = 0; m<iPeptideModificationPositions.size(); m ++){
-                        if(iPeptideModificationPositions.get(m).getPosition() == (iAminoAcidSequence.size() - 1) - j){
+                    for (int m = 0; m < iPeptideModificationPositions.size(); m++) {
+                        if (iPeptideModificationPositions.get(m).getPosition() == (iAminoAcidSequence.size() - 1) - j) {
                             yMass = yMass + iPeptideModifications.get(m).getDeltaMass();
                         }
                     }
@@ -548,7 +583,7 @@ public class Peptide {
                 lIon.addUrParam(new com.compomics.thermo_msf_parser.gui.Charge(charge));
                 iTheoreticalFragmentIons.add(lIon);
                 //BNH3 Ion
-                lIon = new PeptideFragmentIon(PeptideFragmentIon.PeptideFragmentIonType.BNH3_ION, i + 1, (bMass - lOxygenMass - 2 * - lNitrogenMass - 3 * lHydrogenMass + charge * lHydrogenMass) / charge);
+                lIon = new PeptideFragmentIon(PeptideFragmentIon.PeptideFragmentIonType.BNH3_ION, i + 1, (bMass - lOxygenMass - 2 * -lNitrogenMass - 3 * lHydrogenMass + charge * lHydrogenMass) / charge);
                 lIon.addUrParam(new com.compomics.thermo_msf_parser.gui.Charge(charge));
                 iTheoreticalFragmentIons.add(lIon);
                 //BH2O Ion
@@ -600,25 +635,26 @@ public class Peptide {
 
     /**
      * This method will give the fragment ions for a specific type and charge
+     *
      * @param lCharge The charge of the fragment ions wanted
      * @param lTypes The typs of fragment ions wanted
      * @return Vector with the requested fragment ions
      */
-    public Vector<PeptideFragmentIon> getFragmentIonsByTypeAndCharge(int lCharge, Vector<PeptideFragmentIon.PeptideFragmentIonType> lTypes){
-        if(iTheoreticalFragmentIons == null){
+    public Vector<PeptideFragmentIon> getFragmentIonsByTypeAndCharge(int lCharge, Vector<PeptideFragmentIon.PeptideFragmentIonType> lTypes) {
+        if (iTheoreticalFragmentIons == null) {
             this.calculateFragmentions(getParentSpectrum().getCharge());
         }
         Vector<PeptideFragmentIon> lResult = new Vector<PeptideFragmentIon>();
 
-        for(int i = 0; i<iTheoreticalFragmentIons.size(); i ++){
-            if(((com.compomics.thermo_msf_parser.gui.Charge) iTheoreticalFragmentIons.get(i).getUrParam(new com.compomics.thermo_msf_parser.gui.Charge())).getCharge() == lCharge){
+        for (int i = 0; i < iTheoreticalFragmentIons.size(); i++) {
+            if (((com.compomics.thermo_msf_parser.gui.Charge) iTheoreticalFragmentIons.get(i).getUrParam(new com.compomics.thermo_msf_parser.gui.Charge())).getCharge() == lCharge) {
                 boolean lPass = false;
-                for(int t = 0; t<lTypes.size(); t ++){
-                    if(iTheoreticalFragmentIons.get(i).getType() == lTypes.get(t)){
+                for (int t = 0; t < lTypes.size(); t++) {
+                    if (iTheoreticalFragmentIons.get(i).getType() == lTypes.get(t)) {
                         lPass = true;
                     }
                 }
-                if(lPass){
+                if (lPass) {
                     lResult.add(iTheoreticalFragmentIons.get(i));
                 }
             }
@@ -629,9 +665,10 @@ public class Peptide {
 
     /**
      * To string method
+     *
      * @return String with the peptide sequence
      */
-    public String toString(){
+    public String toString() {
         return iSequence;
     }
 
@@ -679,5 +716,4 @@ public class Peptide {
     public Vector<Float> getPhosphoRSSiteProbabilities() {
         return iPhosphoRSSiteProbabilities;
     }
-    
 }
