@@ -9,6 +9,7 @@ import com.compomics.thermo_msf_parser.msf.util.Joiner;
 import java.io.IOException;
 import java.sql.*;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -18,6 +19,7 @@ import java.util.regex.Pattern;
  * Created by IntelliJ IDEA. User: Niklaas Date: 18-Feb-2011 Time: 09:12:53
  */
 public class Parser {
+
     /**
      * Obtain a list of fasta files used
      */
@@ -250,7 +252,7 @@ public class Parser {
             String lVersion = rs.getString("SoftwareVersion");
             if (lVersion.startsWith("1.2")) {
                 iMsfVersion = MsfVersion.VERSION1_2;
-            } else if (lVersion.startsWith("1.3")) {
+            } else if (lVersion.startsWith("1.3") || lVersion.startsWith("1.4")) { //TODO: create VERSION1_4
                 iMsfVersion = MsfVersion.VERSION1_3;
             }
         }
@@ -267,9 +269,12 @@ public class Parser {
                     rs.getInt("MinorVersion"),
                     rs.getString("NodeComment"),
                     rs.getString("NodeGUID"));
-            if (rs.getString("NodeGUID").equals(GUID.NODE_PTM_SCORER) || rs.getString("NodeGUID").equals(GUID.NODE_PTM_SCORER2) || rs.getString("NodeGUID").equals(GUID.NODE_PTM_SCORER3)) {
-                hasPhosphoRS = true;
-            }
+            
+            hasPhosphoRS = (lNode.getNodeGUID().equals(GUID.NODE_PTM_SCORER)
+                    || lNode.getNodeGUID().equals(GUID.NODE_PTM_SCORER2)
+                    || lNode.getNodeGUID().equals(GUID.NODE_PTM_SCORER3));
+
+
             iProcessingNodes.add(lNode);
             iProcessingNodesMap.put(lNode.getProcessingNodeNumber(), lNode);
         }
@@ -336,7 +341,7 @@ public class Parser {
                     String[] numbers = parameter.getParameterValue().split("#");
                     int modnumber = Integer.parseInt(numbers[numbers.length - 1]);
                     // Add the found amino acid references to add to the modifications later
-                    modsToAminoAcidNumbers.put(modnumber, Arrays.asList(numbers).subList(0, numbers.length-1));
+                    modsToAminoAcidNumbers.put(modnumber, Arrays.asList(numbers).subList(0, numbers.length - 1));
                     usedMods.add(modnumber);
                     if (isFixed) {
                         fixedMods.add(modnumber);
@@ -353,14 +358,14 @@ public class Parser {
         while (rs.next()) {
             boolean fixedModification = fixedMods.contains(rs.getInt(1));
             Modification lMod = new Modification(rs.getInt(1), rs.getString(2), rs.getDouble(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getInt(7), rs.getInt(8), rs.getDouble(9), rs.getInt(10), rs.getInt(11), fixedModification);
-            for (String aminoAcidNumber: modsToAminoAcidNumbers.get(rs.getInt(1))) {
+            for (String aminoAcidNumber : modsToAminoAcidNumbers.get(rs.getInt(1))) {
                 lMod.getSelectedAminoAcids().add(iAminoAcidsMap.get(Integer.parseInt(aminoAcidNumber)));
             }
-            
+
             iModifications.add(lMod);
             iModificationsMap.put(rs.getInt("AminoAcidModificationID"), lMod);
         }
-        
+
         //add the amino acid to the modifications
         rs = stat.executeQuery("select * from AminoAcidModificationsAminoAcids");
         while (rs.next()) {
@@ -422,7 +427,8 @@ public class Parser {
         //get the peptides
         rs = stat.executeQuery("select * from Peptides as p");
         while (rs.next()) {
-            Peptide lPeptide = new Peptide(rs.getInt("PeptideID"), rs.getInt("SpectrumID"), rs.getInt("ConfidenceLevel"), rs.getString("Sequence"), rs.getInt("TotalIonsCount"), rs.getInt("MatchedIonsCount"), rs.getString("Annotation"), rs.getInt("ProcessingNodeNumber"), iAminoAcidsLetterMap);            if (iMsfVersion == MsfVersion.VERSION1_3) {
+            Peptide lPeptide = new Peptide(rs.getInt("PeptideID"), rs.getInt("SpectrumID"), rs.getInt("ConfidenceLevel"), rs.getString("Sequence"), rs.getInt("TotalIonsCount"), rs.getInt("MatchedIonsCount"), rs.getString("Annotation"), rs.getInt("ProcessingNodeNumber"), iAminoAcidsLetterMap);
+            if (iMsfVersion == MsfVersion.VERSION1_3) {
                 lPeptide.setMissedCleavage(rs.getInt("MissedCleavages"));
                 lPeptide.setUniquePeptideSequenceId(rs.getInt("UniquePeptideSequenceID"));
             }
@@ -540,7 +546,7 @@ public class Parser {
         }
 
         // Get the modifications from the db
-        populateModifications(stat);
+        //populateModifications(stat);
 
         //get the taxonomies
         rs = stat.executeQuery("select * from TaxonomyNodes");
@@ -594,7 +600,7 @@ public class Parser {
             iScanEvents.add(lScanEvent);
             iScanEventsMap.put(lScanEvent.getScanEventId(), lScanEvent);
         }
-        
+
         for (Spectrum s : iSpectra) {
             s.setScanEvent(iScanEventsMap.get(s.getScanEventId()));
         }
@@ -919,19 +925,38 @@ public class Parser {
             }
         }
 
-        //add the modifications to the peptides
+        //add modifications to the peptides
         String[] modificationTypes = new String[]{"TerminalModification", "AminoAcidModification"};
         String[] decoySuffixes = new String[]{"", "_decoy"};
 
-        for (String decoySuffix : decoySuffixes) {
-            for (String modificationType : modificationTypes) {
-                boolean isTerminalModification = modificationType.startsWith("Terminal"); //hacky but it saves some space
 
-                rs = stat.executeQuery("select * from Peptides" + modificationType + "s" + decoySuffix);
-                while (rs.next()) {
-                    Peptide pep = iPeptidesMap.get(rs.getInt("PeptideID"));
-                    if (pep != null) {
+        for (Peptide pep : iPeptidesMap.values()) {
+            for (Integer fieldID : pRSScoreFieldIDs) {
+                if (pep.getCustomDataFieldValues().containsKey(fieldID)) {
+                    pep.setPhosphoRSScore(Float.parseFloat(pep.getCustomDataFieldValues().get(fieldID)));
+                }
+            }
 
+            for (Integer fieldID : pRSProbabilityFieldIDs) {
+                if (pep.getCustomDataFieldValues().containsKey(fieldID)) {
+                    pep.setPhoshpoRSSequenceProbability(Float.parseFloat(pep.getCustomDataFieldValues().get(fieldID)));
+                }
+            }
+
+            Map<Integer, Float> pRSprobabilities = new HashMap<Integer, Float>();
+            for (Integer fieldID : pRSSiteProbabilityFieldIDs) {
+                pRSprobabilities.putAll(parsePRSIdentificationProbabilities(pep.getCustomDataFieldValues().get(fieldID)));
+            }
+
+            HashMap<ModificationPosition, Modification> peptideModifications = new HashMap<ModificationPosition, Modification>();
+            List<Modification> phosphoModifications = new ArrayList<Modification>();
+
+            for (String decoySuffix : decoySuffixes) {
+                for (String modificationType : modificationTypes) {
+                    boolean isTerminalModification = modificationType.startsWith("Term");
+
+                    rs = stat.executeQuery("select * from Peptides" + modificationType + "s" + decoySuffix + " where PeptideID = \"" + pep.getPeptideId() + "\"");
+                    while (rs.next()) {
                         if (iModificationsMap.get(rs.getInt(modificationType + "ID")) != null) {
                             Modification lMod = iModificationsMap.get(rs.getInt(modificationType + "ID"));
                             int location = 0;
@@ -947,41 +972,35 @@ public class Parser {
                             }
 
                             ModificationPosition lModPos = new ModificationPosition(location, isNterm, isCterm);
-
-                            Float lpRSSiteProb = null;
-                            boolean pRSProbabilitiesAdded = false;
-                            if (!isNterm && !isCterm) {
-                                for (Integer fieldID : pRSSiteProbabilityFieldIDs) {
-                                    if (pep.getCustomDataFieldValues().containsKey(fieldID)) {
-                                        Map<Integer, Float> probabilities = parsePRSIdentificationProbabilities(pep.getCustomDataFieldValues().get(fieldID));
-                                        if (probabilities.containsKey(location)) {
-                                            lpRSSiteProb = probabilities.get(location);
-                                        }
-                                    }
-                                }
-
-                                // pRS probability will only be present if there's a modification. Therefore, we can add it to the peptide here
-                                // For a little bit of optimization, only do it once
-                                if (!pRSProbabilitiesAdded) {
-                                    for (Integer fieldID : pRSProbabilityFieldIDs) {
-                                        if (pep.getCustomDataFieldValues().containsKey(fieldID)) {
-                                            pep.setPhoshpoRSSequenceProbability(Float.parseFloat(pep.getCustomDataFieldValues().get(fieldID)));
-                                        }
-                                    }
-                                    for (Integer fieldID : pRSScoreFieldIDs) {
-                                        if (pep.getCustomDataFieldValues().containsKey(fieldID)) {
-                                            pep.setPhosphoRSScore(Float.parseFloat(pep.getCustomDataFieldValues().get(fieldID)));
-                                        }
-                                    }
-
-                                    pRSProbabilitiesAdded = true; // Let's not do the same work several times
-                                }
+                            if (lMod.getModificationName().contains("Phos")) {
+                                phosphoModifications.add(lMod);
+                            } else {
+                                peptideModifications.put(lModPos, lMod);
                             }
-
-                            pep.addModification(lMod, lModPos, lpRSSiteProb);
                         }
                     }
                 }
+            }
+
+            // Move phosphorylations to their high-scoring locations
+
+            List<Entry<Integer, Float>> pRSprobabilitiesSorted = new ArrayList<Entry<Integer, Float>>(); // Map (Rank, position) for the pRSprobabilities.
+            pRSprobabilitiesSorted.addAll(pRSprobabilities.entrySet());
+            Collections.sort(pRSprobabilitiesSorted, new Comparator() {
+                public int compare(Object o1, Object o2) {
+                    return ((Entry<Integer, Float>) o2).getValue().compareTo(((Entry<Integer, Float>) o1).getValue()); // Highest to lowest
+                }
+            });
+
+            int index = 0;
+            for (Modification phospho : phosphoModifications) {
+                Entry<Integer, Float> phosphoSite = pRSprobabilitiesSorted.get(index++);
+                ModificationPosition location = new ModificationPosition(phosphoSite.getKey(), false, false);
+                peptideModifications.put(location, phospho);
+            }
+
+            for (ModificationPosition position : peptideModifications.keySet()) {
+                pep.addModification(peptideModifications.get(position), position, pRSprobabilities.get(position.getPosition()));
             }
         }
     }
@@ -1473,8 +1492,8 @@ public class Parser {
     }
 
     public Vector getAminoAcidsFromDb(Connection iConnection) throws SQLException {
-       PreparedStatement stat = iConnection.prepareStatement("select * from AminoAcids");
-       ResultSet rs = stat.executeQuery();
+        PreparedStatement stat = iConnection.prepareStatement("select * from AminoAcids");
+        ResultSet rs = stat.executeQuery();
         while (rs.next()) {
             AminoAcid lAA = new AminoAcid(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getDouble(5), rs.getDouble(6), rs.getString(7));
             iAminoAcids.add(lAA);
@@ -1485,11 +1504,11 @@ public class Parser {
         return iAminoAcids;
     }
 
-    public String addModificationsToPeptideSequence(Peptide peptide, HashMap modificationMap, Connection iConnection){
+    public String addModificationsToPeptideSequence(Peptide peptide, HashMap modificationMap, Connection iConnection) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public HashMap createModificationMap(Connection iConnection){
+    public HashMap createModificationMap(Connection iConnection) {
         try {
             PreparedStatement stat = iConnection.prepareStatement("select * from AminoAcidModifications");
             ResultSet rs = stat.executeQuery();
@@ -1502,21 +1521,21 @@ public class Parser {
             while (rs.next()) {
                 int lModId = rs.getInt("AminoAcidModificationID");
                 int lAaId = rs.getInt("AminoAcidID");
-                if(iAminoAcidsMap.get(lAaId) != null && iModificationsMap.get(lModId) != null){
+                if (iAminoAcidsMap.get(lAaId) != null && iModificationsMap.get(lModId) != null) {
                     iModificationsMap.get(lModId).addAminoAcid(iAminoAcidsMap.get(lAaId));
-                    if(iMsfVersion == MsfVersion.VERSION1_3){
+                    if (iMsfVersion == MsfVersion.VERSION1_3) {
                         iModificationsMap.get(lModId).addClassificationForAminoAcid(rs.getInt("Classification"));
                     }
                 }
 
             }
-            if(iMsfVersion == MsfVersion.VERSION1_3){
+            if (iMsfVersion == MsfVersion.VERSION1_3) {
                 //get the neutral losses
                 rs = stat.executeQuery("select * from AminoAcidModificationsNeutralLosses");
                 while (rs.next()) {
                     NeutralLoss lLoss = new NeutralLoss(rs.getInt("NeutralLossID"), rs.getString("Name"), rs.getDouble("MonoisotopicMass"), rs.getDouble("AverageMass"));
                     iNeutralLosses.add(lLoss);
-                    iNeutralLossesMap.put(lLoss.getNeutralLossId(),lLoss);
+                    iNeutralLossesMap.put(lLoss.getNeutralLossId(), lLoss);
                 }
 
                 //add the amino acid to the neutral losses
@@ -1524,7 +1543,7 @@ public class Parser {
                 while (rs.next()) {
                     int lAaId = rs.getInt("AminoAcidID");
                     int lNlId = rs.getInt("NeutralLossID");
-                    if(iAminoAcidsMap.get(lAaId) != null && iNeutralLossesMap.get(lNlId) != null){
+                    if (iAminoAcidsMap.get(lAaId) != null && iNeutralLossesMap.get(lNlId) != null) {
                         iNeutralLossesMap.get(lNlId).addAminoAcid(iAminoAcidsMap.get(lAaId));
                     }
                 }
@@ -1533,7 +1552,7 @@ public class Parser {
                 while (rs.next()) {
                     int lModId = rs.getInt("AminoAcidModificationID");
                     int lNlId = rs.getInt("NeutralLossID");
-                    if(iModificationsMap.get(lModId) != null && iNeutralLossesMap.get(lNlId) != null){
+                    if (iModificationsMap.get(lModId) != null && iNeutralLossesMap.get(lNlId) != null) {
                         iModificationsMap.get(lModId).addNeutralLoss(iNeutralLossesMap.get(lNlId));
                     }
                 }
@@ -1558,14 +1577,14 @@ public class Parser {
         rs = stat.executeQuery("select * from EnzymesCleavageSpecificities");
         while (rs.next()) {
             int lEnzymeId = rs.getInt("EnzymeID");
-            if(iEnzymesMap.get(lEnzymeId) != null){
+            if (iEnzymesMap.get(lEnzymeId) != null) {
                 iEnzymesMap.get(lEnzymeId).setSpecificity(rs.getInt("Specificity"));
             }
         }
         rs = stat.executeQuery("select * from EnzymesCleavageSpecificities");
         while (rs.next()) {
             int lEnzymeId = rs.getInt("EnzymeID");
-            if(iEnzymesMap.get(lEnzymeId) != null){
+            if (iEnzymesMap.get(lEnzymeId) != null) {
                 iEnzymesMap.get(lEnzymeId).setSpecificity(rs.getInt("Specificity"));
             }
         }
@@ -1574,12 +1593,12 @@ public class Parser {
         return iEnzymesMap;
     }
 
-    public void getPeptides(Connection iConnection,MsfVersion iMsfVersion) throws SQLException {
+    public void getPeptides(Connection iConnection, MsfVersion iMsfVersion) throws SQLException {
         PreparedStatement stat = iConnection.prepareStatement("");
         ResultSet rs = stat.executeQuery("select * from Peptides as p");
         while (rs.next()) {
             Peptide lPeptide = new Peptide(rs.getInt("PeptideID"), rs.getInt("SpectrumID"), rs.getInt("ConfidenceLevel"), rs.getString("Sequence"), rs.getInt("TotalIonsCount"), rs.getInt("MatchedIonsCount"), rs.getString("Annotation"), rs.getInt("ProcessingNodeNumber"), iAminoAcidsLetterMap);
-            if(iMsfVersion ==  MsfVersion.VERSION1_3){
+            if (iMsfVersion == MsfVersion.VERSION1_3) {
                 lPeptide.setMissedCleavage(rs.getInt("MissedCleavages"));
                 lPeptide.setUniquePeptideSequenceId(rs.getInt("UniquePeptideSequenceID"));
             }
@@ -1591,7 +1610,7 @@ public class Parser {
         rs = stat.executeQuery("select * from Peptides_decoy as p");
         while (rs.next()) {
             Peptide lPeptide = new Peptide(rs.getInt("PeptideID"), rs.getInt("SpectrumID"), rs.getInt("ConfidenceLevel"), rs.getString("Sequence"), rs.getInt("TotalIonsCount"), rs.getInt("MatchedIonsCount"), "", rs.getInt("ProcessingNodeNumber"), iAminoAcidsLetterMap);
-            if(iMsfVersion ==  MsfVersion.VERSION1_3){
+            if (iMsfVersion == MsfVersion.VERSION1_3) {
                 lPeptide.setMissedCleavage(rs.getInt("MissedCleavages"));
                 lPeptide.setUniquePeptideSequenceId(rs.getInt("UniquePeptideSequenceID"));
                 lPeptide.setAnnotation(rs.getString("Annotation"));
@@ -1599,12 +1618,12 @@ public class Parser {
             iPeptidesDecoy.add(lPeptide);
             iPeptidesDecoyMap.put(lPeptide.getPeptideId(), lPeptide);
         }
-        if(iMsfVersion == MsfVersion.VERSION1_3){
+        if (iMsfVersion == MsfVersion.VERSION1_3) {
             //add the processing node Custom data fields
             rs = stat.executeQuery("select * from CustomDataPeptides_Decoy");
             while (rs.next()) {
-                if(iPeptidesDecoyMap.get(rs.getInt("PeptideID")) != null){
-                    iPeptidesDecoyMap.get(rs.getInt("PeptideID")).addCustomDataField(rs.getInt("FieldID"),rs.getString("FieldValue"));
+                if (iPeptidesDecoyMap.get(rs.getInt("PeptideID")) != null) {
+                    iPeptidesDecoyMap.get(rs.getInt("PeptideID")).addCustomDataField(rs.getInt("FieldID"), rs.getString("FieldValue"));
                 }
             }
             rs = stat.executeQuery("select fieldid from CustomDataPeptides_Decoy group by fieldid");
@@ -1622,7 +1641,7 @@ public class Parser {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public Vector<Peptide> getPeptidesForAccession(String lProteinAccession, MsfVersion iMsfVersion, Connection iConnection, Vector<AminoAcid> iAminoAcids){
+    public Vector<Peptide> getPeptidesForAccession(String lProteinAccession, MsfVersion iMsfVersion, Connection iConnection, Vector<AminoAcid> iAminoAcids) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -1654,20 +1673,20 @@ public class Parser {
             iSpectraMapByUniqueSpectrumId.put(lSpectrum.getUniqueSpectrumId(), lSpectrum);
         }
 
-        if(!iLowMemory){
+        if (!iLowMemory) {
             rs = stat.executeQuery("select * from Spectra");
             while (rs.next()) {
-                int lSpectrumId =  rs.getInt("UniqueSpectrumID");
+                int lSpectrumId = rs.getInt("UniqueSpectrumID");
                 byte[] lZipped = rs.getBytes("Spectrum");
-                if(iSpectraMapByUniqueSpectrumId.get(lSpectrumId) != null){
+                if (iSpectraMapByUniqueSpectrumId.get(lSpectrumId) != null) {
                     iSpectraMapByUniqueSpectrumId.get(lSpectrumId).setZippedBytes(lZipped);
                 }
             }
         }
         rs = stat.executeQuery("select * from SpectrumScores");
         while (rs.next()) {
-            int lSpectrumId =  rs.getInt("SpectrumID");
-            if(iSpectraMapBySpectrumId.get(lSpectrumId) != null){
+            int lSpectrumId = rs.getInt("SpectrumID");
+            if (iSpectraMapBySpectrumId.get(lSpectrumId) != null) {
                 iSpectraMapBySpectrumId.get(lSpectrumId).addSpectrumScore(rs.getDouble("Score"), rs.getInt("ProcessingNodeNumber"));
             }
         }
@@ -1677,14 +1696,14 @@ public class Parser {
             ScanEvent lScanEvent = new ScanEvent(rs.getInt("ScanEventID"), rs.getInt("MSLevel"), rs.getInt("Polarity"), rs.getInt("ScanType"), rs.getInt("Ionization"), rs.getInt("MassAnalyzer"), rs.getInt("ActivationType"));
             iScanEvents.add(lScanEvent);
         }
-        for(int i = 0; i<iSpectra.size(); i ++){
-            for(int j = 0; j<iScanEvents.size(); j ++){
-                if(iSpectra.get(i).getScanEventId() == iScanEvents.get(j).getScanEventId()){
+        for (int i = 0; i < iSpectra.size(); i++) {
+            for (int j = 0; j < iScanEvents.size(); j++) {
+                if (iSpectra.get(i).getScanEventId() == iScanEvents.get(j).getScanEventId()) {
                     iSpectra.get(j).setScanEvent(iScanEvents.get(j));
                 }
             }
         }
-    return null;
+        return null;
     }
 
     public Iterator getAllProteins(Connection iConnection) throws SQLException {
@@ -1692,9 +1711,9 @@ public class Parser {
         ResultSet rs = stat.executeQuery();
         while (rs.next()) {
             Protein lProtein = null;
-            if(iLowMemory){
+            if (iLowMemory) {
                 lProtein = new Protein(rs.getInt("ProteinID"), this);
-                if(iMsfVersion == MsfVersion.VERSION1_3){
+                if (iMsfVersion == MsfVersion.VERSION1_3) {
                     lProtein.setMasterProtein(rs.getInt("IsMasterProtein"));
                 }
             } else {
@@ -1706,23 +1725,23 @@ public class Parser {
         //add the description to the protein
         rs = stat.executeQuery("select  * from  ProteinAnnotations ");
         while (rs.next()) {
-            if(iProteinsMap.get(rs.getInt("ProteinID")) != null){
+            if (iProteinsMap.get(rs.getInt("ProteinID")) != null) {
                 iProteinsMap.get(rs.getInt("ProteinID")).setDescription(rs.getString("Description"));
             }
         }
         //add the score to the protein
         rs = stat.executeQuery("select  * from  ProteinScores ");
         while (rs.next()) {
-            if(iProteinsMap.get(rs.getInt("ProteinID")) != null){
+            if (iProteinsMap.get(rs.getInt("ProteinID")) != null) {
                 iProteinsMap.get(rs.getInt("ProteinID")).addScore(rs.getDouble("ProteinScore"), rs.getInt("ProcessingNodeNumber"), rs.getDouble("Coverage"));
             }
         }
 
-        if(iMsfVersion == MsfVersion.VERSION1_3){
+        if (iMsfVersion == MsfVersion.VERSION1_3) {
             //add the protein group to the protein
             rs = stat.executeQuery("select  * from  ProteinsProteinGroups");
             while (rs.next()) {
-                if(iProteinsMap.get(rs.getInt("ProteinID")) != null){
+                if (iProteinsMap.get(rs.getInt("ProteinID")) != null) {
                     iProteinsMap.get(rs.getInt("ProteinID")).setProteinGroupId(rs.getInt("ProteinGroupID"));
                 }
             }
@@ -1730,7 +1749,7 @@ public class Parser {
             rs = stat.executeQuery("select  * from  PtmAnnotationData");
             while (rs.next()) {
                 Protein.PtmAnnotation lAnno = new Protein.PtmAnnotation(rs.getInt("PtmUnimodID"), rs.getInt("Position"));
-                if(iProteinsMap.get(rs.getInt("ProteinID")) != null){
+                if (iProteinsMap.get(rs.getInt("ProteinID")) != null) {
                     iProteinsMap.get(rs.getInt("ProteinID")).addPtmAnnotation(lAnno);
                 }
             }
@@ -1738,20 +1757,20 @@ public class Parser {
             //add the custom data fields to the proteins
             rs = stat.executeQuery("select  * from  CustomDataProteins_Decoy ");
             while (rs.next()) {
-                if(iProteinsMap.get(rs.getInt("ProteinID")) != null){
-                    iProteinsMap.get(rs.getInt("ProteinID")).addDecoyCustomDataField(rs.getInt("FieldID"),rs.getString("FieldValue"));
+                if (iProteinsMap.get(rs.getInt("ProteinID")) != null) {
+                    iProteinsMap.get(rs.getInt("ProteinID")).addDecoyCustomDataField(rs.getInt("FieldID"), rs.getString("FieldValue"));
                 }
             }
 
             //add the decoy score to the protein
             rs = stat.executeQuery("select  * from  ProteinScores_Decoy");
             while (rs.next()) {
-                if(iProteinsMap.get(rs.getInt("ProteinID")) != null){
+                if (iProteinsMap.get(rs.getInt("ProteinID")) != null) {
                     iProteinsMap.get(rs.getInt("ProteinID")).addDecoyScore(rs.getDouble("ProteinScore"), rs.getInt("ProcessingNodeNumber"), rs.getDouble("Coverage"));
                 }
             }
         }
-    return iProteins.iterator();
+        return iProteins.iterator();
     }
 
     public ProteinLowMem getProteinFromAccession(String proteinAccession, Connection iConnection) throws SQLException {
@@ -1770,7 +1789,7 @@ public class Parser {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public Vector<RatioTypeLowMem> parseRatioTypes(Connection iConnection){
+    public Vector<RatioTypeLowMem> parseRatioTypes(Connection iConnection) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
@@ -1808,61 +1827,5 @@ public class Parser {
 
     public Vector<String> getFastaFiles() {
         return iFastaFiles;
-    }
-
-    public int getChromatogramFileNumber() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    public void setChromatogramFileNumber(int newFileNumber) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    public int getFieldId() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    public String getName() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    public int getTraceTypeID() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    public void setTraceTypeID(int newTraceTypeID) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    public Vector<PeptideLowMem> getPeptidesWithConfidenceLevel(int confidenceLevel, Connection aConnection, MsfVersion iMsfVersion, Vector<AminoAcid> iAminoAcids) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    public int getNumberOfPeptidesForConfidenceLevel(int confidenceLevel, Connection aConnection) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    public void getPeptidesForProteinVector(Vector<ProteinLowMem> proteinLowMemVector, Connection aConnection, Vector<AminoAcid> iAminoAcids, MsfVersion iMsfVersion, int confidenceLevel) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    public void getPeptidesForProteinVector(Vector<ProteinLowMem> proteinLowMemVector, Connection aConnection, Vector<AminoAcid> iAminoAcids, MsfVersion iMsfVersion) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    public SpectrumLowMem getSpectrumForPeptideID(int peptideOfInterestID, Connection aConnection) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    public String getSpectrumTitle(String rawFileName, SpectrumLowMem lspectrum) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    public void createSpectrumXMLForSpectrum(SpectrumLowMem lSpectrum) throws SQLException, IOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    public void unzipXMLforSpectrum(SpectrumLowMem spectrum) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
