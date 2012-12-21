@@ -6,7 +6,7 @@ package com.compomics.thermo_msf_parser.msf.enums;
 
 import java.util.HashMap;
 import java.util.Map;
-
+import org.apache.log4j.Logger;
 /**
  *
  * @author toorn101
@@ -76,7 +76,15 @@ public enum GUID {
     /**
      * Spectrum normalizer for Sequest
      */
-    NODE_SPECTRUM_NORMALIZATION("3359e3e6-8057-4d35-90ad-f0bfaa1adbdb", "Spectrum normalizer");
+    NODE_SPECTRUM_NORMALIZATION("3359e3e6-8057-4d35-90ad-f0bfaa1adbdb", "Spectrum normalizer"),
+    /**
+     * Spectrum selector node
+     */
+    NODE_SPECTRUM_SELECTOR("238d2f70-3dd9-4e2b-a77d-f24933797cf6", "Spectrum selector"),
+    /**
+     * Catch-all for unknown GUIDs. This should be caught
+     */
+    UNKNOWN_GUID("","");
     /**
      * Map to go from GUID string to a GUID enum member
      */
@@ -105,6 +113,10 @@ public enum GUID {
         GUID result = null;
         if (guidStringToGUID.containsKey(iNodeGUID)) {
             result = guidStringToGUID.get(iNodeGUID);
+        }
+        if (result == null) {
+            result = GUID.UNKNOWN_GUID;
+            Logger.getRootLogger().warn("Unknown GUID found in MSF file: " + iNodeGUID);
         }
         return result;
     }
