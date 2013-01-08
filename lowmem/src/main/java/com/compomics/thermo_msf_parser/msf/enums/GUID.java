@@ -82,6 +82,10 @@ public enum GUID {
      */
     NODE_SPECTRUM_SELECTOR("238d2f70-3dd9-4e2b-a77d-f24933797cf6", "Spectrum selector"),
     /**
+     * Spectrum exporter node
+     */
+    NODE_SPECTRUM_EXPORTER("2ad453d3-093f-4acc-a4d2-ee5452a6d186", "Spectrum exporter"),
+    /**
      * Catch-all for unknown GUIDs. This should be caught
      */
     UNKNOWN_GUID("","");
