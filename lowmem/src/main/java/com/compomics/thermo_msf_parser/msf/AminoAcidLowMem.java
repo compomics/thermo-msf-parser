@@ -21,7 +21,7 @@ public class AminoAcidLowMem implements AminoAcidInterface{
      * @return a vector containing all the amino acids in the database
      * @throws SQLException 
      */
-    public Vector getAminoAcidsFromDb(Connection aConnection) throws SQLException {
+    public Vector<AminoAcid> getAminoAcidsFromDb(Connection aConnection) throws SQLException {
         Vector<AminoAcid> iAminoAcids = new Vector<AminoAcid>();
         PreparedStatement stat = aConnection.prepareStatement("select * from AminoAcids");
         ResultSet rs = stat.executeQuery();

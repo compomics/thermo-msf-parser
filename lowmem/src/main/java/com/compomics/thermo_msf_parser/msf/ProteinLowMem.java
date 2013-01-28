@@ -12,13 +12,14 @@ import java.util.*;
 public class ProteinLowMem {
 
 
-    private String accession;
+    private String sequence;
     private int locationInVector = -1;
     private int lProteinID;
     private Connection iConnection;
     private HashMap<Integer, String> iCustomDataFieldValues = new HashMap<Integer, String>();
     private int numberOfPeptides;
     private Vector<PeptideLowMem> peptidesOfProtein = new Vector<PeptideLowMem>();
+    private boolean isMasterProtein;
     
     /**
      * constructor for the ProteinLowMem object
@@ -29,7 +30,7 @@ public class ProteinLowMem {
      */
     
     public ProteinLowMem(String aAccession,Connection aConnection,int aProteinID){
-        this.accession = aAccession;
+        this.sequence = aAccession;
         this.iConnection = aConnection;
         this.lProteinID = aProteinID;
     }
@@ -39,8 +40,8 @@ public class ProteinLowMem {
      * @return the protein accession string
      */
 
-    public String getAccession() {
-        return accession;
+    public String getSequence() {
+        return sequence;
     }
 
     /**
@@ -48,8 +49,8 @@ public class ProteinLowMem {
      * @param accession an accession string
      */
     
-    public void setAccession(String accession) {
-        this.accession = accession;
+    public void setSequence(String accession) {
+        this.sequence = accession;
     }
 
     /**
@@ -87,7 +88,7 @@ public class ProteinLowMem {
 
     @Override
     public String toString(){
-    return accession;
+    return sequence;
     }
 
 
@@ -118,5 +119,13 @@ public class ProteinLowMem {
     
     public void addDecoyPeptide(PeptideLowMem peptideLowMem) {
         //not yet implemented
+    }
+    
+    public void setMasterProtein(boolean isMasterProtein){
+        this.isMasterProtein = isMasterProtein;
+    }
+    
+    public boolean isMasterProtein(){
+        return isMasterProtein;
     }
 }

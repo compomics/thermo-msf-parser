@@ -157,7 +157,7 @@ public class Peptide {
 
         if (iAminoAcidSequence.size() != iSequence.length()) {
             //error
-            System.out.println("ERROR " + iSequence);
+            logger.error(iSequence);
         }
 
     }

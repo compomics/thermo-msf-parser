@@ -12,7 +12,7 @@ public class MsfVersionInfo {
     // Class specific log4j logger for Thermo_msf_parserGUI instances.
 	 private static Logger logger = Logger.getLogger(MsfVersionInfo.class);
     /**
-     * The schama version
+     * The schema version
      */
     private int iSchemaVersion;
     /**

@@ -16,21 +16,22 @@ import java.util.logging.Logger;
  * @author Davy
  */
 public class WorkFlowLowMemController {
-    
+
     /**
-     * 
+     *
      * @param aConnection a connection to the msf file
      * @return a workflowinfo object
      */
-    
-    public WorkflowInfo getWorkFlowInfo(Connection aConnection){
+    public WorkflowInfo getWorkFlowInfo(Connection aConnection) {
         WorkflowInfo iWorkFlowInfo = null;
         try {
             Statement stat = aConnection.createStatement();
             ResultSet rs = stat.executeQuery("select * from WorkflowInfo");
-            while (rs.next()) {
-                iWorkFlowInfo = new WorkflowInfo(rs.getString("WorkflowName"), rs.getString("WorkflowDescription"), rs.getString("User"), rs.getString("WorkflowTemplate"), null);
-            }
+            rs.next();
+            iWorkFlowInfo = new WorkflowInfo(rs.getString("WorkflowName"), rs.getString("WorkflowDescription"), rs.getString("User"), rs.getString("WorkflowTemplate"), rs.getString("MachineName"));
+            rs = stat.executeQuery("select * from SchemaInfo");
+            rs.next();
+            iWorkFlowInfo.setMsfVersionInfo(new MsfVersionInfo(rs.getInt("Version"), rs.getString("SoftwareVersion")));
             //add the messages to the workflow info
             rs = stat.executeQuery("select * from WorkflowMessages");
             while (rs.next()) {
@@ -39,7 +40,6 @@ public class WorkFlowLowMemController {
         } catch (SQLException ex) {
             Logger.getLogger(WorkFlowLowMemController.class.getName()).log(Level.SEVERE, null, ex);
         }
-    return iWorkFlowInfo;
+        return iWorkFlowInfo;
     }
-    
 }

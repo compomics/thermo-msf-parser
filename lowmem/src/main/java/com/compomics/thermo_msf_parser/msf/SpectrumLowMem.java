@@ -200,7 +200,7 @@ public class SpectrumLowMem {
     public byte[] getZippedSpectrumXml(){
         return iZippedSpectrumXml;
     }
-
+    
     public void setFileId(int iFileId) {
         this.iFileId = iFileId;
     }
@@ -212,7 +212,7 @@ public class SpectrumLowMem {
     public void setScanEvent(ScanEvent iScanEvent) {
         this.iScanEvent = iScanEvent;
     }
-
+    
     /**
      * This will add score and a processing node number
      *
@@ -329,4 +329,5 @@ public class SpectrumLowMem {
     public void addSpectrumXML(String aSpectrumXML) {
         spectrumXML = aSpectrumXML;
     }
+    
 }

@@ -1,8 +1,7 @@
 package com.compomics.thermo_msf_parser.gui;
 
+import com.compomics.thermo_msf_parser.msf.util.UrParameter;
 import org.apache.log4j.Logger;
-
-import com.compomics.util.experiment.personalization.UrParameter;
 
 /**
  * A class needed to be able to add charge to PeptideFragmentIon objects, as 
@@ -13,6 +12,7 @@ import com.compomics.util.experiment.personalization.UrParameter;
 public class Charge implements UrParameter {
 	// Class specific log4j logger for Charge instances.
 	 private static Logger logger = Logger.getLogger(Charge.class);
+    static final long serialVersionUID = 6808590175195298797L;
 
     /**
      * The charge as an int.

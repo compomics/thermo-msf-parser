@@ -2,6 +2,7 @@ package com.compomics.thermo_msf_parser.msf;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -33,5 +34,6 @@ public interface ModificationInterface {
     @throws SQLException if something went wrong with the retrieving
     */
 
-    public HashMap createModificationMap(Connection iConnection);
+    public HashMap createModificationMap(Connection msfFileConnection);
+    
 }

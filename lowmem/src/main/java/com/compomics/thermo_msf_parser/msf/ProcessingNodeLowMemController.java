@@ -2,8 +2,6 @@ package com.compomics.thermo_msf_parser.msf;
 
 import java.sql.*;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Created by IntelliJ IDEA.
@@ -46,7 +44,7 @@ public class ProcessingNodeLowMemController {
         } catch (SQLException e) {
             logger.error(e);
         }
-        return  new ArrayList<ProcessingNode>(allNodesMap.values());
+        return new ArrayList<ProcessingNode>(allNodesMap.values());
     }
     
     /**

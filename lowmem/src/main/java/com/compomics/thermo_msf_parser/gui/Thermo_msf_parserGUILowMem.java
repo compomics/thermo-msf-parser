@@ -32,7 +32,6 @@ import java.io.*;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.*;
 import java.util.logging.Level;
 
@@ -809,16 +808,8 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                     }
 
                     //fetch the software version --> to separate method?
-                    Statement stat = msfFile.getConnection().createStatement();
-                    rs = stat.executeQuery("select * from SchemaInfo");
-                    while (rs.next()) {
-                        String lVersion = rs.getString("SoftwareVersion");
-                        if (lVersion.startsWith("1.2")) {
-                            iMsfVersion = MsfVersion.VERSION1_2;
-                        } else if (lVersion.startsWith("1.3")) {
-                            iMsfVersion = MsfVersion.VERSION1_3;
-                        }
-                    }
+
+                    
 
                     //load processing nodes
                     processingNodeTabbedPane.removeAll();
@@ -2331,12 +2322,8 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
         // and clear the peptide sequence coverage details
         proteinSequenceCoverageJEditorPane.setText("");
         String lCleanProteinSequence;
-        try {
             lCleanProteinSequence = proteinLowMemInstance.getSequenceForProteinID(lProtein.getProteinID(), lProtein.getConnection());
-        } catch (SQLException e) {
-            logger.info(e);
-            return;
-        }
+        
         int selectedPeptideStart = -1;
         int selectedPeptideEnd = -1;
 

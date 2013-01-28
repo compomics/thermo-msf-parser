@@ -32,7 +32,5 @@ public class ProteinGroupLowMem {
 
     public Vector<ProteinLowMem> getProteins() {
         return proteins;
-    }
-   
-    
+    }  
 }
