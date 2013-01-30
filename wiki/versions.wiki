@@ -1,6 +1,11 @@
 #labels Featured
 #Starting from thermo-msf-parser version 1.0, all subsequent versions of the library are listed here.
 
+===1.0.8 (30 January 2013)===
+ * BUGFIX for reading protein headers
+ * BUGFIX for creating spectra panels for XML files with incomplete tags
+ * BUGFIX for reading rawfiles with differing extensions
+
 ===1.0.6 (20 April 2012)===
  * BUGFIX on ProcessigNodeParameter constructor
  * removed cyclic dependency between Rover and thermo-msf-parser
