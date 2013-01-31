@@ -29,7 +29,7 @@ public class ParserStarter {
         try {
             UtilitiesGUIDefaults.setLookAndFeel();
         } catch (IOException ex) {
-            java.util.logging.Logger.getLogger(ParserStarter.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
         }
 
 

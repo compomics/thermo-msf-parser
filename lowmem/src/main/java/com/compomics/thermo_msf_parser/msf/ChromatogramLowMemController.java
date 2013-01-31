@@ -6,10 +6,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import org.apache.log4j.Logger;
 
 /**
  * Created by IntelliJ IDEA.
@@ -19,6 +18,7 @@ import java.util.zip.ZipInputStream;
  * To change this template use File | Settings | File Templates.
  */
 public class ChromatogramLowMemController {
+    private static Logger logger = Logger.getLogger(ChromatogramLowMemController.class); 
     /**
      * returns the chromatogram for a given peptide ID in the SQLite db
      * @param peptideID the id of the peptide
@@ -38,7 +38,7 @@ public class ChromatogramLowMemController {
             rs.close();
             stat.close();
         } catch (SQLException ex) {
-            Logger.getLogger(ChromatogramLowMemController.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
         }
         return chromatogramFiles;
     }
@@ -73,11 +73,11 @@ public class ChromatogramLowMemController {
             out.flush();
             out.close();
             lZippedFile.delete();
-            iUnzippedChromatogramXml = lStream.toString();
+            iUnzippedChromatogramXml = lStream.toString("UTF-8");
             lStream.close();
             
         } catch (IOException ex) {
-            Logger.getLogger(ChromatogramLowMemController.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
         }
         return iUnzippedChromatogramXml;
     }
@@ -101,7 +101,7 @@ public class ChromatogramLowMemController {
     /**
      * inner class Point
      */
-    private class Point{
+    public class Point{
         
          /* 
          * from this point on, the inner class methods are public only for semantic reasons. the vm does not enforce visibility rules here so they are still private on compile.

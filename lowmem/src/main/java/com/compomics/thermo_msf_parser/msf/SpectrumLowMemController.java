@@ -4,6 +4,7 @@ import java.io.*;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Vector;
+import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.apache.log4j.Logger;
@@ -67,7 +68,7 @@ public class SpectrumLowMemController implements SpectrumInterface {
     public Vector<Peak> getMSMSPeaks(String lXml) throws Exception {
         Vector<Peak> lPeaks = new Vector<Peak>();
         try {
-            String xmlSubstring = lXml.substring(lXml.indexOf("<Peak ", lXml.indexOf("<PeakCentr")), lXml.lastIndexOf("</PeakCent"));
+            String xmlSubstring = lXml.substring(lXml.indexOf("<Peak ", lXml.indexOf("<PeakCentr")), lXml.lastIndexOf("</"));
             String[] lLines = xmlSubstring.split("\n");
             for (int i = 0; i < lLines.length; i++) {
                 if (lLines[i].trim().startsWith("<Peak ")) {
@@ -88,7 +89,7 @@ public class SpectrumLowMemController implements SpectrumInterface {
      * @throws Exception
      */
     public Vector<Peak> getMSPeaks(String lXml) throws Exception {
-        String xmlSubstring = lXml.substring(lXml.indexOf("<Peak ", lXml.indexOf("<IsotopeClusterPeakCentroids")), lXml.lastIndexOf("</IsotopeClusterPeakCentroids"));
+        String xmlSubstring = lXml.substring(lXml.indexOf("<Peak ", lXml.indexOf("<IsotopeClusterPeakCentroids")), lXml.lastIndexOf("</"));
         String[] lLines = xmlSubstring.split("\n");
         Vector<Peak> lPeaks = new Vector<Peak>();
         for (int i = 0; i < lLines.length; i++) {
@@ -106,7 +107,7 @@ public class SpectrumLowMemController implements SpectrumInterface {
      * @throws Exception
      */
     public Peak getFragmentedMsPeak(String lXml) throws Exception {
-        String xmlSubstring = lXml.substring(lXml.indexOf("<MonoisotopicPeakCentroids"), lXml.lastIndexOf("</MonoisotopicPeakCentroids"));
+        String xmlSubstring = lXml.substring(lXml.indexOf("<MonoisotopicPeakCentroids"), lXml.lastIndexOf("</"));
         String[] lLines = xmlSubstring.split("\n");
         Peak lPeak = null;
         for (int i = 0; i < lLines.length; i++) {
@@ -162,13 +163,13 @@ public class SpectrumLowMemController implements SpectrumInterface {
         }
         return returnSpectrum;
     }
-    
+
     public SpectrumLowMem getSpectrumForSpectrumID(int spectrumOfInterestID, Connection aConnection) {
         SpectrumLowMem returnSpectrum = null;
         try {
             Statement stat = aConnection.createStatement();
             ResultSet rs;
-            rs = stat.executeQuery("select s.*, FileID from spectrumheaders as s, masspeaks where masspeaks.masspeakid = s.masspeakid and s.SpectrumID = "+spectrumOfInterestID);
+            rs = stat.executeQuery("select s.*, FileID from spectrumheaders as s, masspeaks where masspeaks.masspeakid = s.masspeakid and s.SpectrumID = " + spectrumOfInterestID);
             rs.next();
             returnSpectrum = new SpectrumLowMem(rs.getInt("SpectrumID"), rs.getInt("UniqueSpectrumID"), rs.getInt("MassPeakID"), rs.getInt("LastScan"), rs.getInt("FirstScan"), rs.getInt("ScanNumbers"), rs.getInt("Charge"), rs.getDouble("RetentionTime"), rs.getDouble("Mass"), rs.getInt("ScanEventID"), aConnection);
             returnSpectrum.setFileId(rs.getInt("FileID"));
@@ -191,7 +192,7 @@ public class SpectrumLowMemController implements SpectrumInterface {
      * @return a processed title
      */
     public String getSpectrumTitle(String rawFileName, SpectrumLowMem lspectrum) {
-        String spectrumTitle = rawFileName.substring(0, rawFileName.toLowerCase().indexOf(".raw"));
+        String spectrumTitle = rawFileName.substring(0, rawFileName.toLowerCase().lastIndexOf("."));
         return spectrumTitle + "_" + lspectrum.getSpectrumId() + "_" + lspectrum.getFirstScan() + "_" + lspectrum.getCharge();
     }
 

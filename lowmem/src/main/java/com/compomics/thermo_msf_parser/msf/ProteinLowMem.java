@@ -12,7 +12,7 @@ import java.util.*;
 public class ProteinLowMem {
 
 
-    private String sequence;
+    private String accession;
     private int locationInVector = -1;
     private int lProteinID;
     private Connection iConnection;
@@ -30,7 +30,7 @@ public class ProteinLowMem {
      */
     
     public ProteinLowMem(String aAccession,Connection aConnection,int aProteinID){
-        this.sequence = aAccession;
+        this.accession = aAccession;
         this.iConnection = aConnection;
         this.lProteinID = aProteinID;
     }
@@ -40,8 +40,8 @@ public class ProteinLowMem {
      * @return the protein accession string
      */
 
-    public String getSequence() {
-        return sequence;
+    public String getAccession() {
+        return accession;
     }
 
     /**
@@ -49,8 +49,8 @@ public class ProteinLowMem {
      * @param accession an accession string
      */
     
-    public void setSequence(String accession) {
-        this.sequence = accession;
+    public void setAccession(String accession) {
+        this.accession = accession;
     }
 
     /**
@@ -88,7 +88,7 @@ public class ProteinLowMem {
 
     @Override
     public String toString(){
-    return sequence;
+    return accession;
     }
 
 

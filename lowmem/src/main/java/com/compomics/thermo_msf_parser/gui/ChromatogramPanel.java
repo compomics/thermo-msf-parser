@@ -74,7 +74,6 @@ public class ChromatogramPanel extends GraphicsPanel {
 
         this.currentGraphicsPanelType = GraphicsPanelType.chromatogram;
 
-        dataSetCounter = 0;
         initData(aXAxisData, aYAxisData, aXAxisLabel, aYAxisLabel);
         this.iSpecPanelListeners = new ArrayList();
         this.addListeners();
@@ -126,7 +125,7 @@ public class ChromatogramPanel extends GraphicsPanel {
      *                   to the closest, lower even integer  (e.g.,
      *                   5 becomes 4, 13 becomes 12).
      */
-    public void setPointSize(Integer aPointSize) {
+    private void setPointSize(Integer aPointSize) {
         if (aPointSize % 2 != 0) {
             aPointSize--;
         }

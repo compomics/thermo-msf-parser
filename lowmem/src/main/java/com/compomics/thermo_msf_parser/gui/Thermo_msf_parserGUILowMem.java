@@ -40,9 +40,8 @@ import java.util.logging.Level;
  */
 public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
 
-    // Class specific log4j logger for Thermo_msf_parserGUI instances.
     private static Logger logger = Logger.getLogger(Thermo_msf_parserGUILowMem.class);
-    //gui elements
+
     private JPanel jpanContent;
     private JTabbedPane jtabpanSpectrum;
     private JTabbedPane jtabpanLower;
@@ -169,10 +168,6 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
      */
     private MsfFile msfFile;
     /**
-     * msfversion enumeration object
-     */
-    private MsfVersion iMsfVersion;
-    /**
      * resultset
      */
     private ResultSet rs;
@@ -196,18 +191,18 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
      * instance for protein sorter
      */
     ProteinSorter lProtSorter = new ProteinSorter();
-    /**
-     * instance scoretypelowmem
-     */
+    
+    private HashMap<Integer, CustomDataField> customData;
+    
+    private ProgressBarMiddleMan progressBarIntFiller = new ProgressBarMiddleMan(peptideLowMemInstance, proteinLowMemInstance);
+
     private ScoreTypeLowMemController scoreTypeLowMemInstance = new ScoreTypeLowMemController();
     private RatioTypeLowMemController ratioTypeLowMemInstance = new RatioTypeLowMemController();
     private CustomDataLowMemController customDataLowMemControllerInstance = new CustomDataLowMemController();
     private SpectrumLowMemController spectrumLowMemInstance = new SpectrumLowMemController();
     private ChromatogramLowMemController chromatogramLowMemInstance = new ChromatogramLowMemController();
-    private HashMap<Integer, CustomDataField> customData;
     private RawFileLowMemController rawFileLowMemInstance = new RawFileLowMemController();
     private ProcessingNodeLowMemController ProcessingNodeLowMemInstance = new ProcessingNodeLowMemController();
-    private ProgressBarMiddleMan progressBarIntFiller = new ProgressBarMiddleMan(peptideLowMemInstance, proteinLowMemInstance);
 
     /**
      * The constructor
@@ -340,8 +335,8 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
 
                             out.flush();
                             out.close();
-                        } catch (IOException e1) {
-                            logger.info(e1);
+                        } catch (IOException ioe) {
+                            logger.info(ioe);
                             JOptionPane.showMessageDialog(new JFrame(), "There was a problem saving your data!", "Problem saving", JOptionPane.ERROR_MESSAGE);
                         }
                         finally{
@@ -585,11 +580,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
         };
         ActionListener spectrumViewChange = new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                try {
                     peptidesTableMouseClicked(null);
-                } catch (SQLException e1) {
-                    logger.error(e1);
-                }
             }
         };
 
@@ -757,15 +748,17 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                         progressBar.setValue(i + 1);
                         progressBar.setString("Parsing: " + iMsfFileLocations.get(i).getName());
                         progressBar.updateUI();
-
+                        
                         proteinList.addMouseListener(new MouseAdapter() {
                             @Override
                             public void mouseReleased(MouseEvent me) {
+                                Thermo_msf_parserGUILowMem.this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
                                 if (me.getButton() == 1) {
                                     loadProtein(false);
                                     selectedProteinList.setSelectedIndex(-1);
                                     selectedProteinList.updateUI();
                                 }
+                                Thermo_msf_parserGUILowMem.this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                             }
                         });
 
@@ -807,16 +800,12 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                         iParsedMsfs.add(msfFile);
                     }
 
-                    //fetch the software version --> to separate method?
-
-                    
-
                     //load processing nodes
                     processingNodeTabbedPane.removeAll();
                     if (processingNodeLowMemInstance.getQuantitationMethod(msfFile.getConnection()).equals("")) {
                         iQuantitationFound = false;
                     }
-                    ArrayList<ProcessingNode> processingNodes = processingNodeLowMemInstance.getAllProcessingNodes(msfFile.getConnection(), iMsfVersion);
+                    ArrayList<ProcessingNode> processingNodes = processingNodeLowMemInstance.getAllProcessingNodes(msfFile.getConnection(), msfFile.getVersion());
                     for (ProcessingNode lNode : processingNodes) {
                         String lTitle = lNode.getProcessingNodeNumber() + " " + lNode.getFriendlyName();
 
@@ -1260,11 +1249,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
         jtablePeptides.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent evt) {
-                try {
                     peptidesTableMouseClicked(evt);
-                } catch (SQLException e) {
-                    logger.error(e);
-                }
             }
         });
         if (jscollPeptides == null) {
@@ -1880,7 +1865,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
      * @return Vector with the peptide line objects
      */
     private Vector<Object[]> collectPeptidesFromProtein(Vector<Object[]> lPeptides, ProteinLowMem lProtein) {
-            Vector<PeptideLowMem> peptides = peptideLowMemInstance.getPeptidesForProtein(lProtein, iMsfVersion, iAminoAcids);
+            Vector<PeptideLowMem> peptides = peptideLowMemInstance.getPeptidesForProtein(lProtein, msfFile.getVersion(), iAminoAcids);
             for (PeptideLowMem lPeptide : peptides) {
                 int lConfidenceLevel = lPeptide.getConfidenceLevel();
                 boolean lUse = false;
@@ -1970,13 +1955,13 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
              }
              }*/
             if (chbHighConfident.isSelected()) {
-                peptideLowMemInstance.getPeptidesForProteinVector(iDisplayedProteins, msfFile.getConnection(), iAminoAcids, iMsfVersion, 3);
+                peptideLowMemInstance.getPeptidesForProteinVector(iDisplayedProteins, msfFile.getConnection(), iAminoAcids, msfFile.getVersion(), 3);
             }
             if (chbMediumConfident.isSelected()) {
-                peptideLowMemInstance.getPeptidesForProteinVector(iDisplayedProteins, msfFile.getConnection(), iAminoAcids, iMsfVersion, 2);
+                peptideLowMemInstance.getPeptidesForProteinVector(iDisplayedProteins, msfFile.getConnection(), iAminoAcids, msfFile.getVersion(), 2);
             }
             if (chbLowConfident.isSelected()) {
-                peptideLowMemInstance.getPeptidesForProteinVector(iDisplayedProteins, msfFile.getConnection(), iAminoAcids, iMsfVersion, 1);
+                peptideLowMemInstance.getPeptidesForProteinVector(iDisplayedProteins, msfFile.getConnection(), iAminoAcids, msfFile.getVersion(), 1);
             }
 
             //only add the peptide line if we need to use it
@@ -2117,7 +2102,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                         lPeptideObject.add("");
                     }
                 }
-                lPeptideObject.add(ProcessingNodeLowMemInstance.getAllProcessingNodes(spectrumOfPeptide.getConnection(), iMsfVersion).get(lPeptide.getProcessingNodeNumber()));
+                lPeptideObject.add(ProcessingNodeLowMemInstance.getAllProcessingNodes(spectrumOfPeptide.getConnection(), msfFile.getVersion()).get(lPeptide.getProcessingNodeNumber()));
             }
         return lPeptideObject.toArray();
     }
@@ -2166,7 +2151,6 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
      * msf files
      */
     private void collectCustomSpectrumData() {
-        try {
             for (MsfFile iParsedMsf : iParsedMsfs) {
                 ArrayList<CustomDataField> customSpectraData = customDataLowMemControllerInstance.getCustomSpectraData(customDataLowMemControllerInstance.getCustomFieldMap(iParsedMsf.getConnection()), iParsedMsf.getConnection());
                 for (CustomDataField aCustomSpectraData : customSpectraData) {
@@ -2181,9 +2165,6 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                     }
                 }
             }
-        } catch (SQLException sqle) {
-            logger.error(sqle);
-        }
     }
 
     /**
@@ -2304,11 +2285,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
     }
 
     private void peptidesTableKeyReleased(KeyEvent evt) {
-        try {
             peptidesTableMouseClicked(null);
-        } catch (SQLException sqle) {
-            logger.error(sqle);
-        }
     }
 
     /**
@@ -2360,7 +2337,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
         int[] coverage = new int[lCleanProteinSequence.length() + 1];
 
         Vector<PeptideLowMem> lPeptides = null;
-            lPeptides = peptideLowMemInstance.getPeptidesForProtein(lProtein, iMsfVersion, iAminoAcids);
+            lPeptides = peptideLowMemInstance.getPeptidesForProtein(lProtein, msfFile.getVersion(), iAminoAcids);
         // iterate the peptide table and store the coverage for each peptide
         for (PeptideLowMem lPeptide : lPeptides) {
             int lConfidenceLevel = lPeptide.getConfidenceLevel();
@@ -2415,7 +2392,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
      *
      * @throws java.sql.SQLException
      */
-    private void peptidesTableMouseClicked(MouseEvent evt) throws SQLException {
+    private void peptidesTableMouseClicked(MouseEvent evt) {
 
         // Set the cursor into the wait status.
         this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
@@ -2543,7 +2520,6 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                 if (chromatogramCheckBox.isSelected()) {
 
                     //add the chromatograms
-                    try {
                         jtabChromatogram.removeAll();
                         if (jtabpanLower.indexOfTab("Chromatogram") == -1) {
                             jtabpanLower.add("Chromatogram", jtabChromatogram);
@@ -2577,7 +2553,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
 
                                 double lAreaDistance = chromatogramPanel.getMaxXAxisValue() / 500.0;
                                 if (iSelectedProtein != null) {
-                                    Vector<PeptideLowMem> peptideVector = peptideLowMemInstance.getPeptidesForProtein(iSelectedProtein, iMsfVersion, iAminoAcids);
+                                    Vector<PeptideLowMem> peptideVector = peptideLowMemInstance.getPeptidesForProtein(iSelectedProtein, msfFile.getVersion(), iAminoAcids);
                                     for (PeptideLowMem lPeptide : peptideVector) {
                                         SpectrumLowMem tempSpectrum = lPeptide.getParentSpectrum();
                                         int lConfidenceLevel = lPeptide.getConfidenceLevel();
@@ -2630,9 +2606,6 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                                 chromatogramPanel.repaint();
                             }
                         }
-                    } catch (IOException e) {
-                        logger.info(e);
-                    }
                 } else {
                     jtabpanLower.remove(jtabChromatogram);
                     jtabChromatogram.removeAll();
@@ -3056,7 +3029,6 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
      */
     public void loadProtein(boolean aFromInterestedList) {
         if (aFromInterestedList) {
-
             iSelectedProtein = (ProteinLowMem) selectedProteinList.getSelectedValue();
         } else {
             iSelectedProtein = (ProteinLowMem) proteinList.getSelectedValue();

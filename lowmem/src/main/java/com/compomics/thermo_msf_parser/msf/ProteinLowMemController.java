@@ -3,8 +3,6 @@ package com.compomics.thermo_msf_parser.msf;
 import com.compomics.thermo_msf_parser.msf.util.UtilProtein;
 import java.sql.*;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Created by IntelliJ IDEA. User: Davy Date: 10/1/12 Time: 10:36 AM To change
@@ -106,20 +104,19 @@ public class ProteinLowMemController extends Observable implements ProteinInterf
             UtilProtein iUtilProtein;
             while (rs.next()) {
                 String lFasta = rs.getString(1) + "\n" + rs.getString(2);
+                int secondIndex;
                 if (lFasta.contains(">GENSCAN")) {
                     iUtilProtein = new UtilProtein(lFasta);
                     accession = (iUtilProtein.getHeader().toString().substring(lFasta.indexOf("GEN"), lFasta.indexOf("pep") - 1));
                 } else if (lFasta.contains(">ENS")) {
-                    try {
-                        iUtilProtein = new UtilProtein(lFasta);
-                        accession = (iUtilProtein.getHeader().toString().substring(lFasta.indexOf("ENS"), lFasta.indexOf("pep") - 1));
-                    } catch (Exception e) {
-                        Logger.getLogger(PeptideLowMemController.class.getName()).log(Level.SEVERE, null, e);
-                    }
-
+                    iUtilProtein = new UtilProtein(lFasta);
+                    accession = (iUtilProtein.getHeader().toString().substring(lFasta.indexOf("ENS"), lFasta.indexOf("pep") - 1));
+                }
+                 else if ((secondIndex = (lFasta.indexOf("|",lFasta.indexOf("|")+1))) != -1) {       
+                    accession = lFasta.substring(lFasta.indexOf("|")+1,secondIndex);
                 } else {
                     iUtilProtein = new UtilProtein(lFasta);
-                    accession = (iUtilProtein.getHeader().getAccession());
+                    accession = iUtilProtein.getHeader().getAccession();
                 }
             }
             rs.close();
@@ -299,18 +296,21 @@ public class ProteinLowMemController extends Observable implements ProteinInterf
      * @param aConnection a connection to the msf file
      * @return a vector containing all the proteins in protein objects connected
      * to the peptide
-     * @throws java.sql.SQLException
      */
-    public Vector<ProteinLowMem> getProteinsForPeptide(int peptideID, Connection aConnection) throws SQLException {
+    public Vector<ProteinLowMem> getProteinsForPeptide(int peptideID, Connection aConnection) {
         Vector<ProteinLowMem> proteinVector = new Vector<ProteinLowMem>();
-        PreparedStatement stat = aConnection.prepareStatement("select Proteins.ProteinID from Proteins,(select ProteinID from PeptidesProteins where PeptideID = " + peptideID + " ) as protid where protid.ProteinID = Proteins.ProteinID");
-        ResultSet rs = stat.executeQuery();
-        while (rs.next()) {
-            int lProteinID = rs.getInt(1);
-            proteinVector.add(new ProteinLowMem(getAccessionFromProteinID(lProteinID, aConnection), aConnection, lProteinID));
+        try {
+            PreparedStatement stat = aConnection.prepareStatement("select Proteins.ProteinID from Proteins,(select ProteinID from PeptidesProteins where PeptideID = " + peptideID + " ) as protid where protid.ProteinID = Proteins.ProteinID");
+            ResultSet rs = stat.executeQuery();
+            while (rs.next()) {
+                int lProteinID = rs.getInt(1);
+                proteinVector.add(new ProteinLowMem(getAccessionFromProteinID(lProteinID, aConnection), aConnection, lProteinID));
+            }
+            rs.close();
+            stat.close();
+        } catch (SQLException sqle) {
+            logger.error(sqle);
         }
-        rs.close();
-        stat.close();
         return proteinVector;
     }
 
@@ -352,7 +352,6 @@ public class ProteinLowMemController extends Observable implements ProteinInterf
      * @param aConnection connection to the SQLite database
      * @return a vector containing all the protein accessions connected to the
      * peptide
-     * @throws SQLException
      */
     public Vector<String> getAllProteinAccessionsForPeptide(int peptideID, Connection aConnection) {
         Vector<String> proteinVector = new Vector<String>();
@@ -376,15 +375,17 @@ public class ProteinLowMemController extends Observable implements ProteinInterf
      * @param proteinID the id of the protein stored in the SQLite database
      * @param aConnection connection to the SQLite database
      * @return the number of peptides connected to the protein id
-     * @throws SQLException
      */
-    public Integer getNumberOfPeptidesForProtein(int proteinID, Connection aConnection) throws SQLException {
+    public Integer getNumberOfPeptidesForProtein(int proteinID, Connection aConnection) {
         Integer numberOfPeptides = 0;
-
-        Statement stat = aConnection.createStatement();
-        ResultSet rs = stat.executeQuery("select count(PeptideID) from PeptidesProteins where ProteinID = " + proteinID);
-        rs.next();
-        numberOfPeptides = rs.getInt(1);
+        try {
+            Statement stat = aConnection.createStatement();
+            ResultSet rs = stat.executeQuery("select count(PeptideID) from PeptidesProteins where ProteinID = " + proteinID);
+            rs.next();
+            numberOfPeptides = rs.getInt(1);
+        } catch (SQLException sqle) {
+            logger.error(sqle);
+        }
         return numberOfPeptides;
     }
 

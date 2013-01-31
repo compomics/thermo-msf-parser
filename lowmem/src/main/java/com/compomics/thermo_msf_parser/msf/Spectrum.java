@@ -1,6 +1,5 @@
 package com.compomics.thermo_msf_parser.msf;
 
-
 import org.apache.log4j.Logger;
 
 import java.io.ByteArrayInputStream;
@@ -14,14 +13,12 @@ import java.util.Vector;
 import java.util.zip.ZipInputStream;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Niklaas
- * Date: 18-Feb-2011
- * Time: 11:33:33
+ * Created by IntelliJ IDEA. User: Niklaas Date: 18-Feb-2011 Time: 11:33:33
  */
 public class Spectrum {
     // Class specific log4j logger for Thermo_msf_parserGUI instances.
-	 private static Logger logger = Logger.getLogger(Spectrum.class);
+
+    private static Logger logger = Logger.getLogger(Spectrum.class);
     /**
      * The spectrum id
      */
@@ -83,7 +80,8 @@ public class Spectrum {
      */
     private ScanEvent iScanEvent;
     /**
-     * HashMap with the custom data field values. The key is the id of the custom data field
+     * HashMap with the custom data field values. The key is the id of the
+     * custom data field
      */
     private HashMap<Integer, String> iCustomDataFieldValues = new HashMap<Integer, String>();
     /**
@@ -114,18 +112,18 @@ public class Spectrum {
     /**
      * Constructor for the spectrum
      *
-     * @param iSpectrumId       The spectrum id
+     * @param iSpectrumId The spectrum id
      * @param iUniqueSpectrumId The unique spectrum id
-     * @param iMassPeakId       The mass peak id
-     * @param iLastScan         The last scan
-     * @param iFirstScan        The first scan
-     * @param iScan             The scan
-     * @param iCharge           The charge
-     * @param iRetentionTime    The retention time
-     * @param iMass             The mass
-     * @param iScanEventId      The scan event id
-     * @param iConnection       The connection to the msf file
-     * @param iParser           The parser
+     * @param iMassPeakId The mass peak id
+     * @param iLastScan The last scan
+     * @param iFirstScan The first scan
+     * @param iScan The scan
+     * @param iCharge The charge
+     * @param iRetentionTime The retention time
+     * @param iMass The mass
+     * @param iScanEventId The scan event id
+     * @param iConnection The connection to the msf file
+     * @param iParser The parser
      */
     public Spectrum(int iSpectrumId, int iUniqueSpectrumId, int iMassPeakId, int iLastScan, int iFirstScan, int iScan, int iCharge, double iRetentionTime, double iMass, int iScanEventId, Connection iConnection, com.compomics.thermo_msf_parser.Parser iParser) {
         this.iSpectrumId = iSpectrumId;
@@ -142,7 +140,7 @@ public class Spectrum {
         this.iParser = iParser;
     }
 
- @Override
+    @Override
     public Spectrum clone() {
         Spectrum newSpectrum = new Spectrum(iSpectrumId, iUniqueSpectrumId, iMassPeakId,
                 iLastScan, iFirstScan, iScan,
@@ -152,8 +150,6 @@ public class Spectrum {
     }
 
     //getters
-
-
     public int getSpectrumId() {
         return iSpectrumId;
     }
@@ -193,7 +189,6 @@ public class Spectrum {
     public double getMz() {
         return (iSinglyChargedMass + ((double) (iCharge - 1)) * 1.007825) / (double) iCharge;
     }
-
 
     public int getScanEventId() {
         return iScanEventId;
@@ -250,13 +245,14 @@ public class Spectrum {
      * This method will unzip the zipped xml byte array
      *
      * @return A string with the spectrum xml
-     * @throws Exception An exception is thrown when there is a problem with the connection to the msf file
+     * @throws Exception An exception is thrown when there is a problem with the
+     * connection to the msf file
      */
     public String getUnzippedSpectrumXml() throws Exception {
         byte[] lZippedSpectrumXml = getZippedSpectrumXml();
 
         ZipInputStream in = new ZipInputStream(new ByteArrayInputStream(lZippedSpectrumXml));
-        
+
         ByteArrayOutputStream lStream = new ByteArrayOutputStream(50);
         while (in.getNextEntry() != null) {
             int count;
@@ -272,15 +268,17 @@ public class Spectrum {
     }
 
     /**
-     * This method will give a vector with the MS/MS peaks found in the spectrum xml
+     * This method will give a vector with the MS/MS peaks found in the spectrum
+     * xml
      *
      * @return vector with the MS/MS peaks found in the spectrum xml
-     * @throws Exception An exception is thrown when there is a problem with the connection to the msf file
+     * @throws Exception An exception is thrown when there is a problem with the
+     * connection to the msf file
      */
     public Vector<Peak> getMSMSPeaks() throws Exception {
         String lXml = getUnzippedSpectrumXml();
         Vector<Peak> lPeaks = new Vector<Peak>();
-        try{
+        try {
             lXml = lXml.substring(lXml.indexOf("<Peak ", lXml.indexOf("<PeakCentr")), lXml.lastIndexOf("</PeakCent"));
             String[] lLines = lXml.split("\n");
             for (int i = 0; i < lLines.length; i++) {
@@ -288,21 +286,23 @@ public class Spectrum {
                     lPeaks.add(new Peak(lLines[i]));
                 }
             }
-        } catch(IndexOutOfBoundsException e){
+        } catch (IndexOutOfBoundsException e) {
             //no peaks found
         }
         return lPeaks;
     }
 
     /**
-     * This method will give a vector with the MS peaks found in the spectrum xml
+     * This method will give a vector with the MS peaks found in the spectrum
+     * xml
      *
      * @return vector with the MS peaks found in the spectrum xml
-     * @throws Exception An exception is thrown when there is a problem with the connection to the msf file
+     * @throws Exception An exception is thrown when there is a problem with the
+     * connection to the msf file
      */
     public Vector<Peak> getMSPeaks() throws Exception {
         String lXml = getUnzippedSpectrumXml();
-        lXml = lXml.substring(lXml.indexOf("<Peak ", lXml.indexOf("<IsotopeClusterPeakCentroids")), lXml.lastIndexOf("</IsotopeClusterPeakCentroids"));
+        lXml = lXml.substring(lXml.indexOf("<Peak ", lXml.indexOf("<IsotopeClusterPeakCentroids")), lXml.lastIndexOf("</"));
         String[] lLines = lXml.split("\n");
         Vector<Peak> lPeaks = new Vector<Peak>();
         for (int i = 0; i < lLines.length; i++) {
@@ -317,7 +317,8 @@ public class Spectrum {
      * This method will give the MS peak that is used for the fragmentation
      *
      * @return peak (MS) that is used for the fragmentation
-     * @throws Exception An exception is thrown when there is a problem with the connection to the msf file
+     * @throws Exception An exception is thrown when there is a problem with the
+     * connection to the msf file
      */
     public Peak getFragmentedMsPeak() throws Exception {
         String lXml = getUnzippedSpectrumXml();
@@ -336,7 +337,8 @@ public class Spectrum {
      * This method will give the event linked to this
      *
      * @return Event
-     * @throws SQLException An exception is thrown when there is a problem with the connection to the msf file
+     * @throws SQLException An exception is thrown when there is a problem with
+     * the connection to the msf file
      */
     public Event getEvent() throws SQLException {
         Vector lEventVector = new Vector<Integer>();
@@ -347,7 +349,6 @@ public class Spectrum {
     }
 
     //setters
-
     public void setFileId(int iFileId) {
         this.iFileId = iFileId;
     }
@@ -363,7 +364,7 @@ public class Spectrum {
     /**
      * This will add score and a processing node number
      *
-     * @param lScore                The score
+     * @param lScore The score
      * @param lProcessingNodeNumber The processing node number
      */
     public void addSpectrumScore(double lScore, int lProcessingNodeNumber) {
@@ -372,9 +373,10 @@ public class Spectrum {
     }
 
     /**
-     * This method will add a value in the custom data field map by the id off the custom data field
+     * This method will add a value in the custom data field map by the id off
+     * the custom data field
      *
-     * @param lId    The custom data field id
+     * @param lId The custom data field id
      * @param lValue The value to add
      */
     public void addCustomDataField(int lId, String lValue) {
@@ -421,18 +423,18 @@ public class Spectrum {
         if (lRawFile == null) {
             lRawFile = "";
         } else {
-            lRawFile = lRawFile.substring(0, lRawFile.toLowerCase().indexOf(".raw"));
+            lRawFile = lRawFile.substring(0, lRawFile.toLowerCase().lastIndexOf("."));
         }
 
         return lRawFile + "_" + iSpectrumId + "_" + iFirstScan + "_" + iCharge;
     }
 
-     public String getUniqueSpectrumTitle() {
+    public String getUniqueSpectrumTitle() {
         String lRawFile = iParser.getRawfileNameByFileId(iFileId);
         if (lRawFile == null) {
             lRawFile = "";
         } else {
-            lRawFile = lRawFile.substring(0, lRawFile.indexOf(".raw"));
+            lRawFile = lRawFile.substring(0, lRawFile.lastIndexOf("."));
         }
 
         return lRawFile + "_" + iUniqueSpectrumId + "_" + iFirstScan + "_" + iCharge;
@@ -441,17 +443,17 @@ public class Spectrum {
 
     public boolean isHighestScoring(Peptide iSelectedPeptide, Vector<ScoreType> scoreTypes) {
         Boolean lIsHighestScore = null;
-        for(int l = 0; l<scoreTypes.size(); l++){
+        for (int l = 0; l < scoreTypes.size(); l++) {
             if (iSelectedPeptide.getScoreByScoreType(scoreTypes.get(l)) != null) {
                 Double lScore = iSelectedPeptide.getScoreByScoreType(scoreTypes.get(l));
-                if(lIsHighestScore == null){
+                if (lIsHighestScore == null) {
                     lIsHighestScore = true;
                 }
-                if(lScore != null){
+                if (lScore != null) {
                     for (int i = 0; i < iPeptides.size(); i++) {
                         if (!iSelectedPeptide.getModifiedPeptide().equalsIgnoreCase(iPeptides.get(i).getModifiedPeptide())) {
                             Double lCompareScore = iPeptides.get(i).getScoreByScoreType(scoreTypes.get(l));
-                            if(lCompareScore != null){
+                            if (lCompareScore != null) {
                                 if (lScore < lCompareScore) {
                                     lIsHighestScore = false;
                                 }
@@ -461,7 +463,7 @@ public class Spectrum {
                 }
             }
         }
-        if(lIsHighestScore == null){
+        if (lIsHighestScore == null) {
             lIsHighestScore = false;
         }
         return lIsHighestScore;
@@ -469,17 +471,17 @@ public class Spectrum {
 
     public boolean isLowestScoring(Peptide iSelectedPeptide, Vector<ScoreType> scoreTypes) {
         Boolean lIsLowestScore = null;
-        for(int i = 0; i<scoreTypes.size(); i ++){
+        for (int i = 0; i < scoreTypes.size(); i++) {
             if (iSelectedPeptide.getScoreByScoreType(scoreTypes.get(i)) != null) {
                 Double lScore = iSelectedPeptide.getScoreByScoreType(scoreTypes.get(i));
-                if(lIsLowestScore == null){
+                if (lIsLowestScore == null) {
                     lIsLowestScore = true;
                 }
-                if(lScore != null){
+                if (lScore != null) {
                     for (int j = 0; j < iPeptides.size(); j++) {
                         if (!iSelectedPeptide.getModifiedPeptide().equalsIgnoreCase(iPeptides.get(j).getModifiedPeptide())) {
                             Double lCompareScore = iPeptides.get(j).getScoreByScoreType(scoreTypes.get(j));
-                            if(lCompareScore != null){
+                            if (lCompareScore != null) {
                                 if (lScore > lCompareScore) {
                                     lIsLowestScore = false;
                                 }
@@ -489,7 +491,7 @@ public class Spectrum {
                 }
             }
         }
-        if(lIsLowestScore == null){
+        if (lIsLowestScore == null) {
             lIsLowestScore = false;
         }
         return lIsLowestScore;

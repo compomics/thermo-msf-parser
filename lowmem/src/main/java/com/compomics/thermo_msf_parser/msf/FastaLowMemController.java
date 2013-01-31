@@ -5,18 +5,19 @@
 package com.compomics.thermo_msf_parser.msf;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author Davy
  */
 public class FastaLowMemController {
+    public static final Logger logger = Logger.getLogger(FastaLowMemController.class);
 
     public ArrayList<String> getFastaFileNames(Connection msfFileConnection) {
         ArrayList<String> iFastaFiles = new ArrayList<String>();
@@ -29,7 +30,7 @@ public class FastaLowMemController {
             rs.close();
             stat.close();
         } catch (SQLException ex) {
-            Logger.getLogger(FastaLowMemController.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
         }
         return iFastaFiles;
     }
@@ -37,12 +38,13 @@ public class FastaLowMemController {
     public int getNumberOfProteinsInFastaFile(Connection msfFileConnection,String fastaFileName) {
         int numberOfProteins = 0;
         try {
-            Statement stat = msfFileConnection.createStatement();
-            ResultSet rs = stat.executeQuery("select NumberOfProteins from fastafiles where VirtualFileName = "+fastaFileName);
+            PreparedStatement stat = msfFileConnection.prepareStatement("select NumberOfProteins from fastafiles where VirtualFileName = ?");
+            stat.setString(1, fastaFileName);
+            ResultSet rs = stat.executeQuery();
             rs.next();
             numberOfProteins =rs.getInt("NumberOfProteins");
         } catch (SQLException ex) {
-            Logger.getLogger(FastaLowMemController.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
         }
         return numberOfProteins;
     }
@@ -50,12 +52,13 @@ public class FastaLowMemController {
     public int getNumberOfAminoAcidsInFastaFile(Connection msfFileConnection, String fastaFileName) {
             int numberOfAminoAcids = 0;
         try {
-            Statement stat = msfFileConnection.createStatement();
-            ResultSet rs = stat.executeQuery("select NumberOfAminoAcids from fastafiles where VirtualFileName = "+fastaFileName);
+            PreparedStatement stat = msfFileConnection.prepareStatement("select NumberOfAminoAcids from fastafiles where VirtualFileName = ?");
+            stat.setString(1,fastaFileName);
+            ResultSet rs = stat.executeQuery();
             rs.next();
             numberOfAminoAcids =rs.getInt("NumberOfAminoAcids");
         } catch (SQLException ex) {
-            Logger.getLogger(FastaLowMemController.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
         }
         return numberOfAminoAcids;
     }

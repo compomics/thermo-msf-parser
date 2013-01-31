@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-import java.util.logging.Level;
 import org.apache.log4j.Logger;
 
 /**
@@ -177,7 +176,6 @@ public class ModificationLowMemController implements ModificationInterface {
                 modToAdd.getSelectedAminoAcids().add(aminoAcids.get(Integer.parseInt(aminoAcidNumber)-1));}
                 addAminoAcidsToModification(modToAdd, msfFileConnection, msfVersion,aminoAcids);
                 modsToReturn.add(modToAdd);
-
             }
         } catch (SQLException sqle) {
             logger.error(sqle);
@@ -221,7 +219,7 @@ public class ModificationLowMemController implements ModificationInterface {
                 }
             }
         } catch (SQLException ex) {
-            java.util.logging.Logger.getLogger(ModificationLowMemController.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
         }
     }
 }

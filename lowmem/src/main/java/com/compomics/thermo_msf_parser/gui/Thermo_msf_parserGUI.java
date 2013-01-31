@@ -2494,7 +2494,7 @@ public class Thermo_msf_parserGUI extends JFrame {
                 if (chromatogramCheckBox.isSelected()) {
 
                     //add the chromatograms
-                    try {
+
                         jtabChromatogram.removeAll();
                         if (jtabpanLower.indexOfTab("Chromatogram") == -1) {
                             jtabpanLower.add("Chromatogram", jtabChromatogram);
@@ -2577,11 +2577,6 @@ public class Thermo_msf_parserGUI extends JFrame {
                                 chromatogramPanel.repaint();
                             }
                         }
-
-
-                    } catch (IOException e) {
-                        logger.info(e);
-                    }
                 } else {
                     jtabpanLower.remove(jtabChromatogram);
                     jtabChromatogram.removeAll();

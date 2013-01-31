@@ -52,7 +52,7 @@ public class MsfFile {
             }
             rs.close();
             stat.close();
-        } catch (Exception e) {
+        } catch (SQLException e) {
             logger.error(e);
         }
         return iAminoAcid;
