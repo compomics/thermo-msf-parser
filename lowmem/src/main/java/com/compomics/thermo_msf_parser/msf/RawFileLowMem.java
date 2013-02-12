@@ -8,10 +8,10 @@ package com.compomics.thermo_msf_parser.msf;
  * Time: 2:31 PM
  * To change this template use File | Settings | File Templates.
  */
-public class RawFileLowMem {
+class RawFileLowMem {
     
-    private int fileId;
-    private String fileName;
+    private final int fileId;
+    private final String fileName;
     
     RawFileLowMem(int fileId, String fileName){
         

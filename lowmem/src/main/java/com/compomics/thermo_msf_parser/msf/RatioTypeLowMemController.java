@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 public class RatioTypeLowMemController implements RatioTypeInterface {
     private Vector iComponents;
     private Vector iQuanChannelIds;
-    HashMap<Integer,String> quanChannelID = new HashMap<Integer, String>();
+    private final HashMap<Integer,String> quanChannelID = new HashMap<Integer, String>();
     
     public Vector<RatioTypeLowMem> parseRatioTypes(Connection aConnection){
         Vector<RatioTypeLowMem> lRatioTypes = new Vector<RatioTypeLowMem>();

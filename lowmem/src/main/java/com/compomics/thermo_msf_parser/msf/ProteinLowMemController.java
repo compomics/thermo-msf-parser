@@ -10,7 +10,7 @@ import java.util.*;
  */
 public class ProteinLowMemController extends Observable implements ProteinInterface {
 
-    private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ProteinLowMemController.class);
+    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ProteinLowMemController.class);
     private int proteinCounter;
     private int internalcounter = 0;
 
@@ -225,7 +225,7 @@ public class ProteinLowMemController extends Observable implements ProteinInterf
     public ArrayList<ProteinLowMem> getProteinsForConfidenceLevel(int confidenceLevel, Connection aConnection, boolean useCounter) {
         ArrayList<ProteinLowMem> changedAccessions = new ArrayList<ProteinLowMem>();
         String proteinAccession;
-        if (useCounter == true) {
+        if (useCounter) {
             proteinCounter = 0;
             try {
                 Statement stat = aConnection.createStatement();

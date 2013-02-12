@@ -81,7 +81,7 @@ public class PeptideFragmentIon extends Ion {
         /**
          * This int is the identifier for a precursor ion loss. The nature of the loss is not coded yet.
          */
-        PRECURSOR_LOSS;
+        PRECURSOR_LOSS
     }
     /**
      * Type of ion

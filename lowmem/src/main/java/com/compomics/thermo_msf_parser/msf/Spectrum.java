@@ -142,11 +142,10 @@ public class Spectrum {
 
     @Override
     public Spectrum clone() {
-        Spectrum newSpectrum = new Spectrum(iSpectrumId, iUniqueSpectrumId, iMassPeakId,
+       return new Spectrum(iSpectrumId, iUniqueSpectrumId, iMassPeakId,
                 iLastScan, iFirstScan, iScan,
                 iCharge, iRetentionTime, iSinglyChargedMass,
                 iScanEventId, iConnection, iParser);
-        return newSpectrum;
     }
 
     //getters
@@ -441,6 +440,7 @@ public class Spectrum {
 
     }
 
+    //TODO this looks wrong
     public boolean isHighestScoring(Peptide iSelectedPeptide, Vector<ScoreType> scoreTypes) {
         Boolean lIsHighestScore = null;
         for (int l = 0; l < scoreTypes.size(); l++) {

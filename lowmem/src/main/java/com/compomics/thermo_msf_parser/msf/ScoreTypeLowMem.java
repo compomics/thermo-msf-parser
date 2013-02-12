@@ -1,13 +1,6 @@
 package com.compomics.thermo_msf_parser.msf;
 
-import com.compomics.thermo_msf_parser.gui.MsfFile;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Vector;
 
 /**
  * Created by IntelliJ IDEA.
@@ -18,27 +11,27 @@ import java.util.Vector;
  */
 public class ScoreTypeLowMem {
     
-        private int iScoreTypeId;
+        private final int iScoreTypeId;
     /**
      * The score name
      */
-    private String iScoreName;
+    private final String iScoreName;
     /**
      * The friendly score name
      */
-    private String iFriendlyName;
+    private final String iFriendlyName;
     /**
      * The description
      */
-    private String iDescription;
+    private final String iDescription;
     /**
      * The score category
      */
-    private int iScoreCategory;
+    private final int iScoreCategory;
     /**
      * An int that indicates if this score is the main score
      */
-    private int iIsMainScore;
+    private final int iIsMainScore;
 
 
     ScoreTypeLowMem(int aScoreID, String aScoreName, String aFriendlyName, String aDescription, int aScoreCategory, int isMainScore) {

@@ -10,5 +10,5 @@ package com.compomics.thermo_msf_parser.msf.enums;
  */
 public enum ActivationType {
 
-    CID, MPD, ECD, PQD, ETD, HCD;
+    CID, MPD, ECD, PQD, ETD, HCD
 }

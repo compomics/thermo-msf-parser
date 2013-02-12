@@ -4,18 +4,19 @@
  */
 package com.compomics.thermo_msf_parser.msf;
 
+import org.apache.log4j.Logger;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import org.apache.log4j.Logger;
 
 /**
  *
  * @author Davy
  */
 public class ProteinGroupLowMemController {
-private static Logger logger = Logger.getLogger(ProteinGroupLowMemController.class); 
+private static final Logger logger = Logger.getLogger(ProteinGroupLowMemController.class);
     
     public int getProteinGroupIDForProteinID(int proteinID, Connection msfFileConnection) {
         int proteinGroupID = 0;

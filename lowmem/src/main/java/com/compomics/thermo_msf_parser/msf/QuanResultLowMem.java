@@ -1,7 +1,5 @@
 package com.compomics.thermo_msf_parser.msf;
 
-import org.apache.log4j.Logger;
-
 import java.util.Vector;
 
 /**
@@ -24,39 +22,39 @@ public class QuanResultLowMem {
     /**
      * The quan result id
      */
-    private int iQuanResultId;
+    private final int iQuanResultId;
     /**
      * A vector with the quan channel ids
      */
-    private Vector<Integer> iQuanChannelIds = new Vector<Integer>();
+    private final Vector<Integer> iQuanChannelIds = new Vector<Integer>();
     /**
      * A vector with the masses
      */
-    private Vector<Double> iMasses = new Vector<Double>();
+    private final Vector<Double> iMasses = new Vector<Double>();
     /**
      * A vector with the charges
      */
-    private Vector<Integer> iCharges = new Vector<Integer>();
+    private final Vector<Integer> iCharges = new Vector<Integer>();
     /**
      * A vector with the intensities
      */
-    private Vector<Double> iIntensities = new Vector<Double>();
+    private final Vector<Double> iIntensities = new Vector<Double>();
     /**
      * A vector with the retention times
      */
-    private Vector<Double> iRetentionTimes = new Vector<Double>();
+    private final Vector<Double> iRetentionTimes = new Vector<Double>();
     /**
      * A Vector that holds the isotope patterns
      */
-    private Vector<IsotopePattern> iIsotopePatterns = new Vector<IsotopePattern>();
+    private final Vector<IsotopePattern> iIsotopePatterns = new Vector<IsotopePattern>();
     /**
      * The processing node number
      */
-    private Vector<Integer> iProcessingNodeNumbers = new Vector<Integer>();
+    private final Vector<Integer> iProcessingNodeNumbers = new Vector<Integer>();
     /**
      * The spectrum id
      */
-    private Vector<Integer> iSpectrumIds = new Vector<Integer>();
+    private final Vector<Integer> iSpectrumIds = new Vector<Integer>();
     /**
      * The height
      */
@@ -171,8 +169,7 @@ public class QuanResultLowMem {
             }
         }
         if(lNumValue != null && lDenValue != null){
-            double lRatio = lNumValue / lDenValue;
-            return lRatio;
+            return lNumValue / lDenValue;
         } else {
             return null;
         }

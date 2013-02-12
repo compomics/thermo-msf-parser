@@ -29,8 +29,6 @@ import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.Level;
@@ -167,14 +165,6 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
      * a msf file
      */
     private MsfFile msfFile;
-    /**
-     * resultset
-     */
-    private ResultSet rs;
-    /**
-     * the Prepared statement
-     */
-    private PreparedStatement stat;
     /**
      * instance ProcessingNodeLowMem
      */
@@ -2763,8 +2753,6 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                     formatProteinSequence(iSelectedProtein);
                 }
 
-            } catch (IOException e) {
-                logger.info(e);
             } catch (Exception e) {
                 logger.info(e);
             }

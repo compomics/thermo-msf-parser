@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  */
 public class ScanEventLowMemController {
 
-    public ScanEvent getScanEventForScanEventID(int scanEventID, Connection msfFileConnection) {
+    ScanEvent getScanEventForScanEventID(int scanEventID, Connection msfFileConnection) {
         ScanEvent scanEvent = null;
         try {
             Statement stat = msfFileConnection.createStatement();

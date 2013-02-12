@@ -19,43 +19,43 @@ public class SpectrumLowMem {
     /**
      * The spectrum id
      */
-    private int iSpectrumId;
+    private final int iSpectrumId;
     /**
      * The unique spectrum id
      */
-    private int iUniqueSpectrumId;
+    private final int iUniqueSpectrumId;
     /**
      * The mass peak id
      */
-    private int iMassPeakId;
+    private final int iMassPeakId;
     /**
      * The last scan
      */
-    private int iLastScan;
+    private final int iLastScan;
     /**
      * The first scan
      */
-    private int iFirstScan;
+    private final int iFirstScan;
     /**
      * The scan
      */
-    private int iScan;
+    private final int iScan;
     /**
      * The charge
      */
-    private int iCharge;
+    private final int iCharge;
     /**
      * The retention time
      */
-    private double iRetentionTime;
+    private final double iRetentionTime;
     /**
      * The singly charged mass
      */
-    private double iSinglyChargedMass;
+    private final double iSinglyChargedMass;
     /**
      * The scan event id
      */
-    private int iScanEventId;
+    private final int iScanEventId;
     /**
      * The file id
      */
@@ -63,15 +63,15 @@ public class SpectrumLowMem {
     /**
      * A vector with spectrum scores
      */
-    private Vector<Double> iSpectrumScores = new Vector<Double>();
+    private final Vector<Double> iSpectrumScores = new Vector<Double>();
     /**
      * A vector with the processing node numbers for the spectrum scores
      */
-    private Vector<Integer> iSpectrumScoresProcessingNodeNumber = new Vector<Integer>();
+    private final Vector<Integer> iSpectrumScoresProcessingNodeNumber = new Vector<Integer>();
     /**
      * The peptides added to this spectrum
      */
-    private Vector<Peptide> iSpectrumPeptides = new Vector<Peptide>();
+    private final Vector<Peptide> iSpectrumPeptides = new Vector<Peptide>();
     /**
      * The scan event
      */
@@ -79,7 +79,7 @@ public class SpectrumLowMem {
     /**
      * HashMap with the custom data field values. The key is the id of the custom data field
      */
-    private HashMap<Integer, String> iCustomDataFieldValues = new HashMap<Integer, String>();
+    private final HashMap<Integer, String> iCustomDataFieldValues = new HashMap<Integer, String>();
     /**
      * The zipped spectrum xml byte array
      */
@@ -87,11 +87,11 @@ public class SpectrumLowMem {
     /**
      * The peptides linked to this spectrum
      */
-    private Vector<PeptideLowMem> iPeptides = new Vector<PeptideLowMem>();
+    private final Vector<PeptideLowMem> iPeptides = new Vector<PeptideLowMem>();
     /**
      * The decoy peptides linked to this spectrum
      */
-    private Vector<PeptideLowMem> iPeptidesDecoy = new Vector<PeptideLowMem>();
+    private final Vector<PeptideLowMem> iPeptidesDecoy = new Vector<PeptideLowMem>();
     /**
      * The quan result linked to this spectrum
      */
@@ -99,7 +99,7 @@ public class SpectrumLowMem {
     /**
      * The connection to the msf file
      */
-    private Connection iConnection;
+    private final Connection iConnection;
     
     private String spectrumXML;
 
@@ -265,6 +265,7 @@ public class SpectrumLowMem {
         return iConnection;
     }
 
+    //TODO this looks wrong
     public boolean isHighestScoring(PeptideLowMem iSelectedPeptide, Vector<ScoreTypeLowMem> scoreTypes) {
         Boolean lIsHighestScore = null;
         for(int l = 0; l<scoreTypes.size(); l++){

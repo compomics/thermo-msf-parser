@@ -19,8 +19,8 @@ import org.apache.log4j.Logger;
  */
 public class ModificationLowMemController implements ModificationInterface {
 
-    private static Logger logger = Logger.getLogger(ModificationLowMemController.class);
-    private ProcessingNodeLowMemController processingNodes = new ProcessingNodeLowMemController();
+    private static final Logger logger = Logger.getLogger(ModificationLowMemController.class);
+    private final ProcessingNodeLowMemController processingNodes = new ProcessingNodeLowMemController();
 
     public String addModificationsToPeptideSequence(Peptide peptide, HashMap modificationMap, Connection iConnection) {
         String modifiedSequence = peptide.getSequence();

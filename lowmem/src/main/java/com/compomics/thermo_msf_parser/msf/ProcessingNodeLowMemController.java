@@ -11,7 +11,7 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class ProcessingNodeLowMemController {
-    private static org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(QuanResult.class);
+    private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(QuanResult.class);
     /**
     * @param aConnection a connection to the msf file
     * @param iMsfVersion the version of the msf file

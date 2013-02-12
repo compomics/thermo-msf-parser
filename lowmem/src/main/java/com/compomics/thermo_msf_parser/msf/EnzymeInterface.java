@@ -18,6 +18,6 @@ public interface EnzymeInterface {
      * @return
      * @throws SQLException 
      */    
-    public HashMap createEnzymeMap (Connection iConnection) throws SQLException;
+    public HashMap createEnzymeMap (Connection iConnection);
 
 }

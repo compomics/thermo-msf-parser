@@ -1,7 +1,6 @@
 package com.compomics.thermo_msf_parser.msf;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.Vector;
@@ -23,7 +22,7 @@ public interface ProteinInterface {
     @throws SQLException if something went wrong with the retrieving
      */
 
-    public Iterator getAllProteins(Connection iConnection) throws SQLException;
+    public Iterator getAllProteins(Connection iConnection);
 
     /**
     get a protein from an accession
@@ -35,7 +34,7 @@ public interface ProteinInterface {
      * @param iConnection a connection to the msf file
      */
 
-    public ProteinLowMem getProteinFromAccession(String proteinAccession, Connection iConnection) throws SQLException;
+    public ProteinLowMem getProteinFromAccession(String proteinAccession, Connection iConnection);
 
     /**
     get the accession from a protein
@@ -46,7 +45,7 @@ public interface ProteinInterface {
     @throws SQLException if something went wrong with the retrieving
     */
 
-    public String getAccessionFromProteinID(int proteinID,Connection iConnection) throws SQLException;
+    public String getAccessionFromProteinID(int proteinID,Connection iConnection);
 
     /**
      * get the sequence stored in the db for a given ProteinID
@@ -57,7 +56,7 @@ public interface ProteinInterface {
      * @throws SQLException if something went wrong with the retrieving
      */
 
-    public String getSequenceForProteinID(int proteinID,Connection iConnection) throws SQLException;
+    public String getSequenceForProteinID(int proteinID,Connection iConnection);
 
     /**
      * method for retrieving all the proteins connected to a given peptide in the DB
@@ -67,5 +66,5 @@ public interface ProteinInterface {
      * @return a vector containing all Protein objects connected to a given peptide
      * @throws SQLException if something went wrong with the retrieving
      */
-    public Vector<ProteinLowMem> getProteinsForPeptide(int PeptideID,Connection iConnection) throws SQLException;
+    public Vector<ProteinLowMem> getProteinsForPeptide(int PeptideID,Connection iConnection);
 }

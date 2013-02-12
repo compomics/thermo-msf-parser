@@ -18,7 +18,7 @@ import org.apache.log4j.Logger;
  * To change this template use File | Settings | File Templates.
  */
 public class ChromatogramLowMemController {
-    private static Logger logger = Logger.getLogger(ChromatogramLowMemController.class); 
+    private static final Logger logger = Logger.getLogger(ChromatogramLowMemController.class);
     /**
      * returns the chromatogram for a given peptide ID in the SQLite db
      * @param peptideID the id of the peptide

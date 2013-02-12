@@ -2,11 +2,11 @@ package com.compomics.thermo_msf_parser.gui;
 
 import com.compomics.thermo_msf_parser.msf.AminoAcid;
 import com.compomics.thermo_msf_parser.msf.MsfVersion;
+import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.sql.*;
 import java.util.Vector;
-import org.apache.log4j.Logger;
 
 /**
  * Created by IntelliJ IDEA. User: Davy Date: 4/25/12 Time: 3:36 PM To change
@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
  */
 public class MsfFile {
     
-    private static Logger logger = Logger.getLogger(MsfFile.class);
+    private static final Logger logger = Logger.getLogger(MsfFile.class);
 
     private File msfFile;
     private Connection iConnection;
@@ -38,9 +38,6 @@ public class MsfFile {
         return iConnection;
     }
 
-    public void setConnection(Connection iConnection) {
-        this.iConnection = iConnection;
-    }
 
     public Vector<AminoAcid> getAminoAcids(){
         try {
@@ -58,9 +55,6 @@ public class MsfFile {
         return iAminoAcid;
     }
 
-    public void setAminoAcids(Vector<AminoAcid> aAminoAcidVector) {
-        this.iAminoAcid = aAminoAcidVector;
-    }
 
     public MsfVersion getVersion() {
         MsfVersion iMsfVersion = MsfVersion.VERSION1_2;

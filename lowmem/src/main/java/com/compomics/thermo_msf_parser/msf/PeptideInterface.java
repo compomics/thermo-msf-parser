@@ -1,7 +1,6 @@
 package com.compomics.thermo_msf_parser.msf;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Vector;
 
 /**
@@ -20,7 +19,7 @@ public interface PeptideInterface {
     @return a Vector containing all the peptides connected to the given Protein, empty if none are found
     */
     
-    public Vector getPeptidesForProtein(ProteinLowMem protein,MsfVersion iMsfVersion,Vector<AminoAcid> iAminoAcids) throws SQLException;
+    public Vector getPeptidesForProtein(ProteinLowMem protein,MsfVersion iMsfVersion,Vector<AminoAcid> iAminoAcids);
 
    /**
    @param lProteinAccession: a string containing the accession of the protein

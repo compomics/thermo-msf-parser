@@ -173,8 +173,7 @@ public class QuanResult {
             }
         }
         if(lNumValue != null && lDenValue != null){
-            double lRatio = lNumValue / lDenValue;
-            return lRatio;
+            return lNumValue / lDenValue;
         } else {
             return null;
         }

@@ -16,9 +16,9 @@ public class ProteinLowMem {
     private int locationInVector = -1;
     private int lProteinID;
     private Connection iConnection;
-    private HashMap<Integer, String> iCustomDataFieldValues = new HashMap<Integer, String>();
+    private final HashMap<Integer, String> iCustomDataFieldValues = new HashMap<Integer, String>();
     private int numberOfPeptides;
-    private Vector<PeptideLowMem> peptidesOfProtein = new Vector<PeptideLowMem>();
+    private final Vector<PeptideLowMem> peptidesOfProtein = new Vector<PeptideLowMem>();
     private boolean isMasterProtein;
     
     /**
@@ -117,9 +117,9 @@ public class ProteinLowMem {
     }
     
     
-    public void addDecoyPeptide(PeptideLowMem peptideLowMem) {
+    //public void addDecoyPeptide(PeptideLowMem peptideLowMem) {
         //not yet implemented
-    }
+    //}
     
     public void setMasterProtein(boolean isMasterProtein){
         this.isMasterProtein = isMasterProtein;

@@ -13,8 +13,8 @@ import java.util.Vector;
  */
 public class PeptideLowMemController extends Observable implements PeptideInterface {
 
-    private static Logger logger = Logger.getLogger(PeptideLowMemController.class);
-    private ScoreTypeLowMemController scoreTypeInstance = new ScoreTypeLowMemController();
+    private static final Logger logger = Logger.getLogger(PeptideLowMemController.class);
+    private final ScoreTypeLowMemController scoreTypeInstance = new ScoreTypeLowMemController();
     private int counter;
 
     /**
@@ -216,7 +216,7 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
                 rs.close();
                 stat.close();
             } else if (iMsfVersion == MsfVersion.VERSION1_2) {
-                PreparedStatement stat = aConnection.prepareStatement("select PeptideID,ConfidenceLevel,Sequence,TotalIonsCount,MatchedIonsCount,Annotation,ProcessingNodeNumber, s.*, FileID as file,PeptidesProteins.ProteinID from spectrumheaders as s, masspeaks, Peptides as p,Spectra as sp, (select PeptideID,ProteinID from peptidesProteins where PeptidesProteins.ProteinID in (" + listOfProteinIds + ")) as pp where masspeaks.masspeakid = s.masspeakid and s.SpectrumID = p.SpectrumID and s.UniqueSpectrumID = sp.UniqueSpectrumID and p.PeptideID = pp.PeptideID and p.ConfidenceLevel = " + confidenceLevel);
+                PreparedStatement stat = aConnection.prepareStatement("select p.PeptideID as PeptideID,ConfidenceLevel,Sequence,TotalIonsCount,MatchedIonsCount,Annotation,ProcessingNodeNumber, s.*, FileID as file,pp.ProteinID from spectrumheaders as s, masspeaks, Peptides as p,Spectra as sp, (select PeptideID,ProteinID from peptidesProteins where PeptidesProteins.ProteinID in (" + listOfProteinIds + ")) as pp where masspeaks.masspeakid = s.masspeakid and s.SpectrumID = p.SpectrumID and s.UniqueSpectrumID = sp.UniqueSpectrumID and p.PeptideID = pp.PeptideID and p.ConfidenceLevel = " + confidenceLevel);
                 ResultSet rs = stat.executeQuery();
                 while (rs.next()) {
                     PeptideLowMem lPeptide = new PeptideLowMem(rs.getInt("PeptideID"), rs.getInt("SpectrumID"), rs.getInt("ConfidenceLevel"), rs.getString("Sequence"), rs.getInt("TotalIonsCount"), rs.getInt("MatchedIonsCount"), rs.getString("Annotation"), rs.getInt("ProcessingNodeNumber"), iAminoAcids, aConnection);

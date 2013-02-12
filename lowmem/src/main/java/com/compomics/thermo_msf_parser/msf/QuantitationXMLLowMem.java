@@ -13,29 +13,24 @@ import java.util.Vector;
  * Time: 2:05 PM
  * To change this template use File | Settings | File Templates.
  */
-public class QuantitationXMLLowMem {
+class QuantitationXMLLowMem {
 
     private Vector iComponents = new Vector<String>();
     private Vector<Integer> iChannelIds = new Vector<Integer>();
     private Vector<RatioType> iRatioTypes = new Vector<RatioType>();
-    private boolean lRatioReporting;
-    private String iQuantitationMethodName;
-
-
-    public QuantitationXMLLowMem(){
-
-    }
 
 
     public void parseQuantitationXML(String aQuantitationXML){
+        //String iQuantitationMethodName;
+        boolean lRatioReporting;
         String[] lLines = aQuantitationXML.split("\r\n");
         lRatioReporting = false;
 
         for(int i = 0; i<lLines.length; i ++){
             String lLine = lLines[i].trim();
-            if(lLine.startsWith("<ProcessingMethod")){
-                iQuantitationMethodName = lLine.substring(lLine.indexOf("name=\"") + 6, lLine.indexOf("\"", lLine.indexOf("name=\"") + 6));
-            }
+           // if(lLine.startsWith("<ProcessingMethod")){
+               // iQuantitationMethodName = lLine.substring(lLine.indexOf("name=\"") + 6, lLine.indexOf("\"", lLine.indexOf("name=\"") + 6));
+            //}
             if(lLine.endsWith("selected=\"QuanLabels\">")){
                 //we have a component
                 String lComponent = lLine.substring(lLine.indexOf("name=\"") + 6, lLine.indexOf("\"", lLine.indexOf("name=\"") + 6));

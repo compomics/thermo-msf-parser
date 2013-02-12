@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.logging.Level;
 
 /**
  * Created by IntelliJ IDEA.
@@ -56,11 +55,8 @@ public class ParserStarter {
         // Get the jarFile path.
         String path;
         path = this.getClass().getResource("Thermo_msf_parserGUI.class").getPath();
-        //logger.debug(path);
         path = path.substring(5, path.indexOf(jarFileName));
-        //logger.debug(path);
         path = path.replace("%20", " ");
-        //logger.debug(path);
 
         // Get Java vm options.
         String options = getJava();
@@ -77,7 +73,7 @@ public class ParserStarter {
                 "cancel"};
         int n = JOptionPane.showOptionDialog(null,
                 "choose what instance of thermo-msf-parser you want to use",
-                "Momory Usage",
+                "Memory Usage",
                 JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE,
                 null,
                 choiceOptions,

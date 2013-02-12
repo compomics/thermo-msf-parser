@@ -9,5 +9,5 @@ package com.compomics.thermo_msf_parser.msf.enums;
  * @author toorn101
  */
 public enum ChromatogramTraceType {
-    MASS_RANGE_TRACE, TIC_TRACE, BASE_PEAK_TRACE, FRAGMENT_TRACE;
+    MASS_RANGE_TRACE, TIC_TRACE, BASE_PEAK_TRACE, FRAGMENT_TRACE
 }

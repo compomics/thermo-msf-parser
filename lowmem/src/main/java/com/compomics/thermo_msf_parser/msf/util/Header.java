@@ -11,9 +11,9 @@
  * Time: 13:43:28
  */
 package com.compomics.thermo_msf_parser.msf.util;
-import java.io.Serializable;
 import org.apache.log4j.Logger;
 
+import java.io.Serializable;
 import java.util.StringTokenizer;
 
 /**
@@ -1219,6 +1219,7 @@ public class Header implements Cloneable, Serializable {
      *
      * @return  Object  Header that is a deep copy of this Header.
      */
+    @Override
     public Object clone() {
         Object result = null;
         try {

@@ -9,27 +9,16 @@ import com.compomics.util.gui.events.RescalingEvent;
 import com.compomics.util.gui.interfaces.SpectrumAnnotation;
 import com.compomics.util.gui.interfaces.SpectrumPanelListener;
 import com.compomics.util.gui.spectrum.SpectrumPanel;
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Composite;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Properties;
-import java.util.TreeSet;
-import java.util.Vector;
-import javax.swing.JPanel;
+import java.util.*;
 
 /**
  *
@@ -1267,7 +1256,6 @@ public abstract class GraphicsPanel extends JPanel {
             for (int i = 0; i < iXAxisData.get(j).length; i++) {
                 double lMass = iXAxisData.get(j)[i];
                 if (lMass < aMinXAxisValue) {
-                    continue;
                 } else if (lMass > aMaxXAxisValue) {
                     break;
                 } else {
@@ -2094,7 +2082,6 @@ public abstract class GraphicsPanel extends JPanel {
 
                 // Only draw those x values within the ('low x value', 'high x value') window.
                 if (lXAxisValue < iXAxisMin) {
-                    continue;
                 } else if (lXAxisValue > iXAxisMax) {
                     break;
                 } else {
@@ -2169,7 +2156,6 @@ public abstract class GraphicsPanel extends JPanel {
 
                 // Only draw those x-axis measurements within the ('low x', 'high x') window.
                 if (xMeasurement < iXAxisMin) {
-                    continue;
                 } else if (xMeasurement > iXAxisMax) {
                     break;
                 } else {

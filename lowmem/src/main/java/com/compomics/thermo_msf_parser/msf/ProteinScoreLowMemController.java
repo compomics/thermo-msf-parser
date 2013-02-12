@@ -4,19 +4,20 @@
  */
 package com.compomics.thermo_msf_parser.msf;
 
+import org.apache.log4j.Logger;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Vector;
-import org.apache.log4j.Logger;
 
 /**
  *
  * @author Davy
  */
 public class ProteinScoreLowMemController {
-private static Logger logger = Logger.getLogger(ProteinScoreLowMemController.class);     
+private static final Logger logger = Logger.getLogger(ProteinScoreLowMemController.class);
     
     
     public Vector<ProteinScore> getScoresForProteinId (int proteinID, Connection msfFileConnection) {

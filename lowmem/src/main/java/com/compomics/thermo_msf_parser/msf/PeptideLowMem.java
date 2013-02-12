@@ -16,7 +16,7 @@ public class PeptideLowMem {
 
     private int counter = 0;
     // Class specific log4j logger for Thermo_msf_parserGUI instances.
-    private static Logger logger = Logger.getLogger(PeptideLowMem.class);
+    private static final Logger logger = Logger.getLogger(PeptideLowMem.class);
     /**
      * The peptide id
      */
@@ -36,15 +36,15 @@ public class PeptideLowMem {
     /**
      * The scores
      */
-    private Vector<Double> iScores = new Vector<Double>();
+    private final Vector<Double> iScores = new Vector<Double>();
     /**
      * The scoretypeids
      */
-    private Vector<Integer> iScoreTypeIds = new Vector<Integer>();
+    private final Vector<Integer> iScoreTypeIds = new Vector<Integer>();
     /**
      * The scoretype
      */
-    private Vector<ScoreTypeLowMem> iScoreTypes = new Vector<ScoreTypeLowMem>();
+    private final Vector<ScoreTypeLowMem> iScoreTypes = new Vector<ScoreTypeLowMem>();
     /**
      * The total ions count
      */
@@ -60,20 +60,20 @@ public class PeptideLowMem {
     /**
      * The proteins linked to this peptide
      */
-    private Vector<ProteinLowMem> iPeptideProteins = new Vector<ProteinLowMem>();
+    private final Vector<ProteinLowMem> iPeptideProteins = new Vector<ProteinLowMem>();
     /**
      * The modifications linked to this peptide
      */
-    private Vector<Modification> iPeptideModifications = new Vector<Modification>();
+    private final Vector<Modification> iPeptideModifications = new Vector<Modification>();
     /**
      * The modifications positions of the modifications in the
      * iPeptideModifications Vector
      */
-    private Vector<ModificationPosition> iPeptideModificationPositions = new Vector<ModificationPosition>();
+    private final Vector<ModificationPosition> iPeptideModificationPositions = new Vector<ModificationPosition>();
     /**
      * The site probabilities of the Phospho modifications
      */
-    private Vector<Float> iPhosphoRSSiteProbabilities = new Vector<Float>();
+    private final Vector<Float> iPhosphoRSSiteProbabilities = new Vector<Float>();
     /**
      * the phosphoRS p value for the current 'phosphorylation isoform'
      */
@@ -98,7 +98,7 @@ public class PeptideLowMem {
      * HashMap with the custom data field values. The key is the id of the
      * custom data field
      */
-    private HashMap<Integer, String> iCustomDataFieldValues = new HashMap<Integer, String>();
+    private final HashMap<Integer, String> iCustomDataFieldValues = new HashMap<Integer, String>();
     /**
      * All the amino acids
      */
@@ -185,7 +185,7 @@ public class PeptideLowMem {
     public PeptideLowMem(ResultSet rs, Vector<AminoAcid> iAminoAcids, Connection aConn) {
         try {
             this.iPeptideId = rs.getInt("PeptideID");
-            this.iSpectrumId = rs.getInt("SpectrumID");;
+            this.iSpectrumId = rs.getInt("SpectrumID");
             this.iConfidenceLevel = rs.getInt("ConfidenceLevel");
             this.iSequence = rs.getString("Sequence");
             this.iTotalIonsCount = rs.getInt("TotalIonsCount");
@@ -209,7 +209,6 @@ public class PeptideLowMem {
             logger.error(ex);
         }
     }
-    public PeptideLowMem(){}
 
     /**
      * Getter for the peptide id
@@ -565,7 +564,7 @@ public class PeptideLowMem {
      *
      * @param iSpectrumCharge The maximum charge of the fragement ions
      */
-    public void calculateFragmentions(int iSpectrumCharge) {
+    private void calculateFragmentions(int iSpectrumCharge) {
 
         iTheoreticalFragmentIons = new Vector<PeptideFragmentIon>();
         double lHydrogenMass = 1.007825;
@@ -736,7 +735,7 @@ public class PeptideLowMem {
      */
     public void addDecoyProtein(ProteinLowMem aProtein) {
         iPeptideProteins.add(aProtein);
-        aProtein.addDecoyPeptide(this);
+        //aProtein.addDecoyPeptide(this);
     }
 
     /**

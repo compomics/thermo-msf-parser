@@ -33,7 +33,7 @@ public interface SpectrumInterface {
      * @throws Exception
      */
 
-    public Vector<Peak> getMSMSPeaks(String lXml) throws Exception;
+    public Vector<Peak> getMSMSPeaks(String lXml);
 
     /**
      * @param lXml the unzipped XML spectrum file to retrieve the peaks from
@@ -41,7 +41,7 @@ public interface SpectrumInterface {
      * @throws Exception
      */
 
-    public Vector<Peak> getMSPeaks(String lXml) throws Exception;
+    public Vector<Peak> getMSPeaks(String lXml);
 
     /**
 
@@ -49,7 +49,7 @@ public interface SpectrumInterface {
      @return the fragmented MS peak from the XML file created with the createSpectrumXMLForPeptide method
      @throws Exception
      */
-    public Peak getFragmentedMsPeak(String lXml) throws Exception;
+    public Peak getFragmentedMsPeak(String lXml);
 
     /**
      * 

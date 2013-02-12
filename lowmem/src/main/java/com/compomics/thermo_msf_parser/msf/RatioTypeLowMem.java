@@ -12,12 +12,12 @@ import java.util.Vector;
 public class RatioTypeLowMem{
 
     private Vector<String> iComponents = new Vector<String>();
-    private String iRatioType;
-    private String iNumerator;
-    private String iDenominator;
+    private final String iRatioType;
+    private final String iNumerator;
+    private final String iDenominator;
     private int iDenominatorChannelId;
     private int iNumeratorChannelId;
-    private Vector<Integer> lChannelIds;
+    private final Vector<Integer> lChannelIds;
     
 public RatioTypeLowMem(String lRatioType, String lNumerator, String lDenominator, Vector<Integer> lChannelIds, Vector<String> lComponents) {
         this.iRatioType = lRatioType;

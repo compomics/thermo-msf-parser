@@ -10,24 +10,16 @@ import com.compomics.thermo_msf_parser.msf.ProteinLowMemController;
  * Time: 3:42 PM
  * To change this template use File | Settings | File Templates.
  */
-public class ProgressBarMiddleMan {
+class ProgressBarMiddleMan {
 
     private boolean peptidesOrProteins = true;
-    private PeptideLowMemController peptideLowMemInstance;
-    private ProteinLowMemController proteinLowMemInstance;
+    private final PeptideLowMemController peptideLowMemInstance;
+    private final ProteinLowMemController proteinLowMemInstance;
 
 
     public ProgressBarMiddleMan(PeptideLowMemController peptideLowMemInstance,ProteinLowMemController proteinLowMemInstance){
         this.peptideLowMemInstance = peptideLowMemInstance;
         this.proteinLowMemInstance = proteinLowMemInstance;
-    }
-
-    public void setPeptides(){
-        peptidesOrProteins = true;
-    }
-
-    public void setProteins(){
-        peptidesOrProteins = false;
     }
 
 

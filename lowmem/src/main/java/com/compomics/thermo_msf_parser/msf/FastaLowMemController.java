@@ -4,20 +4,17 @@
  */
 package com.compomics.thermo_msf_parser.msf;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
 import org.apache.log4j.Logger;
+
+import java.sql.*;
+import java.util.ArrayList;
 
 /**
  *
  * @author Davy
  */
 public class FastaLowMemController {
-    public static final Logger logger = Logger.getLogger(FastaLowMemController.class);
+    private static final Logger logger = Logger.getLogger(FastaLowMemController.class);
 
     public ArrayList<String> getFastaFileNames(Connection msfFileConnection) {
         ArrayList<String> iFastaFiles = new ArrayList<String>();

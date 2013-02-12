@@ -1,13 +1,13 @@
 package com.compomics.thermo_msf_parser.msf;
 
+import org.apache.log4j.Logger;
+
 import java.io.*;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Vector;
-import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import org.apache.log4j.Logger;
 
 /**
  * Created by IntelliJ IDEA. User: Davy Date: 10/1/12 Time: 11:08 AM To change
@@ -15,7 +15,7 @@ import org.apache.log4j.Logger;
  */
 public class SpectrumLowMemController implements SpectrumInterface {
 
-    private static Logger logger = Logger.getLogger(PeptideLowMemController.class);
+    private static final Logger logger = Logger.getLogger(SpectrumLowMemController.class);
 
     public String createSpectrumXMLForPeptide(int peptideID, Connection aConnection) throws SQLException, IOException {
         byte[] lZippedSpectrumXml = null;
@@ -65,7 +65,7 @@ public class SpectrumLowMemController implements SpectrumInterface {
      * xml
      * @throws Exception
      */
-    public Vector<Peak> getMSMSPeaks(String lXml) throws Exception {
+    public Vector<Peak> getMSMSPeaks(String lXml) {
         Vector<Peak> lPeaks = new Vector<Peak>();
         try {
             String xmlSubstring = lXml.substring(lXml.indexOf("<Peak ", lXml.indexOf("<PeakCentr")), lXml.lastIndexOf("</"));
@@ -88,7 +88,7 @@ public class SpectrumLowMemController implements SpectrumInterface {
      * xml
      * @throws Exception
      */
-    public Vector<Peak> getMSPeaks(String lXml) throws Exception {
+    public Vector<Peak> getMSPeaks(String lXml) {
         String xmlSubstring = lXml.substring(lXml.indexOf("<Peak ", lXml.indexOf("<IsotopeClusterPeakCentroids")), lXml.lastIndexOf("</"));
         String[] lLines = xmlSubstring.split("\n");
         Vector<Peak> lPeaks = new Vector<Peak>();
@@ -104,9 +104,8 @@ public class SpectrumLowMemController implements SpectrumInterface {
      *
      * @param lXml the spectrum xml we want the fragmented peak from
      * @return a peak object containing the fragmented MS peak
-     * @throws Exception
      */
-    public Peak getFragmentedMsPeak(String lXml) throws Exception {
+    public Peak getFragmentedMsPeak(String lXml) {
         String xmlSubstring = lXml.substring(lXml.indexOf("<MonoisotopicPeakCentroids"), lXml.lastIndexOf("</"));
         String[] lLines = xmlSubstring.split("\n");
         Peak lPeak = null;

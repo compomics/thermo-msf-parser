@@ -1,9 +1,13 @@
 package com.compomics.thermo_msf_parser.msf;
 
-import java.sql.*;
+import org.apache.log4j.Logger;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import org.apache.log4j.Logger;
 
 /**
  * Created by IntelliJ IDEA. User: Davy Date: 5/2/12 Time: 11:46 AM To change
@@ -11,8 +15,8 @@ import org.apache.log4j.Logger;
  */
 public class CustomDataLowMemController {
 
-    private static Logger logger = Logger.getLogger(CustomDataLowMemController.class);
-    private HashMap<Integer, CustomDataField> customDataFieldHashMap = new HashMap<Integer, CustomDataField>();
+    private static final Logger logger = Logger.getLogger(CustomDataLowMemController.class);
+    private final HashMap<Integer, CustomDataField> customDataFieldHashMap = new HashMap<Integer, CustomDataField>();
 
     /**
      *
