@@ -86,6 +86,14 @@ public enum GUID {
      */
     NODE_SPECTRUM_EXPORTER("2ad453d3-093f-4acc-a4d2-ee5452a6d186", "Spectrum exporter"),
     /**
+     * Event detector node
+     */
+    NODE_EVENT_DETECTOR("a8127a07-6a42-4b56-93e7-c6e41af6a0a5", "Event detector"),
+    /**
+     * Precursor ions quantifier node
+     */
+    NODE_PRECURSOR_IONS_QUANTIFIER("fd1e56f4-941c-4573-9cfe-f8fa3ad2261c", "Precursor ions quantifier"),
+    /**
      * Catch-all for unknown GUIDs. This should be caught
      */
     UNKNOWN_GUID("","");
