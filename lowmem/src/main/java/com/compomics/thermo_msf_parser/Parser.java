@@ -242,6 +242,7 @@ public class Parser {
         //create the connection to the msf file
         Class.forName("org.sqlite.JDBC");
         iConnection = DriverManager.getConnection("jdbc:sqlite:" + iMsfFileLocation);
+
         Statement stat = iConnection.createStatement();
         ResultSet rs;
         this.iLowMemory = iLowMemory;
@@ -269,8 +270,8 @@ public class Parser {
                     rs.getInt("MinorVersion"),
                     rs.getString("NodeComment"),
                     rs.getString("NodeGUID"));
-            
-            hasPhosphoRS = (lNode.getNodeGUID().equals(GUID.NODE_PTM_SCORER)
+
+            hasPhosphoRS = hasPhosphoRS || (lNode.getNodeGUID().equals(GUID.NODE_PTM_SCORER)
                     || lNode.getNodeGUID().equals(GUID.NODE_PTM_SCORER2)
                     || lNode.getNodeGUID().equals(GUID.NODE_PTM_SCORER3));
 
@@ -443,7 +444,7 @@ public class Parser {
         }
 
 
-        //get the peptides
+        //get the decoy peptides
         rs = stat.executeQuery("select * from Peptides_decoy as p");
         while (rs.next()) {
             Peptide lPeptide = new Peptide(rs.getInt("PeptideID"), rs.getInt("SpectrumID"), rs.getInt("ConfidenceLevel"), rs.getString("Sequence"), rs.getInt("TotalIonsCount"), rs.getInt("MatchedIonsCount"), "", rs.getInt("ProcessingNodeNumber"), iAminoAcidsLetterMap);
@@ -455,6 +456,7 @@ public class Parser {
             iPeptidesDecoy.add(lPeptide);
             iPeptidesDecoyMap.put(lPeptide.getPeptideId(), lPeptide);
         }
+
         if (iMsfVersion == MsfVersion.VERSION1_3) {
             //add the processing node Custom data fields
             rs = stat.executeQuery("select * from CustomDataPeptides_Decoy");
@@ -546,7 +548,7 @@ public class Parser {
         }
 
         // Get the modifications from the db
-        //populateModifications(stat);
+        populateModifications(iConnection);
 
         //get the taxonomies
         rs = stat.executeQuery("select * from TaxonomyNodes");
@@ -900,26 +902,36 @@ public class Parser {
      * @param stat statement object for the database
      * @throws SQLException
      */
-    private void populateModifications(Statement stat) throws SQLException {
+    private void populateModifications(Connection conn) throws SQLException {
+
+        //Create some indexes
+        conn.prepareStatement("create index if not exists [COMPOMICS_Peptideaminoacidmodifications_peptides] on [peptidesaminoacidmodifications] ([PeptideID] ASC);").execute();
+        conn.prepareStatement("create index if not exists [COMPOMICS_peptideterminalmodifications_peptides] on [peptidesterminalmodifications] ([PeptideID] asc);").execute();
+        conn.prepareStatement("create index if not exists [COMPOMICS_Peptideaminoacidmodifications_peptides_decoy] on [peptidesaminoacidmodifications_decoy] ([PeptideID] ASC);").execute();
+        conn.prepareStatement("create index if not exists [COMPOMICS_peptideterminalmodifications_peptides_decoy] on [peptidesterminalmodifications_decoy] ([PeptideID] asc);").execute();
+
+
         ResultSet rs;
         Vector<Integer> pRSSiteProbabilityFieldIDs = new Vector<Integer>();
         Vector<Integer> pRSProbabilityFieldIDs = new Vector<Integer>();
         Vector<Integer> pRSScoreFieldIDs = new Vector<Integer>();
 
         // pRS probabilities only for version 1.3 and greater
-        if (iMsfVersion.compareTo(MsfVersion.VERSION1_3) >= 0) {
+        if (iMsfVersion.compareTo(MsfVersion.VERSION1_3) >= 0 && hasPhosphoRS) {
+            Statement st = conn.createStatement();
+
             // Obtain IDs for the pRS sequence probability in customdata
-            rs = stat.executeQuery("select fieldid from customdatafields where guid='" + GUID.PRS_SEQUENCE_PROBABILITY + "'");
+            rs = st.executeQuery("select fieldid from customdatafields where guid='" + GUID.PRS_SEQUENCE_PROBABILITY + "'");
             while (rs.next()) {
                 pRSProbabilityFieldIDs.add(rs.getInt("FieldID"));
             }
             // Obtain the IDs specific for the pRS site probabilities in customdata
-            rs = stat.executeQuery("select fieldid from customdatafields where guid='" + GUID.PRS_SCORE + "'");
+            rs = st.executeQuery("select fieldid from customdatafields where guid='" + GUID.PRS_SCORE + "'");
             while (rs.next()) {
                 pRSScoreFieldIDs.add(rs.getInt("FieldID"));
             }
             // Obtain the IDs specific for the pRS site probabilities in customdata
-            rs = stat.executeQuery("select fieldid from customdatafields where guid='" + GUID.PRS_SITE_PROBABILITIES + "'");
+            rs = st.executeQuery("select fieldid from customdatafields where guid='" + GUID.PRS_SITE_PROBABILITIES + "'");
             while (rs.next()) {
                 pRSSiteProbabilityFieldIDs.add(rs.getInt("FieldID"));
             }
@@ -927,82 +939,144 @@ public class Parser {
 
         //add modifications to the peptides
         String[] modificationTypes = new String[]{"TerminalModification", "AminoAcidModification"};
-        String[] decoySuffixes = new String[]{"", "_decoy"};
+
+        //Some rather convoluted code to deal with the convoluted way of storing decoy and normal peptides
+
+        // Arrays with values for "normal" and "decoy" peptides
+        // Array of the collections with "normal" and "decoy" peptides, parsed before
+        Vector[] peptideCollection = new Vector[]{iPeptides, iPeptidesDecoy};
+
+        PreparedStatement decoyPeptideAAModsStatement = conn.prepareStatement("select * from PeptidesAminoAcidModifications_decoy where peptideId=?");
+        PreparedStatement decoyPeptideTermModsStatement = conn.prepareStatement("select * from PeptidesTerminalModifications_decoy where peptideId=?");
+        PreparedStatement peptideAAModsStatement = conn.prepareStatement("select * from PeptidesAminoAcidModifications where peptideId=?");
+        PreparedStatement peptideTermModsStatement = conn.prepareStatement("select * from PeptidesTerminalModifications where peptideId=?");
+
+        PreparedStatement[] preparedAAModsStatements = new PreparedStatement[]{peptideAAModsStatement, decoyPeptideAAModsStatement};
+        PreparedStatement[] preparedTermModsStatements = new PreparedStatement[]{peptideTermModsStatement, decoyPeptideTermModsStatement};
 
 
-        for (Peptide pep : iPeptidesMap.values()) {
-            for (Integer fieldID : pRSScoreFieldIDs) {
-                if (pep.getCustomDataFieldValues().containsKey(fieldID)) {
-                    pep.setPhosphoRSScore(Float.parseFloat(pep.getCustomDataFieldValues().get(fieldID)));
+        for (int decoy = 0; decoy < 1; decoy++) {
+            for (Iterator<Peptide> it = peptideCollection[decoy].iterator(); it.hasNext();) {
+                Peptide pep = it.next();
+
+                for (Integer fieldID : pRSScoreFieldIDs) {
+                    if (pep.getCustomDataFieldValues().containsKey(fieldID)) {
+                        pep.setPhosphoRSScore(Float.parseFloat(pep.getCustomDataFieldValues().get(fieldID)));
+                    }
                 }
-            }
-
-            for (Integer fieldID : pRSProbabilityFieldIDs) {
-                if (pep.getCustomDataFieldValues().containsKey(fieldID)) {
-                    pep.setPhoshpoRSSequenceProbability(Float.parseFloat(pep.getCustomDataFieldValues().get(fieldID)));
+                for (Integer fieldID : pRSProbabilityFieldIDs) {
+                    if (pep.getCustomDataFieldValues().containsKey(fieldID)) {
+                        pep.setPhoshpoRSSequenceProbability(Float.parseFloat(pep.getCustomDataFieldValues().get(fieldID)));
+                    }
                 }
-            }
+                Map<Integer, Float> pRSprobabilities = new HashMap<Integer, Float>();
+                for (Integer fieldID : pRSSiteProbabilityFieldIDs) {
+                    if (pep.getCustomDataFieldValues().containsKey(fieldID)) {
+                        pRSprobabilities.putAll(parsePRSIdentificationProbabilities(pep.getCustomDataFieldValues().get(fieldID)));
+                    }
+                }
 
-            Map<Integer, Float> pRSprobabilities = new HashMap<Integer, Float>();
-            for (Integer fieldID : pRSSiteProbabilityFieldIDs) {
-                pRSprobabilities.putAll(parsePRSIdentificationProbabilities(pep.getCustomDataFieldValues().get(fieldID)));
-            }
+                HashMap<ModificationPosition, Modification> peptideModifications = new HashMap<ModificationPosition, Modification>();
+                HashMap<ModificationPosition, Modification> phosphoModifications = new HashMap<ModificationPosition, Modification>();
 
-            HashMap<ModificationPosition, Modification> peptideModifications = new HashMap<ModificationPosition, Modification>();
-            List<Modification> phosphoModifications = new ArrayList<Modification>();
+                preparedAAModsStatements[decoy].setInt(1, pep.getPeptideId());
+                rs = preparedAAModsStatements[decoy].executeQuery();
 
-            for (String decoySuffix : decoySuffixes) {
-                for (String modificationType : modificationTypes) {
-                    boolean isTerminalModification = modificationType.startsWith("Term");
+                while (rs.next()) {
+                    Integer aaModId = rs.getInt("AminoAcidModificationID");
 
-                    rs = stat.executeQuery("select * from Peptides" + modificationType + "s" + decoySuffix + " where PeptideID = \"" + pep.getPeptideId() + "\"");
-                    while (rs.next()) {
-                        if (iModificationsMap.get(rs.getInt(modificationType + "ID")) != null) {
-                            Modification lMod = iModificationsMap.get(rs.getInt(modificationType + "ID"));
-                            int location = 0;
-                            boolean isCterm = false, isNterm = false;
-                            if (isTerminalModification) {
-                                if (lMod.getPositionType() == 1) {
-                                    isNterm = true;
-                                } else {
-                                    isCterm = true;
-                                }
-                            } else {
-                                location = rs.getInt("Position");
-                            }
 
-                            ModificationPosition lModPos = new ModificationPosition(location, isNterm, isCterm);
-                            if (lMod.getModificationName().contains("Phos")) {
-                                phosphoModifications.add(lMod);
-                            } else {
-                                peptideModifications.put(lModPos, lMod);
-                            }
+                    Modification aaMod = iModificationsMap.get(aaModId);
+                    if (aaMod != null) {
+                        int location = rs.getInt("Position");
+
+                        ModificationPosition modPos = new ModificationPosition(location, false, false);
+                        if (aaMod.getModificationName().contains("Phos")) {
+                            phosphoModifications.put(modPos, aaMod);
+                        } else {
+                            peptideModifications.put(modPos, aaMod);
                         }
                     }
                 }
-            }
 
-            // Move phosphorylations to their high-scoring locations
+                preparedTermModsStatements[decoy].setInt(1, pep.getPeptideId());
+                rs = preparedTermModsStatements[decoy].executeQuery();
 
-            List<Entry<Integer, Float>> pRSprobabilitiesSorted = new ArrayList<Entry<Integer, Float>>(); // Map (Rank, position) for the pRSprobabilities.
-            pRSprobabilitiesSorted.addAll(pRSprobabilities.entrySet());
-            Collections.sort(pRSprobabilitiesSorted, new Comparator() {
-                public int compare(Object o1, Object o2) {
-                    return ((Entry<Integer, Float>) o2).getValue().compareTo(((Entry<Integer, Float>) o1).getValue()); // Highest to lowest
+                while (rs.next()) {
+                    Integer termModId = rs.getInt("TerminalModificationID");
+                    Modification termMod = iModificationsMap.get(termModId);
+                    if (termMod != null) {
+                        boolean isNterm = false, isCterm = false;
+
+                        if (termMod.getPositionType() == 1) {
+                            isNterm = true;
+                        } else {
+                            isCterm = true;
+                        }
+
+                        ModificationPosition modPos = new ModificationPosition(0, isNterm, isCterm);
+                        peptideModifications.put(modPos, termMod);
+                    }
                 }
-            });
 
-            int index = 0;
-            for (Modification phospho : phosphoModifications) {
-                Entry<Integer, Float> phosphoSite = pRSprobabilitiesSorted.get(index++);
-                ModificationPosition location = new ModificationPosition(phosphoSite.getKey(), false, false);
-                peptideModifications.put(location, phospho);
-            }
 
-            for (ModificationPosition position : peptideModifications.keySet()) {
-                pep.addModification(peptideModifications.get(position), position, pRSprobabilities.get(position.getPosition()));
+                if (iMsfVersion.compareTo(MsfVersion.VERSION1_3) >= 0 && !pRSprobabilities.isEmpty()) {
+                    List<Entry<Integer, Float>> pRSprobabilitiesSorted = new ArrayList<Entry<Integer, Float>>();
+                    pRSprobabilitiesSorted.addAll(pRSprobabilities.entrySet());
+
+                    /**
+                     * Comparator for list of pRSSiteLocalisation entries, first
+                     * sorts by score and in case of ties, uses the predefined
+                     * location
+                     */
+                    class PhosphoSiteComparator implements Comparator<Entry<Integer, Float>> {
+
+                        private Set<Integer> preassignedLocations = new HashSet<Integer>();
+
+                        public PhosphoSiteComparator(Map<ModificationPosition, Modification> preassignedLocations) {
+                            for (ModificationPosition position : preassignedLocations.keySet()) {
+                                this.preassignedLocations.add(position.getPosition());
+                            }
+                        }
+
+                        public int compare(Entry<Integer, Float> o1, Entry<Integer, Float> o2) {
+                            int compared = o2.getValue().compareTo(o1.getValue()); // Highest to lowest
+                            if (compared == 0) {
+                                compared = (preassignedLocations.contains(o2.getKey()) ? 1 : 0) + (preassignedLocations.contains(o1.getKey()) ? -1 : 0);
+                            }
+                            return compared;
+                        }
+                    }
+
+                    Collections.sort(pRSprobabilitiesSorted, new PhosphoSiteComparator(phosphoModifications));
+
+                    int index = 0;
+
+                    for (Modification phospho : phosphoModifications.values()) {
+                        Entry<Integer, Float> phosphoSite = pRSprobabilitiesSorted.get(index++);
+                        ModificationPosition location = new ModificationPosition(phosphoSite.getKey(), false, false);
+                        peptideModifications.put(location, phospho);
+                    }
+                } else {
+                    for (Entry<ModificationPosition, Modification> entry : phosphoModifications.entrySet()) {
+                        peptideModifications.put(entry.getKey(), entry.getValue());
+                    }
+                }
+                for (ModificationPosition position : peptideModifications.keySet()) {
+                    if (pRSprobabilities.containsKey(position.getPosition())) {
+                        pep.addModification(peptideModifications.get(position), position, pRSprobabilities.get(position.getPosition()));
+                    } else {
+                        pep.addModification(peptideModifications.get(position), position, null);
+                    }
+                }
             }
         }
+
+        //remove our custom indexes
+        conn.prepareStatement("drop index if exists [COMPOMICS_Peptideaminoacidmodifications_peptides];").execute();
+        conn.prepareStatement("drop index if exists [COMPOMICS_Peptideterminalmodifications_peptides];").execute();
+        conn.prepareStatement("drop index if exists [COMPOMICS_Peptideaminoacidmodifications_peptides_decoy];").execute();
+        conn.prepareStatement("drop index if exists [COMPOMICS_Peptidterminalmodifications_peptides_decoy];").execute();
     }
 
     /**
