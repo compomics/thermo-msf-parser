@@ -19,90 +19,90 @@ import java.util.logging.Logger;
  * @author Davy
  */
 public class ScoreTypeLowMemController implements ScoreTypeInterface {
-    
-        private Vector<ScoreTypeLowMem> iScoreTypes = new Vector<ScoreTypeLowMem>();
-    
-        public Vector<ScoreTypeLowMem> getScoreTypesOfMsfFileVector(Vector<MsfFile> MsfFiles){
+
+    private Vector<ScoreTypeLowMem> iScoreTypes = new Vector<ScoreTypeLowMem>();
+
+    public Vector<ScoreTypeLowMem> getScoreTypesOfMsfFileVector(Vector<MsfFile> MsfFiles) {
         Connection aConnection;
         for (MsfFile msfFile : MsfFiles) {
-                try {
-                    aConnection = msfFile.getConnection();
-                    PreparedStatement stat =aConnection.prepareStatement("select * from ProcessingNodeScores");
+            try {
+                aConnection = msfFile.getConnection();
+                PreparedStatement stat = aConnection.prepareStatement("select * from ProcessingNodeScores");
                 //get the score types
-                if (iScoreTypes.isEmpty()){
+                if (iScoreTypes.isEmpty()) {
                     ResultSet rs = stat.executeQuery();
                     while (rs.next()) {
                         ScoreTypeLowMem lScoreType = new ScoreTypeLowMem(rs.getInt("ScoreID"), rs.getString("ScoreName"), rs.getString("FriendlyName"), rs.getString("Description"), rs.getInt("ScoreCategory"), rs.getInt("IsMainScore"));
                         iScoreTypes.add(lScoreType);
                     }
                 }
-                } catch (SQLException ex) {
-                    Logger.getLogger(ScoreTypeLowMemController.class.getName()).log(Level.SEVERE, null, ex);
-                }
+            } catch (SQLException ex) {
+                Logger.getLogger(ScoreTypeLowMemController.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         return iScoreTypes;
     }
 
-    public HashMap<Integer, Double> getScoresForPeptide(Peptide peptide, Connection aConnection){
+    public HashMap<Integer, Double> getScoresForPeptide(Peptide peptide, Connection aConnection) {
         HashMap<Integer, Double> peptideScores = new HashMap<Integer, Double>();
         try {
             int scoreID;
             double scoreValue;
-            PreparedStatement stat = aConnection.prepareStatement("select ScoreID,ScoreValue from PeptideScores where PeptideID = "+peptide.getPeptideId());
+            PreparedStatement stat = aConnection.prepareStatement("select ScoreID,ScoreValue from PeptideScores where PeptideID = " + peptide.getPeptideId());
             ResultSet rs = stat.executeQuery();
-            while(rs.next()){
+            while (rs.next()) {
                 scoreID = rs.getInt(1);
                 scoreValue = rs.getDouble(2);
-                peptideScores.put(scoreID,scoreValue);
+                peptideScores.put(scoreID, scoreValue);
             }
         } catch (SQLException ex) {
             Logger.getLogger(ScoreTypeLowMemController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return  peptideScores;
+        return peptideScores;
     }
 
-    public void addScoresToPeptide (PeptideLowMem peptide, Connection aConnection) {
+    public void addScoresToPeptide(PeptideLowMem peptide, Connection aConnection) {
         try {
             int scoreID;
             double scoreValue;
             Vector<ScoreTypeLowMem> scoreTypes = getScoreTypes(aConnection);
-            PreparedStatement stat = aConnection.prepareStatement("select ScoreID,ScoreValue from PeptideScores where PeptideID = "+peptide.getPeptideId());
+            PreparedStatement stat = aConnection.prepareStatement("select ScoreID,ScoreValue from PeptideScores where PeptideID = " + peptide.getPeptideId());
             ResultSet rs = stat.executeQuery();
-            while(rs.next()){
+            while (rs.next()) {
                 scoreID = rs.getInt(1);
                 scoreValue = rs.getDouble(2);
-                peptide.setScore(scoreValue,scoreID,scoreTypes);
+                peptide.setScore(scoreValue, scoreID, scoreTypes);
             }
         } catch (SQLException ex) {
             Logger.getLogger(ScoreTypeLowMemController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public void getScoresForPeptideVector(Vector<PeptideLowMem>peptideLowMemVector,Connection aConnection){
+    public void getScoresForPeptideVector(Vector<PeptideLowMem> peptideLowMemVector, Connection aConnection) {
         String listOfPeptideids = "";
-        HashMap<Integer,PeptideLowMem> pepidToPeptide = new HashMap<Integer,PeptideLowMem>();
-            for (PeptideLowMem aPeptide : peptideLowMemVector){
-                listOfPeptideids = ","+aPeptide.getPeptideId()+listOfPeptideids;
-                pepidToPeptide.put(aPeptide.getPeptideId(),aPeptide);
-            }
-        listOfPeptideids = listOfPeptideids.replaceFirst(",","");
+        HashMap<Integer, PeptideLowMem> pepidToPeptide = new HashMap<Integer, PeptideLowMem>();
+        for (PeptideLowMem aPeptide : peptideLowMemVector) {
+            listOfPeptideids = "," + aPeptide.getPeptideId() + listOfPeptideids;
+            pepidToPeptide.put(aPeptide.getPeptideId(), aPeptide);
+        }
+        listOfPeptideids = listOfPeptideids.replaceFirst(",", "");
         try {
             Vector<ScoreTypeLowMem> iScoreTypes = getScoreTypes(aConnection);
-            PreparedStatement stat = aConnection.prepareStatement("select PeptideID,ScoreID,ScoreValue from PeptideScores where PeptideID in ("+listOfPeptideids+")");
+            PreparedStatement stat = aConnection.prepareStatement("select PeptideID,ScoreID,ScoreValue from PeptideScores where PeptideID in (" + listOfPeptideids + ")");
             ResultSet rs = stat.executeQuery();
-            while (rs.next()){
-                pepidToPeptide.get(rs.getInt("PeptideID")).setScore(rs.getDouble("ScoreValue"),rs.getInt("ScoreID"),iScoreTypes);
+            while (rs.next()) {
+                pepidToPeptide.get(rs.getInt("PeptideID")).setScore(rs.getDouble("ScoreValue"), rs.getInt("ScoreID"), iScoreTypes);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-      public Vector<ScoreTypeLowMem> getScoreTypes(Connection aConnection) {
-            //get the score types
-            if (iScoreTypes.isEmpty()){
-                try {
-                PreparedStatement stat =aConnection.prepareStatement("select * from ProcessingNodeScores");
+    public Vector<ScoreTypeLowMem> getScoreTypes(Connection aConnection) {
+        //get the score types
+        if (iScoreTypes.isEmpty()) {
+            try {
+                PreparedStatement stat = aConnection.prepareStatement("select * from ProcessingNodeScores");
                 ResultSet rs = stat.executeQuery();
                 while (rs.next()) {
                     ScoreTypeLowMem lScoreType = new ScoreTypeLowMem(rs.getInt("ScoreID"), rs.getString("ScoreName"), rs.getString("FriendlyName"), rs.getString("Description"), rs.getInt("ScoreCategory"), rs.getInt("IsMainScore"));
@@ -110,17 +110,27 @@ public class ScoreTypeLowMemController implements ScoreTypeInterface {
                 }
                 return iScoreTypes;
             } catch (SQLException ex) {
-            Logger.getLogger(ScoreTypeLowMemController.class.getName()).log(Level.SEVERE, null, ex);
-        }
-            } else {
-                return iScoreTypes;
+                Logger.getLogger(ScoreTypeLowMemController.class.getName()).log(Level.SEVERE, null, ex);
             }
-            //not good
-            return null;
+        } else {
+            return iScoreTypes;
+        }
+        //not good
+        return null;
     }
-    
-          public void setScoreTypes(Vector<ScoreTypeLowMem> scoreTypes) {
+
+    public void setScoreTypes(Vector<ScoreTypeLowMem> scoreTypes) {
         this.iScoreTypes = scoreTypes;
     }
-    
+
+    public Vector<ScoreTypeLowMem> getMajorScoreTypes(Connection aConnection) {
+        Vector<ScoreTypeLowMem> scoreTypes = getScoreTypes(aConnection);
+        Vector<ScoreTypeLowMem> majorScoreTypes = new Vector<ScoreTypeLowMem>();
+        for (ScoreTypeLowMem scoreType : scoreTypes) {
+            if (scoreType.getIsMainScore() == 1) {
+                majorScoreTypes.add(scoreType);
+            }
+        }
+        return majorScoreTypes;
+    }
 }
