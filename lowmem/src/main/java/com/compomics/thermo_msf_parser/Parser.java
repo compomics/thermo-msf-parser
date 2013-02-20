@@ -1,8 +1,6 @@
 package com.compomics.thermo_msf_parser;
 
 import com.compomics.thermo_msf_parser.msf.*;
-import com.compomics.thermo_msf_parser.msf.Enzyme;
-import com.compomics.thermo_msf_parser.msf.Protein;
 import com.compomics.thermo_msf_parser.msf.enums.GUID;
 import com.compomics.thermo_msf_parser.msf.util.Joiner;
 
@@ -125,6 +123,10 @@ public class Parser {
      * The score types
      */
     private Vector<ScoreType> iScoreTypes = new Vector<ScoreType>();
+    /**
+     * main score types
+     */
+    private Vector<ScoreType> iMajorScoreTypes = new Vector<ScoreType>();
     /**
      * The proteins
      */
@@ -477,6 +479,14 @@ public class Parser {
             ScoreType lScoreType = new ScoreType(rs.getInt("ScoreID"), rs.getString("ScoreName"), rs.getString("FriendlyName"), rs.getString("Description"), rs.getInt("ScoreCategory"), rs.getInt("IsMainScore"));
             iScoreTypes.add(lScoreType);
         }
+        
+        //set the major score type
+        for (int i = 0; i < iScoreTypes.size(); i++) {
+            if (iScoreTypes.get(i).getIsMainScore() == 1) {
+                iMajorScoreTypes.add(iScoreTypes.get(i));
+            }
+        }
+        
         //add the score to the peptides
         rs = stat.executeQuery("select * from  PeptideScores ");
         while (rs.next()) {
@@ -1902,4 +1912,10 @@ public class Parser {
     public Vector<String> getFastaFiles() {
         return iFastaFiles;
     }
+
+    public Vector<ScoreType> getMajorScoreTypes() {
+        return iMajorScoreTypes;
+    }
+    
+    
 }
