@@ -40,6 +40,8 @@ public class FastaLowMemController {
             ResultSet rs = stat.executeQuery();
             rs.next();
             numberOfProteins =rs.getInt("NumberOfProteins");
+            rs.close();
+            stat.close();
         } catch (SQLException ex) {
             logger.error(ex);
         }
@@ -54,6 +56,8 @@ public class FastaLowMemController {
             ResultSet rs = stat.executeQuery();
             rs.next();
             numberOfAminoAcids =rs.getInt("NumberOfAminoAcids");
+            rs.close();
+            stat.close();
         } catch (SQLException ex) {
             logger.error(ex);
         }

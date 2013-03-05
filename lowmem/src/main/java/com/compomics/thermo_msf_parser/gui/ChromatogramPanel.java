@@ -73,7 +73,7 @@ public class ChromatogramPanel extends GraphicsPanel {
         }
 
         this.currentGraphicsPanelType = GraphicsPanelType.chromatogram;
-
+        dataSetCounter = 0;
         initData(aXAxisData, aYAxisData, aXAxisLabel, aYAxisLabel);
         this.iSpecPanelListeners = new ArrayList();
         this.addListeners();
@@ -92,6 +92,7 @@ public class ChromatogramPanel extends GraphicsPanel {
     private void initData(double[] aXAxisData, double[] aYAxisData, String aXAxisLabel, String aYAxisLabel) {
         this.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
         this.setBackground(Color.WHITE);
+        
         processXAndYData(aXAxisData, aYAxisData, iChromatogramColor, iChromatogramPointColor);
         this.iXAxisLabel = (aXAxisLabel == null ? "unknown" : aXAxisLabel);
         this.iYAxisLabel = (aYAxisLabel == null ? "unknown" : aYAxisLabel);

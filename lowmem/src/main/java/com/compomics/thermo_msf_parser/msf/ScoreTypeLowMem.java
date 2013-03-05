@@ -3,15 +3,12 @@ package com.compomics.thermo_msf_parser.msf;
 import java.sql.SQLException;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Davy
- * Date: 4/25/12
- * Time: 10:39 AM
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: Davy Date: 4/25/12 Time: 10:39 AM To change
+ * this template use File | Settings | File Templates.
  */
 public class ScoreTypeLowMem {
-    
-        private final int iScoreTypeId;
+
+    private final int iScoreTypeId;
     /**
      * The score name
      */
@@ -33,7 +30,6 @@ public class ScoreTypeLowMem {
      */
     private final int iIsMainScore;
 
-
     ScoreTypeLowMem(int aScoreID, String aScoreName, String aFriendlyName, String aDescription, int aScoreCategory, int isMainScore) {
         this.iScoreTypeId = aScoreID;
         this.iScoreName = aScoreName;
@@ -49,15 +45,12 @@ public class ScoreTypeLowMem {
      * @return a vector containing all the scoretypes stored in the msf file
      * @throws SQLException
      */
-
-
     /**
      *
-    * @return a vector containing all the scoretypes stored in the msf file
+     * @return a vector containing all the scoretypes stored in the msf file
      * @throws SQLException
      */
-    
-        public int getScoreTypeId() {
+    public int getScoreTypeId() {
         return iScoreTypeId;
     }
 
@@ -81,7 +74,8 @@ public class ScoreTypeLowMem {
         return iIsMainScore;
     }
 
-    public String toString(){
+    @Override
+    public String toString() {
         return iFriendlyName;
     }
 }

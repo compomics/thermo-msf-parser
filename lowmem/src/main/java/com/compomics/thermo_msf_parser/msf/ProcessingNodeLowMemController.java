@@ -25,6 +25,7 @@ public class ProcessingNodeLowMemController {
             while (rs.next()) {
                 allNodesMap.put(rs.getInt("ProcessingNodeNumber"),new ProcessingNode(rs.getInt("ProcessingNodeNumber"), rs.getInt("ProcessingNodeID"), rs.getString("ProcessingNodeParentNumber"), rs.getString("NodeName"), rs.getString("FriendlyName"), rs.getInt("MajorVersion"), rs.getInt("MinorVersion"), rs.getString("NodeComment")));
             }
+            rs.close();
             if (iMsfVersion== MsfVersion.VERSION1_3) {
                 rs = stat.executeQuery("select * from CustomDataProcessingNodes");
                 while (rs.next()){
@@ -41,6 +42,8 @@ public class ProcessingNodeLowMemController {
                     allNodesMap.get(lNodeParameter.getProcessingNodeNumber()).addProcessingNodeParameter(lNodeParameter);
                 }
             }
+            rs.close();
+            stat.close();
         } catch (SQLException e) {
             logger.error(e);
         }
@@ -59,6 +62,8 @@ public class ProcessingNodeLowMemController {
             while (rs.next()) {
                 iQuantitationMethod = rs.getString(1);
             }
+            rs.close();
+            stat.close();
         } catch (SQLException e) {
             logger.error(e);
         }
@@ -82,6 +87,7 @@ public class ProcessingNodeLowMemController {
             while(rs.next()){
                processingNodeToReturn = new ProcessingNode(rs.getInt("ProcessingNodeNumber"), rs.getInt("ProcessingNodeID"), rs.getString("ProcessingNodeParentNumber"), rs.getString("NodeName"), rs.getString("FriendlyName"), rs.getInt("MajorVersion"), rs.getInt("MinorVersion"), rs.getString("NodeComment"));
             }
+            rs.close();
             if (iMsfVersion== MsfVersion.VERSION1_3) {
                 rs = stat.executeQuery("select * from CustomDataProcessingNodes where ProcessingNodeNumber = "+processingNodeId);
                 while (rs.next()){
@@ -93,6 +99,8 @@ public class ProcessingNodeLowMemController {
                 ProcessingNodeParameter lNodeParameter = new ProcessingNodeParameter(rs.getInt("ProcessingNodeNumber"), rs.getInt("ProcessingNodeId"), rs.getString("ParameterName"), rs.getString("FriendlyName"), rs.getInt("IntendedPurpose"), rs.getString("PurposeDetails"), rs.getInt("Advanced"), rs.getString("Category"), rs.getInt("Position"), rs.getString("ParameterValue"), rs.getString("ValueDisplayString"));
                 processingNodeToReturn.addProcessingNodeParameter(lNodeParameter);
             }    
+            rs.close();
+            stat.close();
         } catch (SQLException ex) {
             logger.error(ex);
         }    

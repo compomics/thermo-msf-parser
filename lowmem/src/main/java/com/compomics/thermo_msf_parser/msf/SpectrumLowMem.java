@@ -1,7 +1,5 @@
 package com.compomics.thermo_msf_parser.msf;
 
-import org.apache.log4j.Logger;
-
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Vector;
@@ -14,8 +12,6 @@ import java.util.Vector;
  * To change this template use File | Settings | File Templates.
  */
 public class SpectrumLowMem {
-
-    private static Logger logger = Logger.getLogger(Spectrum.class);
     /**
      * The spectrum id
      */

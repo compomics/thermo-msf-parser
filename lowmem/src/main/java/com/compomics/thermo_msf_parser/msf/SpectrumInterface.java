@@ -15,16 +15,6 @@ import java.util.Vector;
 public interface SpectrumInterface {
 
     
-        /**
-     *
-     * @param peptideID the id of the peptide we want the spectrum xml for
-     * @param aConnection connection to the msf file
-     * @return the unzipped XML file in a string object
-     * @throws java.sql.SQLException
-     * @throws java.io.IOException
-     */
-    
-    public String createSpectrumXMLForPeptide(int peptideID,Connection aConnection) throws SQLException, IOException;
 
     /**
      *
@@ -51,13 +41,6 @@ public interface SpectrumInterface {
      */
     public Peak getFragmentedMsPeak(String lXml);
 
-    /**
-     * 
-     * @param peptideOfInterestID the id of the peptide of which we want the spectrum from 
-     * @param aConnection a connection to the msf file
-     * @return a spectrum object
-     */
-    public SpectrumLowMem getSpectrumForPeptideID(int peptideOfInterestID,Connection aConnection);
     
     
     /**

@@ -27,7 +27,9 @@ private static final Logger logger = Logger.getLogger(ProteinScoreLowMemControll
             ResultSet rs = stat.executeQuery("select ProteinIdentificationGroupID,ProteinScore,Coverage from ProteinScores where ProteinID ="+proteinID);
             while (rs.next()) {
                 proteinScores.add(new ProteinScore(rs.getInt("ProteinIdentificationGroupID"),rs.getInt("ProteinScore"),rs.getInt("Coverage")));
-            }  
+            }
+            rs.close();
+            stat.close();
         } catch(SQLException sqle) {
             logger.error(sqle);
         }

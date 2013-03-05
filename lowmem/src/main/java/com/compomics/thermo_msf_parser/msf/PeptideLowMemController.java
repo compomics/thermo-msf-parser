@@ -27,13 +27,14 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
      * @return a vector containing all the peptides connected to the protein
      * @throws java.sql.SQLException
      */
+    @Override
     public Vector<PeptideLowMem> getPeptidesForProtein(ProteinLowMem protein, MsfVersion iMsfVersion, Vector<AminoAcid> iAminoAcids) {
         Vector<PeptideLowMem> foundPeptides = new Vector<PeptideLowMem>();
         try {
             Statement stat = protein.getConnection().createStatement();
-            
+
             if (iMsfVersion == MsfVersion.VERSION1_2) {
-                ResultSet rs = stat.executeQuery("select PeptideID,ConfidenceLevel,Sequence,TotalIonsCount,MatchedIonsCount,Annotation,ProcessingNodeNumber, s.*, FileID as file from spectrumheaders as s, masspeaks, Peptides as p,Spectra as sp,(select PeptideID as ID from PeptidesProteins where ProteinID ="+protein.getProteinID()+") as pepid where pepid.ID = p.PeptideID and masspeaks.masspeakid = s.masspeakid and s.SpectrumID = P.SpectrumID and sp.UniqueSpectrumID = s.UniqueSpectrumID order by p.PeptideID");
+                ResultSet rs = stat.executeQuery("select PeptideID,ConfidenceLevel,Sequence,TotalIonsCount,MatchedIonsCount,Annotation,ProcessingNodeNumber, s.*, FileID as file from spectrumheaders as s, masspeaks, Peptides as p,Spectra as sp,(select PeptideID as ID from PeptidesProteins where ProteinID =" + protein.getProteinID() + ") as pepid where pepid.ID = p.PeptideID and masspeaks.masspeakid = s.masspeakid and s.SpectrumID = P.SpectrumID and sp.UniqueSpectrumID = s.UniqueSpectrumID order by p.PeptideID");
                 while (rs.next()) {
                     PeptideLowMem lPeptide = new PeptideLowMem(rs.getInt("PeptideID"), rs.getInt("SpectrumID"), rs.getInt("ConfidenceLevel"), rs.getString("Sequence"), rs.getInt("TotalIonsCount"), rs.getInt("MatchedIonsCount"), rs.getString("Annotation"), rs.getInt("ProcessingNodeNumber"), iAminoAcids, protein.getConnection());
                     //iScoreType.addScoresToPeptide(lPeptide,protein.getConnection());
@@ -53,7 +54,7 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
                 }
                 rs.close();
             } else if (iMsfVersion == MsfVersion.VERSION1_3) {
-                ResultSet rs = stat.executeQuery("select PeptideID,ConfidenceLevel,Sequence,TotalIonsCount,MatchedIonsCount,Annotation,MissedCleavages,UniquePeptideSequenceID,ProcessingNodeNumber, s.*,FileID as file from spectrumheaders as s, masspeaks, Peptides as p,Spectra as sp,(select PeptideID as ID from PeptidesProteins where ProteinID ="+protein.getProteinID()+") as pepid where pepid.ID = p.PeptideID and masspeaks.masspeakid = s.masspeakid and s.SpectrumID = P.SpectrumID and sp.UniqueSpectrumID = s.UniqueSpectrumID order by p.PeptideID");
+                ResultSet rs = stat.executeQuery("select PeptideID,ConfidenceLevel,Sequence,TotalIonsCount,MatchedIonsCount,Annotation,MissedCleavages,UniquePeptideSequenceID,ProcessingNodeNumber, s.*,FileID as file from spectrumheaders as s, masspeaks, Peptides as p,Spectra as sp,(select PeptideID as ID from PeptidesProteins where ProteinID =" + protein.getProteinID() + ") as pepid where pepid.ID = p.PeptideID and masspeaks.masspeakid = s.masspeakid and s.SpectrumID = P.SpectrumID and sp.UniqueSpectrumID = s.UniqueSpectrumID order by p.PeptideID");
                 while (rs.next()) {
                     PeptideLowMem lPeptide = new PeptideLowMem(rs.getInt("PeptideID"), rs.getInt("SpectrumID"), rs.getInt("ConfidenceLevel"), rs.getString("Sequence"), rs.getInt("TotalIonsCount"), rs.getInt("MatchedIonsCount"), rs.getString("Annotation"), rs.getInt("ProcessingNodeNumber"), iAminoAcids, protein.getConnection());
                     lPeptide.setMissedCleavage(rs.getInt("MissedCleavages"));
@@ -79,6 +80,7 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
         return foundPeptides;
     }
 
+    @Override
     public Vector<PeptideLowMem> getPeptidesForAccession(String lProteinAccession, MsfVersion iMsfVersion, Connection aConnection, Vector<AminoAcid> iAminoAcids) {
         int lProteinID = 0;
         String lSequence = null;
@@ -98,6 +100,7 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
     }
 
     //TODO finish this
+    @Override
     public Vector getInformationForPeptide(int peptideID, Connection aConnection, boolean fullInfo) {
         Vector peptideInfo = new Vector();
         try {
@@ -118,6 +121,7 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
         return peptideInfo;
     }
 
+    @Override
     public Vector<PeptideLowMem> getPeptidesWithConfidenceLevel(int confidenceLevel, Connection aConnection, MsfVersion iMsfVersion, Vector<AminoAcid> iAminoAcids) {
         Vector<PeptideLowMem> confidenceLevelPeptides = new Vector<PeptideLowMem>();
         int internalcounter = 0;
@@ -143,7 +147,6 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
                     }
                 }
                 rs.close();
-                stat.close();
                 counter = 0;
                 scoreTypeInstance.getScoresForPeptideVector(confidenceLevelPeptides, aConnection);
 
@@ -165,22 +168,24 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
                 }
                 scoreTypeInstance.getScoresForPeptideVector(confidenceLevelPeptides, aConnection);
                 rs.close();
-                stat.close();
                 counter = 0;
             }
+            stat.close();
         } catch (SQLException sqle) {
             logger.error(sqle);
         }
         return confidenceLevelPeptides;
     }
 
+    @Override
     public int getNumberOfPeptidesForConfidenceLevel(int confidenceLevel, Connection aConnection) {
         int numberOfPeptides = 0;
-        Statement stat = null;
         try {
-            stat = aConnection.createStatement();
+            Statement stat = aConnection.createStatement();
             ResultSet rs = stat.executeQuery("select count(PeptideID) from Peptides where ConfidenceLevel = " + confidenceLevel);
             numberOfPeptides = rs.getInt(1);
+            rs.close();
+            stat.close();
         } catch (SQLException e) {
             logger.error(e);
         }
@@ -191,6 +196,7 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
         return counter;
     }
 
+    @Override
     public void getPeptidesForProteinVector(Vector<ProteinLowMem> proteinLowMemVector, Connection aConnection, Vector<AminoAcid> iAminoAcids, MsfVersion iMsfVersion, int confidenceLevel) {
         try {
             String listOfProteinIds = "";
@@ -208,7 +214,6 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
                     lPeptide.setMissedCleavage(rs.getInt("MissedCleavages"));
                     lPeptide.setUniquePeptideSequenceId(rs.getInt("UniquePeptideSequenceID"));
                     lPeptide.setParentSpectrum(new SpectrumLowMem(rs.getInt("SpectrumID"), rs.getInt("UniqueSpectrumID"), rs.getInt("MassPeakID"), rs.getInt("LastScan"), rs.getInt("FirstScan"), rs.getInt("ScanNumbers"), rs.getInt("Charge"), rs.getDouble("RetentionTime"), rs.getDouble("Mass"), rs.getInt("ScanEventID"), aConnection));
-                    //TODO make initializer with fileID argument
                     lPeptide.getParentSpectrum().setFileId(rs.getInt("file"));
                     //lPeptide.getParentSpectrum().setZippedBytes(rs.getBytes("Spectrum"));
                     protIdToProt.get(rs.getInt("pp.ProteinID")).addPeptide(lPeptide);
@@ -225,12 +230,15 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
                     //lPeptide.getParentSpectrum().setZippedBytes(rs.getBytes("Spectrum"));
                     protIdToProt.get(rs.getInt("pp.ProteinID")).addPeptide(lPeptide);
                 }
+                rs.close();
+                stat.close();
             }
         } catch (SQLException ex) {
             logger.error(ex);
         }
     }
 
+    @Override
     public void getPeptidesForProteinVector(Vector<ProteinLowMem> proteinLowMemVector, Connection aConnection, Vector<AminoAcid> iAminoAcids, MsfVersion iMsfVersion) {
         try {
             String listOfProteinIds = "";
@@ -265,6 +273,8 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
                     //lPeptide.getParentSpectrum().setZippedBytes(rs.getBytes("Spectrum"));
                     protIdToProt.get(rs.getInt("ProteinID")).addPeptide(lPeptide);
                 }
+                rs.close();
+                stat.close();
             }
         } catch (SQLException ex) {
             logger.error(ex);
@@ -278,6 +288,8 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
             ResultSet rs = stat.executeQuery("select count(peptideid) from Peptides");
             rs.next();
             numberOfPeptides = rs.getInt(1);
+            rs.close();
+            stat.close();
         } catch (SQLException sqle) {
             logger.error(sqle);
         }

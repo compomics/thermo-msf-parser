@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Vector;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -96,6 +97,22 @@ public class ChromatogramLowMemController {
             }
         }
         return lPoints;
+    }
+
+    public Collection<? extends Chromatogram> getChromatogramFilesForMsfFile(Connection msfFileConnection) {
+        Vector<Chromatogram> chromatogramFiles = new Vector<Chromatogram>();   
+        try {
+            PreparedStatement stat = msfFileConnection.prepareStatement("select chro.Chromatogram,chro.TraceType,chro.FileID from Chromatograms as chro");
+            ResultSet rs = stat.executeQuery();
+            while (rs.next()) {
+                chromatogramFiles.add(new Chromatogram(rs.getInt("FileID"), rs.getInt("TraceType"), rs.getBytes("Chromatogram")));
+            }
+            rs.close();
+            stat.close();
+        } catch (SQLException ex) {
+            logger.error(ex);
+        }
+        return chromatogramFiles;
     }
     
     /**

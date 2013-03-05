@@ -11,17 +11,18 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author Davy
  */
 public class ScoreTypeLowMemController implements ScoreTypeInterface {
-
+private static final Logger logger = Logger.getLogger(ScoreTypeLowMemController.class);
+    
     private Vector<ScoreTypeLowMem> iScoreTypes = new Vector<ScoreTypeLowMem>();
 
+    @Override
     public Vector<ScoreTypeLowMem> getScoreTypesOfMsfFileVector(Vector<MsfFile> MsfFiles) {
         Connection aConnection;
         for (MsfFile msfFile : MsfFiles) {
@@ -35,14 +36,17 @@ public class ScoreTypeLowMemController implements ScoreTypeInterface {
                         ScoreTypeLowMem lScoreType = new ScoreTypeLowMem(rs.getInt("ScoreID"), rs.getString("ScoreName"), rs.getString("FriendlyName"), rs.getString("Description"), rs.getInt("ScoreCategory"), rs.getInt("IsMainScore"));
                         iScoreTypes.add(lScoreType);
                     }
+                    rs.close();
                 }
+                stat.close();
             } catch (SQLException ex) {
-                Logger.getLogger(ScoreTypeLowMemController.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error(ex);
             }
         }
         return iScoreTypes;
     }
 
+    @Override
     public HashMap<Integer, Double> getScoresForPeptide(Peptide peptide, Connection aConnection) {
         HashMap<Integer, Double> peptideScores = new HashMap<Integer, Double>();
         try {
@@ -55,12 +59,15 @@ public class ScoreTypeLowMemController implements ScoreTypeInterface {
                 scoreValue = rs.getDouble(2);
                 peptideScores.put(scoreID, scoreValue);
             }
+            rs.close();
+            stat.close();
         } catch (SQLException ex) {
-            Logger.getLogger(ScoreTypeLowMemController.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
         }
         return peptideScores;
     }
 
+    @Override
     public void addScoresToPeptide(PeptideLowMem peptide, Connection aConnection) {
         try {
             int scoreID;
@@ -73,11 +80,14 @@ public class ScoreTypeLowMemController implements ScoreTypeInterface {
                 scoreValue = rs.getDouble(2);
                 peptide.setScore(scoreValue, scoreID, scoreTypes);
             }
+            rs.close();
+            stat.close();
         } catch (SQLException ex) {
-            Logger.getLogger(ScoreTypeLowMemController.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
         }
     }
 
+    @Override
     public void getScoresForPeptideVector(Vector<PeptideLowMem> peptideLowMemVector, Connection aConnection) {
         String listOfPeptideids = "";
         HashMap<Integer, PeptideLowMem> pepidToPeptide = new HashMap<Integer, PeptideLowMem>();
@@ -93,11 +103,14 @@ public class ScoreTypeLowMemController implements ScoreTypeInterface {
             while (rs.next()) {
                 pepidToPeptide.get(rs.getInt("PeptideID")).setScore(rs.getDouble("ScoreValue"), rs.getInt("ScoreID"), iScoreTypes);
             }
+            rs.close();
+            stat.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error(e);
         }
     }
 
+@Override
     public Vector<ScoreTypeLowMem> getScoreTypes(Connection aConnection) {
         //get the score types
         if (iScoreTypes.isEmpty()) {
@@ -108,9 +121,11 @@ public class ScoreTypeLowMemController implements ScoreTypeInterface {
                     ScoreTypeLowMem lScoreType = new ScoreTypeLowMem(rs.getInt("ScoreID"), rs.getString("ScoreName"), rs.getString("FriendlyName"), rs.getString("Description"), rs.getInt("ScoreCategory"), rs.getInt("IsMainScore"));
                     iScoreTypes.add(lScoreType);
                 }
+                rs.close();
+                stat.close();
                 return iScoreTypes;
             } catch (SQLException ex) {
-                Logger.getLogger(ScoreTypeLowMemController.class.getName()).log(Level.SEVERE, null, ex);
+                logger.error(ex);
             }
         } else {
             return iScoreTypes;

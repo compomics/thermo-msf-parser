@@ -5,16 +5,18 @@
     <groupId>com.compomics</groupId>
     <artifactId>thermo_msf_parser</artifactId>
     <packaging>jar</packaging>
-    <version>2.0.2</version>
+    <version>2.0.3</version>
     <name>thermo_msf_parser</name>
     <url>http://code.google.com/p/thermo_msf_parser/</url>
 
     <!-- Set the version number for the whole project -->
     <properties>
         <logging.level.default>DEBUG</logging.level.default>
-        <logging.file.path.name>thermo-msf-parser-log4j.log</logging.file.path.name>
+        <logging.file.path.name>thermo-msf-parser.log</logging.file.path.name>
         <logging.file.max.size>5000KB</logging.file.max.size>
         <logging.pattern>[%d{dd-MMM-yyyy HH:mm:ss} - %p] "%m" (%C:%L)%n</logging.pattern>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
     <!-- Licence -->
@@ -37,8 +39,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
                 <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
+                    <source>1.6</source>
+                    <target>1.6</target>
                     <showDeprecation>true</showDeprecation>
                     <debug>true</debug>
                 </configuration>

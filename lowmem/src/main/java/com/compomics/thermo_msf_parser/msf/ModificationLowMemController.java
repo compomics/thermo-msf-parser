@@ -34,11 +34,12 @@ public class ModificationLowMemController implements ModificationInterface {
                 rs.next();
                 modifiedSequence = rs.getString(1) + "-";
                 lengthChanged = lengthChanged + rs.getString(1).length() + 1;
-
+                
             } else {
                 modifiedSequence = "NH2-" + modifiedSequence;
                 lengthChanged += 4;
             }
+            rs.close();
             //do the middle
             rs = stat.executeQuery("select Position,Abbreviation from PeptidesAminoAcidModifications,AminoAcidModifications where PeptidesAminoAcidModifications.AminoAcidModificationID = AminoAcidModificationID and PeptideID =" + peptide.getPeptideId() + " order by ASC Position");
             while (rs.next()) {
@@ -55,6 +56,7 @@ public class ModificationLowMemController implements ModificationInterface {
         return modifiedSequence;
     }
 
+    @Override
     public HashMap<Integer, String> createModificationMap(Connection aConnection) {
         HashMap<Integer, String> modificationsMap = new HashMap<Integer, String>();
         try {
@@ -63,6 +65,8 @@ public class ModificationLowMemController implements ModificationInterface {
             while (rs.next()) {
                 modificationsMap.put(rs.getInt(1), rs.getString(2));
             }
+            rs.close();
+            stat.close();
         } catch (SQLException ex) {
             logger.error(ex);
         }
@@ -77,6 +81,8 @@ public class ModificationLowMemController implements ModificationInterface {
             while (rs.next()) {
                 allModificationNames.add(rs.getString("Abbreviation"));
             }
+            rs.close();
+            stat.close();
         } catch (SQLException sqle) {
             logger.error(sqle);
         }
@@ -177,6 +183,8 @@ public class ModificationLowMemController implements ModificationInterface {
                 addAminoAcidsToModification(modToAdd, msfFileConnection, msfVersion,aminoAcids);
                 modsToReturn.add(modToAdd);
             }
+            rs.close();
+            stat.close();
         } catch (SQLException sqle) {
             logger.error(sqle);
         }
@@ -194,6 +202,7 @@ public class ModificationLowMemController implements ModificationInterface {
                     modification.addClassificationForAminoAcid(rs.getInt("Classification"));
                 }
             }
+            rs.close();
             if (msfVersion == MsfVersion.VERSION1_3) {
                 NeutralLoss lLoss = null;
                 //get the neutral losses
@@ -201,7 +210,7 @@ public class ModificationLowMemController implements ModificationInterface {
                 while (rs.next()) {
                     lLoss = new NeutralLoss(rs.getInt("NeutralLossID"), rs.getString("Name"), rs.getDouble("MonoisotopicMass"), rs.getDouble("AverageMass"));
                 }
-
+                rs.close();
                 //add the amino acid to the neutral losses
                 rs = stat.executeQuery("select * from AminoAcidModificationsAminoAcidsNL");
                 while (rs.next()) {
@@ -210,6 +219,7 @@ public class ModificationLowMemController implements ModificationInterface {
                         lLoss.addAminoAcid(aminoAcids.get(lAaId -1));
                     }
                 }
+                rs.close();
                 //now add the neutral losses to the modification
                 rs = stat.executeQuery("select * from AminoAcidModificationsAminoAcidsNL");
                 while (rs.next()) {
@@ -217,7 +227,9 @@ public class ModificationLowMemController implements ModificationInterface {
                         modification.addNeutralLoss(lLoss);
                     }
                 }
+                rs.close();
             }
+            stat.close();
         } catch (SQLException ex) {
             logger.error(ex);
         }

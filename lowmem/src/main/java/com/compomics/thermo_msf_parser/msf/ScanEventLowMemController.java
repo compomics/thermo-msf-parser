@@ -25,7 +25,8 @@ public class ScanEventLowMemController {
             while (rs.next()) {
                 scanEvent = new ScanEvent(rs.getInt("ScanEventID"), rs.getInt("MSLevel"), rs.getInt("Polarity"), rs.getInt("ScanType"), rs.getInt("Ionization"), rs.getInt("MassAnalyzer"), rs.getInt("ActivationType"));
             }
-
+            stat.close();
+            rs.close();
         } catch (SQLException ex) {
             Logger.getLogger(ScanEventLowMemController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -44,6 +45,8 @@ public class ScanEventLowMemController {
             while (rs.next()) {
                 scanEvent = new ScanEvent(rs.getInt("ScanEventID"), rs.getInt("MSLevel"), rs.getInt("Polarity"), rs.getInt("ScanType"), rs.getInt("Ionization"), rs.getInt("MassAnalyzer"), rs.getInt("ActivationType"));
             }
+            stat.close();
+            rs.close();
         } catch (SQLException ex) {
             Logger.getLogger(ScanEventLowMemController.class.getName()).log(Level.SEVERE, null, ex);
         }

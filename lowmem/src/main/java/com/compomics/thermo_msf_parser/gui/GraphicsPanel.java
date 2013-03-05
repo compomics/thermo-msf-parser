@@ -283,7 +283,7 @@ public abstract class GraphicsPanel extends JPanel {
     /**
      * All the y-axis values. Indexed by dataset (one double[] per dataset). First
      * dataset is the first double[], second dataset is the second double[] etc.
-     * Y-axis valuea are related to the x-axis values by the table index. So the first
+     * Y-axis values are related to the x-axis values by the table index. So the first
      * y-axis value of the first dataset is the value for the first x-axis value in
      * the first dataset etc.
      */
@@ -628,6 +628,7 @@ public abstract class GraphicsPanel extends JPanel {
      * @see #getComponentGraphics
      * @see #repaint
      */
+    @Override
     public void paint(Graphics g) {
         super.paint(g);
         if (iXAxisData != null) {
@@ -956,6 +957,7 @@ public abstract class GraphicsPanel extends JPanel {
             /**
              * Invoked when a mouse button has been released on a component.
              */
+            @Override
             public void mouseReleased(MouseEvent e) {
                 if (iXAxisData != null) {
                     if (e.getButton() == MouseEvent.BUTTON3 || e.getButton() == MouseEvent.BUTTON2) {
@@ -1002,6 +1004,7 @@ public abstract class GraphicsPanel extends JPanel {
             /**
              * Invoked when the mouse has been clicked on a component.
              */
+            @Override
             public void mouseClicked(MouseEvent e) {
                 if (iXAxisData != null) {
                     if (e.getButton() == MouseEvent.BUTTON1 && e.getModifiersEx() == (MouseEvent.CTRL_DOWN_MASK | MouseEvent.ALT_DOWN_MASK)) {
@@ -1032,7 +1035,7 @@ public abstract class GraphicsPanel extends JPanel {
                         if (iClickedList != null && iClickedList.size() > 0) {
                             // Copy the current clickedlist into the stored sequence.
                             iStoredSequence = (Vector) iClickedList.clone();
-                            iStoredSequence.add(new Integer(iClickedIndex));
+                            iStoredSequence.add(Integer.valueOf(iClickedIndex));
                             iStoredSequenceDatasetIndices = (Vector) iClickedListDatasetIndices.clone();
                             iStoredSequenceDatasetIndices.add(new Integer(iClickedDataSetIndex));
                             iClicked = false;
@@ -1059,6 +1062,7 @@ public abstract class GraphicsPanel extends JPanel {
             /**
              * Invoked when a mouse button has been pressed on a component.
              */
+            @Override
             public void mousePressed(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON1) {
                     iStartXLoc = e.getX();
@@ -1076,6 +1080,7 @@ public abstract class GraphicsPanel extends JPanel {
              * released (regardless of whether the mouse position is within the
              * bounds of the component).
              */
+            @Override
             public void mouseDragged(MouseEvent e) {
                 iDragged = true;
                 iDragXLoc = e.getX();
@@ -1086,6 +1091,7 @@ public abstract class GraphicsPanel extends JPanel {
              * Invoked when the mouse button has been moved on a component
              * (with no buttons no down).
              */
+            @Override
             public void mouseMoved(MouseEvent e) {
                 if (iXAxisData != null && iXAxisDataInPixels != null) {
                     int x = e.getX();
@@ -1305,7 +1311,7 @@ public abstract class GraphicsPanel extends JPanel {
     protected void processXAndYData(double[] aXAxisData, double[] aYAxisData, Color dataPointAndLineColor, Color areaUnderCurveColor) {
 
         // if first dataset, create the dataset array lists
-        if (dataSetCounter == 0) {
+        if (dataSetCounter == 0 || iXAxisData == null || iYAxisData == null) {
             iXAxisData = new ArrayList<double[]>();
             iYAxisData = new ArrayList<double[]>();
         }
@@ -1318,7 +1324,7 @@ public abstract class GraphicsPanel extends JPanel {
 
         // add the peaks to the dataset
         for (int i = 0; i < aXAxisData.length; i++) {
-            peaks.put(new Double(aXAxisData[i]), new Double(aYAxisData[i]));
+            peaks.put(Double.valueOf(aXAxisData[i]), Double.valueOf(aYAxisData[i]));
         }
 
         // add the new dataset
@@ -1617,7 +1623,7 @@ public abstract class GraphicsPanel extends JPanel {
 
                 // find the scale unit for the x tags
                 if (numberTimes >= numberOfTags) {
-                    scaleUnitXTags = aXAxisWidth / numberOfTags;
+                    scaleUnitXTags = aXAxisWidth / (double)numberOfTags;
                 } else {
                     numberOfTags = 5;
 
@@ -1966,12 +1972,10 @@ public abstract class GraphicsPanel extends JPanel {
      *                or empty String if none was found.
      */
     protected String findDeltaMassMatches(double aDelta, double aWindow) {
-        StringBuffer result = new StringBuffer("");
+        StringBuilder result = new StringBuilder("");
         boolean appended = false;
         if (iKnownMassDeltas != null) {
-            Iterator iter = iKnownMassDeltas.keySet().iterator();
-            while (iter.hasNext()) {
-                Double mass = (Double) iter.next();
+            for (Double mass : iKnownMassDeltas.keySet()) {
                 if (Math.abs(mass.doubleValue() - aDelta) < aWindow) {
                     if (appended) {
                         result.append("/");
@@ -2042,7 +2046,7 @@ public abstract class GraphicsPanel extends JPanel {
                 if (aAlReadyAnnotated.containsKey(key)) {
                     int count = ((Integer) aAlReadyAnnotated.get(key)).intValue();
                     spacer += count * (g.getFontMetrics().getAscent() + 2);
-                    aAlReadyAnnotated.put(key, new Integer(count + 1));
+                    aAlReadyAnnotated.put(key,(count++));
                     showArrow = false;
                 } else {
                     aAlReadyAnnotated.put(key, new Integer(1));

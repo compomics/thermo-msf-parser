@@ -25,6 +25,8 @@ private static final Logger logger = Logger.getLogger(ProteinGroupLowMemControll
             ResultSet rs = stat.executeQuery("select ProteinGroupID from ProteinsProteinGroups where ProteinID = "+proteinID);
             rs.next();
             proteinGroupID = rs.getInt("ProteinGroupID");
+            rs.close();
+            stat.close();
         }catch(SQLException sqle) {
             logger.error(sqle);
         }

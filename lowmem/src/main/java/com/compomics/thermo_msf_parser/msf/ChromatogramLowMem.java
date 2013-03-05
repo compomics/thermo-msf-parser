@@ -13,18 +13,22 @@ public class ChromatogramLowMem implements ChromatogramInterface{
     private int iTraceTypeID;
 
     
+    @Override
     public int getChromatogramFileNumber(){
         return fileNumber;
     }
 
+    @Override
     public void setChromatogramFileNumber(int newFileNumber){
         this.fileNumber = newFileNumber;
     }
 
+    @Override
     public int getTraceTypeID(){
         return iTraceTypeID;
     }
 
+    @Override
     public void setTraceTypeID(int newTraceTypeID){
         this.iTraceTypeID = newTraceTypeID;
     }

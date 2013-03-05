@@ -30,4 +30,8 @@ class ProgressBarMiddleMan {
             return proteinLowMemInstance.getNumberOfProteinsProcessed();
         }
     }
+    
+    public void setPeptidesOrProteins(boolean peptidesOrProteins){
+        this.peptidesOrProteins = peptidesOrProteins;
+    }
 }

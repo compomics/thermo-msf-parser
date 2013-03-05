@@ -693,6 +693,7 @@ public class PeptideLowMem {
      *
      * @return String with the peptide sequence
      */
+    @Override
     public String toString() {
         return iSequence;
     }

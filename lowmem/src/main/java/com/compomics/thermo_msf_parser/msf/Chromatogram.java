@@ -13,7 +13,7 @@ import java.util.zip.ZipInputStream;
 /**
  * This class represents a chromatogram
  */
-public class Chromatogram {
+public class Chromatogram implements ChromatogramInterface{
     // Class specific log4j logger for Thermo_msf_parserGUI instances.
 
     private static Logger logger = Logger.getLogger(Chromatogram.class);
@@ -37,6 +37,24 @@ public class Chromatogram {
      * The unzipped chromatogram xml
      */
     private String iUnzippedChromatogramXml;
+    
+    private Vector points;
+
+    public Vector getPointsVector() {
+        return points;
+    }
+
+    public void setPoints() {
+                String lXml = getUnzippedChromatogramXml();
+        String[] lLines = lXml.split("\n");
+        Vector<Point> lPoints = new Vector<Point>();
+        for (int i = 0; i < lLines.length; i++) {
+            if (lLines[i].trim().startsWith("<Pt ")) {
+                lPoints.add(new Point(lLines[i]));
+            }
+        }
+        this.points = lPoints;
+    }
 
     /**
      * The chromatogram constructor
@@ -134,7 +152,7 @@ public class Chromatogram {
     }
 
     /**
-     * Getter for the different points in the chromatgram
+     * Getter for the different points in the chromatogram
      *
      * @return Vector with the different points
      * @throws IOException An error is thrown when the zipped byte[] can not be
@@ -150,6 +168,26 @@ public class Chromatogram {
             }
         }
         return lPoints;
+    }
+
+    @Override
+    public int getChromatogramFileNumber() {
+       return iFileId;
+    }
+
+    @Override
+    public void setChromatogramFileNumber(int newFileId) {
+        this.iFileId = newFileId;
+    }
+
+    @Override
+    public int getTraceTypeID() {
+        return iTraceTypeId;
+    }
+
+    @Override
+    public void setTraceTypeID(int newTraceTypeID) {
+       this.iTraceTypeId = newTraceTypeID;
     }
 
     /**

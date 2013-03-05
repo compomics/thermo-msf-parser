@@ -17,45 +17,48 @@ public class SpectrumLowMemController implements SpectrumInterface {
 
     private static final Logger logger = Logger.getLogger(SpectrumLowMemController.class);
 
-    public String createSpectrumXMLForPeptide(int peptideID, Connection aConnection) throws SQLException, IOException {
+    public String createSpectrumXMLForPeptide(PeptideLowMem peptide, Connection aConnection) throws SQLException, IOException {
         byte[] lZippedSpectrumXml = null;
-        String lXml;
-        ResultSet rs;
-        Statement stat = aConnection.createStatement();
-        rs = stat.executeQuery("select Spectrum from Spectra where UniqueSpectrumID = (select SpectrumID from Peptides where Peptides.PeptideID = " + peptideID + ")");
-        while (rs.next()) {
-            lZippedSpectrumXml = rs.getBytes(1);
-        }
-
-        if (lZippedSpectrumXml == null) {
-        }
-        File lZippedFile = File.createTempFile("zip", null);
-        FileOutputStream fos = new FileOutputStream(lZippedFile);
-        fos.write(lZippedSpectrumXml);
-        fos.flush();
-        fos.close();
-        BufferedOutputStream out = null;
-        ZipInputStream in = new ZipInputStream(new BufferedInputStream(new FileInputStream(lZippedFile)));
-        ZipEntry entry;
-        byte[] ltest = new byte[0];
-        ByteArrayOutputStream lStream = new ByteArrayOutputStream(50);
-        while ((entry = in.getNextEntry()) != null) {
-            int count;
-            byte data[] = new byte[50];
-            out = new BufferedOutputStream(lStream, 50);
-            while ((count = in.read(data, 0, 50)) != -1) {
-                out.write(data, 0, count);
+        String lXml = peptide.getParentSpectrum().getSpectrumXML();
+        if (lXml == null) {
+            ResultSet rs;
+            Statement stat = aConnection.createStatement();
+            rs = stat.executeQuery("select Spectrum from Spectra where UniqueSpectrumID = (select SpectrumID from Peptides where Peptides.PeptideID = " + peptide.getPeptideId() + ")");
+            while (rs.next()) {
+                lZippedSpectrumXml = rs.getBytes(1);
             }
+
+            if (lZippedSpectrumXml == null) {
+            }
+            File lZippedFile = File.createTempFile("zip", null);
+            FileOutputStream fos = new FileOutputStream(lZippedFile);
+            fos.write(lZippedSpectrumXml);
+            fos.flush();
+            fos.close();
+            BufferedOutputStream out = null;
+            ZipInputStream in = new ZipInputStream(new BufferedInputStream(new FileInputStream(lZippedFile)));
+            ZipEntry entry;
+            ByteArrayOutputStream lStream = new ByteArrayOutputStream(50);
+            out = new BufferedOutputStream(lStream, 50);
+            while ((entry = in.getNextEntry()) != null) {
+                int count;
+                byte data[] = new byte[50];
+                while ((count = in.read(data, 0, 50)) != -1) {
+                    out.write(data, 0, count);
+                }
+            }
+            in.close();
+            out.flush();
+            out.close();
+            lZippedFile.delete();
+            lXml = lStream.toString();
+            lStream.close();
+            rs.close();
+            stat.close();
+            return lXml;
+        } else {
+            return lXml;
         }
-        in.close();
-        out.flush();
-        out.close();
-        lZippedFile.delete();
-        lXml = lStream.toString();
-        lStream.close();
-        rs.close();
-        stat.close();
-        return lXml;
     }
 
     /**
@@ -65,6 +68,7 @@ public class SpectrumLowMemController implements SpectrumInterface {
      * xml
      * @throws Exception
      */
+    @Override
     public Vector<Peak> getMSMSPeaks(String lXml) {
         Vector<Peak> lPeaks = new Vector<Peak>();
         try {
@@ -88,6 +92,7 @@ public class SpectrumLowMemController implements SpectrumInterface {
      * xml
      * @throws Exception
      */
+    @Override
     public Vector<Peak> getMSPeaks(String lXml) {
         String xmlSubstring = lXml.substring(lXml.indexOf("<Peak ", lXml.indexOf("<IsotopeClusterPeakCentroids")), lXml.lastIndexOf("</"));
         String[] lLines = xmlSubstring.split("\n");
@@ -105,6 +110,7 @@ public class SpectrumLowMemController implements SpectrumInterface {
      * @param lXml the spectrum xml we want the fragmented peak from
      * @return a peak object containing the fragmented MS peak
      */
+    @Override
     public Peak getFragmentedMsPeak(String lXml) {
         String xmlSubstring = lXml.substring(lXml.indexOf("<MonoisotopicPeakCentroids"), lXml.lastIndexOf("</"));
         String[] lLines = xmlSubstring.split("\n");
@@ -141,13 +147,63 @@ public class SpectrumLowMemController implements SpectrumInterface {
         }
         return iSpectra;
     }
+    
+    
+        /**
+     *
+     * @param aConnection connection to the msf file
+     * @return a vector containing all the spectra (in spectrum objects) stored
+     * in the msf file
+     * @throws SQLException
+     */
+    public Vector<Integer> getAllSpectraIds(Connection aConnection) {
+        Vector<Integer> iSpectra = new Vector<Integer>();
+        try {
+            PreparedStatement stat = aConnection.prepareStatement("select s.SpectrumID from spectrumheaders as s, masspeaks where masspeaks.masspeakid = s.masspeakid");
+            ResultSet rs = stat.executeQuery();
+            while (rs.next()) {
+                iSpectra.add(rs.getInt("SpectrumID"));
+            }
+            rs.close();
+            stat.close();
+        } catch (SQLException sqle) {
+            logger.error(sqle);
+        }
+        return iSpectra;
+    }
 
-    public SpectrumLowMem getSpectrumForPeptideID(int peptideOfInterestID, Connection aConnection) {
+    public SpectrumLowMem getSpectrumForPeptideID(PeptideLowMem peptideOfInterest, Connection aConnection) {
+        SpectrumLowMem returnSpectrum = peptideOfInterest.getParentSpectrum();
+        if (returnSpectrum == null) {
+            try {
+                Statement stat = aConnection.createStatement();
+                ResultSet rs;
+                rs = stat.executeQuery("select s.*, FileID from spectrumheaders as s, masspeaks,(select SpectrumID from Peptides where Peptideid = " + peptideOfInterest.getPeptideId() + ") as specid where masspeaks.masspeakid = s.masspeakid and s.SpectrumID = specid.SpectrumID");
+                rs.next();
+                returnSpectrum = new SpectrumLowMem(rs.getInt("SpectrumID"), rs.getInt("UniqueSpectrumID"), rs.getInt("MassPeakID"), rs.getInt("LastScan"), rs.getInt("FirstScan"), rs.getInt("ScanNumbers"), rs.getInt("Charge"), rs.getDouble("RetentionTime"), rs.getDouble("Mass"), rs.getInt("ScanEventID"), aConnection);
+                returnSpectrum.setFileId(rs.getInt("FileID"));
+                rs = stat.executeQuery("select * from CustomDataSpectra where SpectrumID = " + returnSpectrum.getSpectrumId());
+                while (rs.next()) {
+                    returnSpectrum.addCustomDataField(rs.getInt("FieldID"), rs.getString("FieldValue"));
+                }
+                peptideOfInterest.setParentSpectrum(returnSpectrum);
+                rs.close();
+                stat.close();
+            } catch (SQLException ex) {
+                logger.error(ex);
+            }
+            return returnSpectrum;
+        } else {
+            return returnSpectrum;
+        }
+    }
+
+    public SpectrumLowMem getSpectrumForPeptideID(int peptideOfInterest, Connection aConnection) {
         SpectrumLowMem returnSpectrum = null;
         try {
             Statement stat = aConnection.createStatement();
             ResultSet rs;
-            rs = stat.executeQuery("select s.*, FileID from spectrumheaders as s, masspeaks,(select SpectrumID from Peptides where Peptideid = " + peptideOfInterestID + ") as specid where masspeaks.masspeakid = s.masspeakid and s.SpectrumID = specid.SpectrumID");
+            rs = stat.executeQuery("select s.*, FileID from spectrumheaders as s, masspeaks,(select SpectrumID from Peptides where Peptideid = " + peptideOfInterest + ") as specid where masspeaks.masspeakid = s.masspeakid and s.SpectrumID = specid.SpectrumID");
             rs.next();
             returnSpectrum = new SpectrumLowMem(rs.getInt("SpectrumID"), rs.getInt("UniqueSpectrumID"), rs.getInt("MassPeakID"), rs.getInt("LastScan"), rs.getInt("FirstScan"), rs.getInt("ScanNumbers"), rs.getInt("Charge"), rs.getDouble("RetentionTime"), rs.getDouble("Mass"), rs.getInt("ScanEventID"), aConnection);
             returnSpectrum.setFileId(rs.getInt("FileID"));
@@ -202,84 +258,85 @@ public class SpectrumLowMemController implements SpectrumInterface {
      * @throws java.sql.SQLException
      * @throws java.io.IOException
      */
-    public void createSpectrumXMLForSpectrum(SpectrumLowMem lSpectrum) throws SQLException, IOException {
-        byte[] lZippedSpectrumXml = null;
-        String lXml;
-        ResultSet rs;
-        Statement stat = lSpectrum.getConnection().createStatement();
-        rs = stat.executeQuery("select Spectrum from Spectra where UniqueSpectrumID = " + lSpectrum.getUniqueSpectrumId());
-        while (rs.next()) {
-            lZippedSpectrumXml = rs.getBytes(1);
-        }
-        File lZippedFile = File.createTempFile("zip", null);
-        FileOutputStream fos = new FileOutputStream(lZippedFile);
-        fos.write(lZippedSpectrumXml);
-        fos.flush();
-        fos.close();
-        BufferedOutputStream out = null;
-        ZipInputStream in = new ZipInputStream(new BufferedInputStream(new FileInputStream(lZippedFile)));
-        ZipEntry entry;
-        byte[] ltest = new byte[0];
-        ByteArrayOutputStream lStream = new ByteArrayOutputStream(50);
-        while ((entry = in.getNextEntry()) != null) {
-            int count;
-            byte data[] = new byte[50];
-            out = new BufferedOutputStream(lStream, 50);
-            while ((count = in.read(data, 0, 50)) != -1) {
-                out.write(data, 0, count);
+    public void createSpectrumXMLForSpectrum(SpectrumLowMem lSpectrum) throws IOException {
+        try {
+            byte[] lZippedSpectrumXml = null;
+            String lXml;
+            ResultSet rs;
+            Statement stat = lSpectrum.getConnection().createStatement();
+            rs = stat.executeQuery("select Spectrum from Spectra where UniqueSpectrumID = " + lSpectrum.getUniqueSpectrumId());
+            while (rs.next()) {
+                lZippedSpectrumXml = rs.getBytes(1);
             }
+            File lZippedFile = File.createTempFile("zip", null);
+            FileOutputStream fos = new FileOutputStream(lZippedFile);
+            fos.write(lZippedSpectrumXml);
+            fos.flush();
+            fos.close();
+            BufferedOutputStream out = null;
+            ZipInputStream in = new ZipInputStream(new BufferedInputStream(new FileInputStream(lZippedFile)));
+            ZipEntry entry;
+            ByteArrayOutputStream lStream = new ByteArrayOutputStream(50);
+            out = new BufferedOutputStream(lStream, 50);
+            while ((entry = in.getNextEntry()) != null) {
+                int count;
+                byte data[] = new byte[50];
+                while ((count = in.read(data, 0, 50)) != -1) {
+                    out.write(data, 0, count);
+                }
+            }
+            in.close();
+            out.flush();
+            out.close();
+            lZippedFile.delete();
+            lXml = lStream.toString();
+            lStream.close();
+            rs.close();
+            stat.close();
+            lSpectrum.addSpectrumXML(lXml);
+        } catch (SQLException ex) {
+            logger.error(ex);
         }
-        in.close();
-        out.flush();
-        out.close();
-        lZippedFile.delete();
-        lXml = lStream.toString();
-        lStream.close();
-        rs.close();
-        stat.close();
-        lSpectrum.addSpectrumXML(lXml);
     }
 
+    @Override
     public void unzipXMLforSpectrum(SpectrumLowMem spectrum) {
         File lZippedFile = null;
         String lXml = "";
-        try {
-            if (spectrum.getZippedSpectrumXml() == null) {
-                try {
+        if (spectrum.getSpectrumXML() == null) {
+            try {
+                if (spectrum.getZippedSpectrumXml() == null) {
                     createSpectrumXMLForSpectrum(spectrum);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                byte[] lZippedSpectrumXml = spectrum.getZippedSpectrumXml();
-                lZippedFile = File.createTempFile("zip", null);
-                FileOutputStream fos = new FileOutputStream(lZippedFile);
-                fos.write(lZippedSpectrumXml);
-                fos.flush();
-                fos.close();
-                BufferedOutputStream out = null;
-                ZipInputStream in = new ZipInputStream(new BufferedInputStream(new FileInputStream(lZippedFile)));
-                ZipEntry entry;
-                byte[] ltest = new byte[0];
-                ByteArrayOutputStream lStream = new ByteArrayOutputStream(50);
-                while ((entry = in.getNextEntry()) != null) {
-                    int count;
-                    byte data[] = new byte[50];
+                } else {
+                    byte[] lZippedSpectrumXml = spectrum.getZippedSpectrumXml();
+                    lZippedFile = File.createTempFile("zip", null);
+                    FileOutputStream fos = new FileOutputStream(lZippedFile);
+                    fos.write(lZippedSpectrumXml);
+                    fos.flush();
+                    fos.close();
+                    BufferedOutputStream out = null;
+                    ZipInputStream in = new ZipInputStream(new BufferedInputStream(new FileInputStream(lZippedFile)));
+                    ZipEntry entry;
+                    ByteArrayOutputStream lStream = new ByteArrayOutputStream(50);
                     out = new BufferedOutputStream(lStream, 50);
-                    while ((count = in.read(data, 0, 50)) != -1) {
-                        out.write(data, 0, count);
+                    while ((entry = in.getNextEntry()) != null) {
+                        int count;
+                        byte data[] = new byte[50];
+                        while ((count = in.read(data, 0, 50)) != -1) {
+                            out.write(data, 0, count);
+                        }
                     }
+                    in.close();
+                    out.flush();
+                    out.close();
+                    lZippedFile.delete();
+                    lXml = lStream.toString();
+                    lStream.close();
+                    spectrum.addSpectrumXML(lXml);
                 }
-                in.close();
-                out.flush();
-                out.close();
-                lZippedFile.delete();
-                lXml = lStream.toString();
-                lStream.close();
-                spectrum.addSpectrumXML(lXml);
+            } catch (IOException e) {
+                logger.error(e);
             }
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
     }
 
@@ -290,6 +347,8 @@ public class SpectrumLowMemController implements SpectrumInterface {
             ResultSet rs = stat.executeQuery("select count(SpectrumID) from SpectrumHeaders");
             rs.next();
             numberOfSpectra = rs.getInt(1);
+            rs.close();
+            stat.close();
         } catch (SQLException sqle) {
             logger.error(sqle);
         }

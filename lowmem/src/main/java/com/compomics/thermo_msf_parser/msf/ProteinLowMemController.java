@@ -40,6 +40,21 @@ public class ProteinLowMemController extends Observable implements ProteinInterf
         }
         return proteinList.iterator();
     }
+    
+    public int getNumberOfProteinsForConfidenceLevel(int confidenceLevel, Connection msfFileConnection){
+         int numberOfProteins = 0;
+        Statement stat = null;
+        try {
+            stat = msfFileConnection.createStatement();
+            ResultSet rs = stat.executeQuery("select distinct PeptidesProteins.ProteinID from PeptidesProteins ,(select Peptides.PeptideID from Peptides where Peptides.confidencelevel = " + confidenceLevel + ") as pep where PeptidesProteins.PeptideID=pep.PeptideID");
+            numberOfProteins = rs.getInt(1);
+            rs.close();
+            stat.close();
+        } catch (SQLException e) {
+            logger.error(e);
+        }
+        return numberOfProteins;
+    }
 
     /**
      * this method returns a protein as stored by its UID
@@ -74,6 +89,7 @@ public class ProteinLowMemController extends Observable implements ProteinInterf
      * @param aConnection a connection to the msf file
      * @return a proteinlowmem object
      */
+    @Override
     public ProteinLowMem getProteinFromAccession(String proteinAccession, Connection aConnection) {
         int lProteinID = 0;
         try {
@@ -96,6 +112,7 @@ public class ProteinLowMemController extends Observable implements ProteinInterf
      * @param aConnection a connection to the msf file
      * @return a string containing the accession of a protein
      */
+    @Override
     public String getAccessionFromProteinID(int proteinID, Connection aConnection) {
         String accession = "";
         try {
@@ -139,17 +156,14 @@ public class ProteinLowMemController extends Observable implements ProteinInterf
         com.compomics.util.protein.Protein iUtilProtein = null;
         try {
             Statement stat = aConnection.createStatement();
-            String accession = "";
             ResultSet rs = stat.executeQuery("select Description,Sequence from ProteinAnnotations,Proteins where ProteinAnnotations.ProteinID = " + proteinID + " and Proteins.ProteinID = " + proteinID);
             while (rs.next()) {
                 String lFasta = rs.getString(1) + "\n" + rs.getString(2);
                 if (lFasta.contains(">GENSCAN")) {
                     iUtilProtein = new com.compomics.util.protein.Protein(lFasta);
-                    accession = (iUtilProtein.getHeader().toString().substring(lFasta.indexOf("GEN"), lFasta.indexOf("pep") - 1));
-                } else if (lFasta.contains(">ENS")) {
+                    } else if (lFasta.contains(">ENS")) {
                     try {
                         iUtilProtein = new com.compomics.util.protein.Protein(lFasta);
-                        accession = (iUtilProtein.getHeader().toString().substring(lFasta.indexOf("ENS"), lFasta.indexOf("pep") - 1));
                     } catch (Exception e) {
                         logger.error(e);
                     }
@@ -230,7 +244,7 @@ public class ProteinLowMemController extends Observable implements ProteinInterf
             try {
                 Statement stat = aConnection.createStatement();
                 //TODO check if this slows down significantly, otherwise change query to just select the description aswell and write a method that takes this
-                ResultSet rs = stat.executeQuery("select PeptidesProteins.ProteinID from PeptidesProteins ,(select Peptides.PeptideID from Peptides where Peptides.confidencelevel = " + confidenceLevel + ") as pep where PeptidesProteins.PeptideID=pep.PeptideID");
+                ResultSet rs = stat.executeQuery("select distinct PeptidesProteins.ProteinID from PeptidesProteins ,(select Peptides.PeptideID from Peptides where Peptides.confidencelevel = " + confidenceLevel + ") as pep where PeptidesProteins.PeptideID=pep.PeptideID");
                 while (rs.next()) {
                     int lProteinID = rs.getInt(1);
                     proteinAccession = getAccessionFromProteinID(lProteinID, aConnection);
@@ -275,6 +289,7 @@ public class ProteinLowMemController extends Observable implements ProteinInterf
      * @return the sequence for the protein id
      * @throws java.sql.SQLException
      */
+    @Override
     public String getSequenceForProteinID(int proteinID, Connection aConnection) {
         String lSequence = "";
         try {
@@ -297,6 +312,7 @@ public class ProteinLowMemController extends Observable implements ProteinInterf
      * @return a vector containing all the proteins in protein objects connected
      * to the peptide
      */
+    @Override
     public Vector<ProteinLowMem> getProteinsForPeptide(int peptideID, Connection aConnection) {
         Vector<ProteinLowMem> proteinVector = new Vector<ProteinLowMem>();
         try {
@@ -383,6 +399,8 @@ public class ProteinLowMemController extends Observable implements ProteinInterf
             ResultSet rs = stat.executeQuery("select count(PeptideID) from PeptidesProteins where ProteinID = " + proteinID);
             rs.next();
             numberOfPeptides = rs.getInt(1);
+            rs.close();
+            stat.close();
         } catch (SQLException sqle) {
             logger.error(sqle);
         }
@@ -404,6 +422,8 @@ public class ProteinLowMemController extends Observable implements ProteinInterf
             ResultSet rs = stat.executeQuery("select IsMasterProtein from Proteins where ProteinID = " + proteinID);
             rs.next();
             isMasterProtein = rs.getBoolean("IsMasterProtein");
+            rs.close();
+            stat.close();
         } catch (SQLException sqle) {
             logger.error(sqle);
         }

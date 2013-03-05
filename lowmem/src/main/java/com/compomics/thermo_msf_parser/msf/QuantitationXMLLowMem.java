@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Vector;
+import org.apache.log4j.Logger;
 
 /**
  * Created by IntelliJ IDEA.
@@ -14,7 +15,7 @@ import java.util.Vector;
  * To change this template use File | Settings | File Templates.
  */
 class QuantitationXMLLowMem {
-
+private static final Logger logger = Logger.getLogger(QuantitationXMLLowMem.class);
     private Vector iComponents = new Vector<String>();
     private Vector<Integer> iChannelIds = new Vector<Integer>();
     private Vector<RatioType> iRatioTypes = new Vector<RatioType>();
@@ -61,10 +62,15 @@ class QuantitationXMLLowMem {
     }
     public String getQuantitationXML(Connection iConnection) throws SQLException {
         String iQuantitationMethod = null;
+        try{
         PreparedStatement stat = iConnection.prepareStatement("select ParameterValue from ProcessingNodeParameters where ParameterName = 'QuantificationMethod'");
         ResultSet rs = stat.executeQuery();
         while (rs.next()) {
             iQuantitationMethod =  rs.getString(1);
+        }
+        rs.close();
+        stat.close();} catch(SQLException sqle) {
+        logger.error(sqle);
         }
         return iQuantitationMethod;
     }
