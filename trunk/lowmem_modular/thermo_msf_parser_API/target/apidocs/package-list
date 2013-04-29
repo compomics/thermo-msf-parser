@@ -1,7 +1,0 @@
-com.compomics.thermo_msf_parser_API.enums
-com.compomics.thermo_msf_parser_API.highmeminstance
-com.compomics.thermo_msf_parser_API.interfaces
-com.compomics.thermo_msf_parser_API.lowmeminstance.controllers
-com.compomics.thermo_msf_parser_API.lowmeminstance.model
-com.compomics.thermo_msf_parser_API.proteinsorter
-com.compomics.thermo_msf_parser_API.util
