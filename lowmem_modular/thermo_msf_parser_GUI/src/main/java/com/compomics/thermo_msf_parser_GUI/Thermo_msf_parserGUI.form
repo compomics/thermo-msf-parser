@@ -1,0 +1,674 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.compomics.thermo_msf_parser.gui.Thermo_msf_parserGUI">
+  <grid id="39873" binding="contentPane" layout-manager="GridBagLayout">
+    <constraints>
+      <xy x="20" y="20" width="1059" height="806"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <tabbedpane id="1b865" binding="jSuperTabbedPane">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false">
+            <preferred-size width="200" height="200"/>
+          </grid>
+          <gridbag weightx="1.0" weighty="1.0"/>
+        </constraints>
+        <properties>
+          <tabLayoutPolicy value="0"/>
+          <tabPlacement value="3"/>
+        </properties>
+        <border type="none"/>
+        <children>
+          <grid id="5f965" layout-manager="GridBagLayout">
+            <constraints>
+              <tabbedpane title="Thermo MSF Viewer"/>
+            </constraints>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <grid id="27dc6" binding="jpanContent" layout-manager="GridBagLayout">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                  <gridbag weightx="1.0" weighty="1.0"/>
+                </constraints>
+                <properties/>
+                <border type="none"/>
+                <children>
+                  <grid id="6fcd4" layout-manager="GridBagLayout">
+                    <constraints>
+                      <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                      <gridbag weightx="1.0" weighty="1.0"/>
+                    </constraints>
+                    <properties/>
+                    <border type="none"/>
+                    <children>
+                      <component id="53a15" class="javax.swing.JButton" binding="showAllPeptidesButton" default-binding="true">
+                        <constraints>
+                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                          <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties>
+                          <minimumSize width="150" height="25"/>
+                          <text value="Show all"/>
+                        </properties>
+                      </component>
+                      <splitpane id="ab849" binding="split1">
+                        <constraints>
+                          <grid row="0" column="1" row-span="2" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                            <preferred-size width="200" height="200"/>
+                          </grid>
+                          <gridbag weightx="1.0" weighty="1.0"/>
+                        </constraints>
+                        <properties>
+                          <dividerLocation value="310"/>
+                          <oneTouchExpandable value="true"/>
+                          <orientation value="0"/>
+                        </properties>
+                        <border type="none"/>
+                        <children>
+                          <splitpane id="63645" binding="split2">
+                            <constraints>
+                              <splitpane position="right"/>
+                            </constraints>
+                            <properties>
+                              <dividerLocation value="609"/>
+                            </properties>
+                            <border type="none"/>
+                            <children>
+                              <tabbedpane id="50cc1" binding="jtabpanLower">
+                                <constraints>
+                                  <splitpane position="left"/>
+                                </constraints>
+                                <properties/>
+                                <border type="none"/>
+                                <children>
+                                  <tabbedpane id="86d8e" binding="jtabChromatogram">
+                                    <constraints>
+                                      <tabbedpane title="Chromatogram"/>
+                                    </constraints>
+                                    <properties>
+                                      <background color="-3407770"/>
+                                    </properties>
+                                    <border type="none"/>
+                                    <children>
+                                      <grid id="4a30a" layout-manager="GridBagLayout">
+                                        <constraints>
+                                          <tabbedpane title="No Chromatogram Loaded"/>
+                                        </constraints>
+                                        <properties/>
+                                        <border type="none"/>
+                                        <children/>
+                                      </grid>
+                                    </children>
+                                  </tabbedpane>
+                                  <grid id="16ece" binding="jpanMSHolder" layout-manager="GridBagLayout">
+                                    <constraints>
+                                      <tabbedpane title="MS Spectrum"/>
+                                    </constraints>
+                                    <properties/>
+                                    <border type="none"/>
+                                    <children>
+                                      <grid id="b4ce" binding="jpanMS" custom-create="true" layout-manager="GridBagLayout">
+                                        <constraints>
+                                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                                          <gridbag weightx="1.0" weighty="1.0"/>
+                                        </constraints>
+                                        <properties/>
+                                        <border type="none"/>
+                                        <children/>
+                                      </grid>
+                                    </children>
+                                  </grid>
+                                  <grid id="5bbec" binding="jpanQuantificationSpectrumHolder" layout-manager="GridBagLayout">
+                                    <constraints>
+                                      <tabbedpane title="Quantification Spectrum"/>
+                                    </constraints>
+                                    <properties/>
+                                    <border type="none"/>
+                                    <children>
+                                      <grid id="24a4f" binding="jpanQuantitationSpectrum" custom-create="true" layout-manager="GridBagLayout">
+                                        <constraints>
+                                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                                          <gridbag weightx="1.0" weighty="1.0"/>
+                                        </constraints>
+                                        <properties/>
+                                        <border type="none"/>
+                                        <children/>
+                                      </grid>
+                                    </children>
+                                  </grid>
+                                  <grid id="fb047" binding="jpanMSMS" layout-manager="GridBagLayout">
+                                    <constraints>
+                                      <tabbedpane title="MS/MS Spectrum"/>
+                                    </constraints>
+                                    <properties>
+                                      <maximumSize width="400" height="100"/>
+                                      <minimumSize width="400" height="100"/>
+                                      <preferredSize width="400" height="100"/>
+                                    </properties>
+                                    <border type="none"/>
+                                    <children>
+                                      <grid id="850b7" binding="jpanMSMSLeft" custom-create="true" layout-manager="GridBagLayout">
+                                        <constraints>
+                                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                                          <gridbag weightx="0.95" weighty="0.95"/>
+                                        </constraints>
+                                        <properties/>
+                                        <border type="none"/>
+                                        <children/>
+                                      </grid>
+                                      <grid id="81e9a" layout-manager="GridBagLayout">
+                                        <constraints>
+                                          <grid row="1" column="0" row-span="1" col-span="2" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                                          <gridbag weightx="0.0" weighty="0.0"/>
+                                        </constraints>
+                                        <properties/>
+                                        <border type="none"/>
+                                        <children>
+                                          <component id="c3277" class="javax.swing.JCheckBox" binding="cIonsJCheckBox" custom-create="true">
+                                            <constraints>
+                                              <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                              <gridbag top="1" left="1" bottom="1" right="1" weightx="0.0" weighty="0.0"/>
+                                            </constraints>
+                                            <properties/>
+                                          </component>
+                                          <component id="918f7" class="javax.swing.JCheckBox" binding="zIonsJCheckBox" custom-create="true">
+                                            <constraints>
+                                              <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                              <gridbag top="1" left="1" bottom="1" right="1" weightx="0.0" weighty="0.0"/>
+                                            </constraints>
+                                            <properties/>
+                                          </component>
+                                          <component id="ebea6" class="javax.swing.JCheckBox" binding="chargeOverTwoJCheckBox" custom-create="true">
+                                            <constraints>
+                                              <grid row="0" column="10" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                              <gridbag top="1" left="1" bottom="1" right="1" weightx="0.0" weighty="0.0"/>
+                                            </constraints>
+                                            <properties/>
+                                          </component>
+                                          <component id="d859e" class="javax.swing.JCheckBox" binding="aIonsJCheckBox" custom-create="true">
+                                            <constraints>
+                                              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                              <gridbag top="1" left="1" bottom="1" right="1" weightx="0.0" weighty="0.0"/>
+                                            </constraints>
+                                            <properties/>
+                                          </component>
+                                          <component id="da5c" class="javax.swing.JCheckBox" binding="bIonsJCheckBox" custom-create="true">
+                                            <constraints>
+                                              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                              <gridbag top="1" left="1" bottom="1" right="1" weightx="0.0" weighty="0.0"/>
+                                            </constraints>
+                                            <properties/>
+                                          </component>
+                                          <component id="4f485" class="javax.swing.JCheckBox" binding="xIonsJCheckBox" custom-create="true">
+                                            <constraints>
+                                              <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                              <gridbag top="1" left="1" bottom="1" right="1" weightx="0.0" weighty="0.0"/>
+                                            </constraints>
+                                            <properties/>
+                                          </component>
+                                          <component id="4d3e5" class="javax.swing.JCheckBox" binding="yIonsJCheckBox" custom-create="true">
+                                            <constraints>
+                                              <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                              <gridbag top="1" left="1" bottom="1" right="1" weightx="0.0" weighty="0.0"/>
+                                            </constraints>
+                                            <properties/>
+                                          </component>
+                                          <component id="dec3a" class="javax.swing.JCheckBox" binding="chargeOneJCheckBox" custom-create="true">
+                                            <constraints>
+                                              <grid row="0" column="8" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                              <gridbag top="1" left="1" bottom="1" right="1" weightx="0.0" weighty="0.0"/>
+                                            </constraints>
+                                            <properties/>
+                                          </component>
+                                          <component id="f5b69" class="javax.swing.JCheckBox" binding="chargeTwoJCheckBox" custom-create="true">
+                                            <constraints>
+                                              <grid row="0" column="9" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                              <gridbag top="1" left="1" bottom="1" right="1" weightx="0.0" weighty="0.0"/>
+                                            </constraints>
+                                            <properties/>
+                                          </component>
+                                          <component id="78529" class="javax.swing.JCheckBox" binding="nh3IonsJCheckBox" custom-create="true">
+                                            <constraints>
+                                              <grid row="0" column="21" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                              <gridbag top="1" left="1" bottom="1" right="1" weightx="0.0" weighty="0.0"/>
+                                            </constraints>
+                                            <properties>
+                                              <text value=""/>
+                                            </properties>
+                                          </component>
+                                          <component id="6a2cf" class="javax.swing.JCheckBox" binding="h2oIonsJCheckBox" custom-create="true">
+                                            <constraints>
+                                              <grid row="0" column="22" row-span="1" col-span="10" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                              <gridbag top="1" left="1" bottom="1" right="1" weightx="0.0" weighty="0.0"/>
+                                            </constraints>
+                                            <properties/>
+                                          </component>
+                                          <component id="91cbe" class="javax.swing.JTextField" binding="txtMSMSerror" custom-create="true">
+                                            <constraints>
+                                              <grid row="0" column="32" row-span="1" col-span="10" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                                                <preferred-size width="150" height="-1"/>
+                                              </grid>
+                                              <gridbag top="1" left="1" bottom="1" right="1" weightx="0.0" weighty="0.0"/>
+                                            </constraints>
+                                            <properties>
+                                              <text value="0.5"/>
+                                              <toolTipText value="The MS/MS fragmentation error (in Da)"/>
+                                            </properties>
+                                          </component>
+                                          <component id="8affd" class="javax.swing.JSeparator">
+                                            <constraints>
+                                              <grid row="0" column="7" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                                              <gridbag top="1" left="1" bottom="1" right="1" weightx="0.0" weighty="0.0"/>
+                                            </constraints>
+                                            <properties>
+                                              <orientation value="1"/>
+                                            </properties>
+                                          </component>
+                                          <component id="acd3a" class="javax.swing.JSeparator">
+                                            <constraints>
+                                              <grid row="0" column="11" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                                              <gridbag top="1" left="1" bottom="1" right="1" weightx="0.0" weighty="0.0"/>
+                                            </constraints>
+                                            <properties>
+                                              <orientation value="1"/>
+                                            </properties>
+                                          </component>
+                                          <component id="2d98d" class="javax.swing.JSeparator">
+                                            <constraints>
+                                              <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                                              <gridbag top="1" left="1" bottom="1" right="1" weightx="0.0" weighty="0.0"/>
+                                            </constraints>
+                                            <properties>
+                                              <orientation value="1"/>
+                                            </properties>
+                                          </component>
+                                          <hspacer id="ac827">
+                                            <constraints>
+                                              <grid row="0" column="42" row-span="1" col-span="1" vsize-policy="1" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                                              <gridbag weightx="1.0" weighty="0.0"/>
+                                            </constraints>
+                                          </hspacer>
+                                        </children>
+                                      </grid>
+                                    </children>
+                                  </grid>
+                                </children>
+                              </tabbedpane>
+                              <tabbedpane id="6dd88" binding="jtabpanSpectrum">
+                                <constraints>
+                                  <splitpane position="right"/>
+                                </constraints>
+                                <properties/>
+                                <border type="none"/>
+                                <children>
+                                  <grid id="f5510" binding="jpanProtein" layout-manager="GridBagLayout">
+                                    <constraints>
+                                      <tabbedpane title="Protein"/>
+                                    </constraints>
+                                    <properties/>
+                                    <border type="none"/>
+                                    <children>
+                                      <grid id="fa43a" binding="jpanProteinLeft" layout-manager="GridBagLayout">
+                                        <constraints>
+                                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                                          <gridbag weightx="1.0" weighty="1.0"/>
+                                        </constraints>
+                                        <properties/>
+                                        <border type="none" title="Protein Coverage"/>
+                                        <children>
+                                          <scrollpane id="66e73" binding="proteinCoverageJScrollPane" custom-create="true">
+                                            <constraints>
+                                              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                                              <gridbag top="5" left="5" bottom="5" right="5" weightx="1.0" weighty="1.0"/>
+                                            </constraints>
+                                            <properties/>
+                                            <border type="none"/>
+                                            <children/>
+                                          </scrollpane>
+                                          <component id="21016" class="javax.swing.JLabel" binding="sequenceCoverageJLabel">
+                                            <constraints>
+                                              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                                            </constraints>
+                                            <properties>
+                                              <text value=""/>
+                                            </properties>
+                                          </component>
+                                        </children>
+                                      </grid>
+                                    </children>
+                                  </grid>
+                                  <grid id="c2e25" layout-manager="GridBagLayout">
+                                    <constraints>
+                                      <tabbedpane title="Processing Nodes"/>
+                                    </constraints>
+                                    <properties/>
+                                    <border type="none"/>
+                                    <children>
+                                      <tabbedpane id="27e3f" binding="processingNodeTabbedPane">
+                                        <constraints>
+                                          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+                                            <preferred-size width="200" height="200"/>
+                                          </grid>
+                                          <gridbag weightx="1.0" weighty="1.0"/>
+                                        </constraints>
+                                        <properties/>
+                                        <border type="none"/>
+                                        <children>
+                                          <grid id="1bf16" layout-manager="GridBagLayout">
+                                            <constraints>
+                                              <tabbedpane title="Nothing Loaded"/>
+                                            </constraints>
+                                            <properties/>
+                                            <border type="none"/>
+                                            <children/>
+                                          </grid>
+                                        </children>
+                                      </tabbedpane>
+                                    </children>
+                                  </grid>
+                                </children>
+                              </tabbedpane>
+                            </children>
+                          </splitpane>
+                          <grid id="fd131" layout-manager="GridBagLayout">
+                            <constraints>
+                              <splitpane position="left"/>
+                            </constraints>
+                            <properties/>
+                            <border type="none" title="Peptides" title-position="1"/>
+                            <children>
+                              <scrollpane id="6e6d7" binding="jscollPeptides" custom-create="true">
+                                <constraints>
+                                  <grid row="0" column="0" row-span="1" col-span="6" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                                  <gridbag weightx="1.0" weighty="1.0"/>
+                                </constraints>
+                                <properties/>
+                                <border type="none"/>
+                                <children>
+                                  <component id="cf36a" class="javax.swing.JTable" binding="jtablePeptides" custom-create="true">
+                                    <constraints/>
+                                    <properties/>
+                                  </component>
+                                </children>
+                              </scrollpane>
+                              <component id="cfff0" class="javax.swing.JLabel">
+                                <constraints>
+                                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                                </constraints>
+                                <properties>
+                                  <text value="Peptide Confidence Level: "/>
+                                </properties>
+                              </component>
+                              <component id="ed93a" class="javax.swing.JCheckBox" binding="chbHighConfident" custom-create="true">
+                                <constraints>
+                                  <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                                </constraints>
+                                <properties>
+                                  <maximumSize width="130" height="22"/>
+                                  <minimumSize width="130" height="22"/>
+                                  <preferredSize width="130" height="22"/>
+                                  <selected value="true"/>
+                                  <text value="High"/>
+                                </properties>
+                              </component>
+                              <component id="a5bb2" class="javax.swing.JCheckBox" binding="chbMediumConfident" custom-create="true">
+                                <constraints>
+                                  <grid row="1" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                                </constraints>
+                                <properties>
+                                  <maximumSize width="130" height="22"/>
+                                  <minimumSize width="130" height="22"/>
+                                  <preferredSize width="130" height="22"/>
+                                  <selected value="false"/>
+                                  <text value="Medium"/>
+                                </properties>
+                              </component>
+                              <component id="8660" class="javax.swing.JCheckBox" binding="chbLowConfidence" custom-create="true">
+                                <constraints>
+                                  <grid row="1" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                                </constraints>
+                                <properties>
+                                  <maximumSize width="130" height="22"/>
+                                  <minimumSize width="130" height="22"/>
+                                  <preferredSize width="130" height="22"/>
+                                  <text value="Low"/>
+                                </properties>
+                              </component>
+                              <component id="9a0bc" class="javax.swing.JLabel">
+                                <constraints>
+                                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                                </constraints>
+                                <properties>
+                                  <text value="Peptide Spectrum Match: "/>
+                                </properties>
+                              </component>
+                              <component id="486fb" class="javax.swing.JRadioButton" binding="onlyHighestScoringRadioButton" custom-create="true" default-binding="true">
+                                <constraints>
+                                  <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                                </constraints>
+                                <properties>
+                                  <selected value="true"/>
+                                  <text value="Only Highest Scoring"/>
+                                </properties>
+                              </component>
+                              <component id="3cd91" class="javax.swing.JRadioButton" binding="onlyLowestScoringRadioButton" custom-create="true" default-binding="true">
+                                <constraints>
+                                  <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                                </constraints>
+                                <properties>
+                                  <text value="Only Lowest Scoring"/>
+                                </properties>
+                              </component>
+                              <component id="efb5d" class="javax.swing.JRadioButton" binding="allRadioButton" custom-create="true" default-binding="true">
+                                <constraints>
+                                  <grid row="2" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                                </constraints>
+                                <properties>
+                                  <selected value="false"/>
+                                  <text value="All"/>
+                                </properties>
+                              </component>
+                              <component id="fcad0" class="javax.swing.JLabel">
+                                <constraints>
+                                  <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                                </constraints>
+                                <properties>
+                                  <text value="Load Spectrum: "/>
+                                </properties>
+                              </component>
+                              <component id="931ed" class="javax.swing.JCheckBox" binding="chromatogramCheckBox" default-binding="true">
+                                <constraints>
+                                  <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                                </constraints>
+                                <properties>
+                                  <maximumSize width="130" height="22"/>
+                                  <minimumSize width="130" height="22"/>
+                                  <preferredSize width="130" height="22"/>
+                                  <selected value="true"/>
+                                  <text value="Chromatogram"/>
+                                </properties>
+                              </component>
+                              <component id="ea4b1" class="javax.swing.JCheckBox" binding="msCheckBox">
+                                <constraints>
+                                  <grid row="3" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                                </constraints>
+                                <properties>
+                                  <maximumSize width="130" height="22"/>
+                                  <minimumSize width="130" height="22"/>
+                                  <preferredSize width="130" height="22"/>
+                                  <selected value="true"/>
+                                  <text value="MS"/>
+                                </properties>
+                              </component>
+                              <component id="84964" class="javax.swing.JCheckBox" binding="quantCheckBox">
+                                <constraints>
+                                  <grid row="3" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                                </constraints>
+                                <properties>
+                                  <maximumSize width="130" height="22"/>
+                                  <minimumSize width="130" height="22"/>
+                                  <preferredSize width="130" height="22"/>
+                                  <selected value="true"/>
+                                  <text value="Quant"/>
+                                </properties>
+                              </component>
+                              <component id="5cb58" class="javax.swing.JCheckBox" binding="msmsCheckBox">
+                                <constraints>
+                                  <grid row="3" column="4" row-span="1" col-span="2" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                                </constraints>
+                                <properties>
+                                  <maximumSize width="130" height="22"/>
+                                  <minimumSize width="130" height="22"/>
+                                  <preferredSize width="130" height="22"/>
+                                  <selected value="true"/>
+                                  <text value="MS/MS"/>
+                                </properties>
+                              </component>
+                              <component id="10c2b" class="javax.swing.JLabel">
+                                <constraints>
+                                  <grid row="1" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                  <gridbag top="5" left="5" bottom="5" right="0" weightx="0.0" weighty="0.0"/>
+                                </constraints>
+                                <properties>
+                                  <text value="Full Peptide Information: "/>
+                                </properties>
+                              </component>
+                              <component id="19fd0" class="javax.swing.JCheckBox" binding="peptideInformationChb">
+                                <constraints>
+                                  <grid row="1" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                                  <gridbag weightx="0.0" weighty="0.0"/>
+                                </constraints>
+                                <properties>
+                                  <text value=""/>
+                                </properties>
+                              </component>
+                              <component id="bce83" class="javax.swing.JButton" binding="startRoverButton" default-binding="true">
+                                <constraints>
+                                  <grid row="2" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                                  <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                                </constraints>
+                                <properties>
+                                  <text value="Start Rover"/>
+                                </properties>
+                              </component>
+                            </children>
+                          </grid>
+                        </children>
+                      </splitpane>
+                      <grid id="911f8" layout-manager="GridBagLayout">
+                        <constraints>
+                          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                          <gridbag weightx="0.0" weighty="0.0"/>
+                        </constraints>
+                        <properties/>
+                        <border type="none"/>
+                        <children>
+                          <scrollpane id="5fdd6">
+                            <constraints>
+                              <grid row="1" column="0" row-span="1" col-span="2" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                              <gridbag top="5" left="5" bottom="5" right="5" weightx="1.0" weighty="0.66"/>
+                            </constraints>
+                            <properties/>
+                            <border type="none"/>
+                            <children>
+                              <component id="40934" class="javax.swing.JList" binding="proteinList" custom-create="true">
+                                <constraints/>
+                                <properties/>
+                              </component>
+                            </children>
+                          </scrollpane>
+                          <scrollpane id="c4c03">
+                            <constraints>
+                              <grid row="3" column="0" row-span="1" col-span="2" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                              <gridbag top="5" left="5" bottom="5" right="5" weightx="1.0" weighty="0.34"/>
+                            </constraints>
+                            <properties/>
+                            <border type="none"/>
+                            <children>
+                              <component id="b2a60" class="javax.swing.JList" binding="selectedProteinList" custom-create="true">
+                                <constraints/>
+                                <properties/>
+                              </component>
+                            </children>
+                          </scrollpane>
+                          <component id="58e8c" class="javax.swing.JButton" binding="jbuttonAlphabeticalSort">
+                            <constraints>
+                              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                            </constraints>
+                            <properties>
+                              <maximumSize width="80" height="25"/>
+                              <minimumSize width="80" height="25"/>
+                              <preferredSize width="80" height="25"/>
+                              <text value="A -&gt; Z"/>
+                            </properties>
+                          </component>
+                          <component id="32af3" class="javax.swing.JButton" binding="jbuttonNumberSort">
+                            <constraints>
+                              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                              <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                            </constraints>
+                            <properties>
+                              <maximumSize width="80" height="25"/>
+                              <minimumSize width="80" height="25"/>
+                              <preferredSize width="80" height="25"/>
+                              <text value="20 -&gt; 1"/>
+                            </properties>
+                          </component>
+                          <component id="63eec" class="javax.swing.JLabel" binding="lblProteinOfIntersest">
+                            <constraints>
+                              <grid row="2" column="0" row-span="1" col-span="2" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                              <gridbag weightx="0.0" weighty="0.0"/>
+                            </constraints>
+                            <properties>
+                              <text value="Matching protein(s)"/>
+                            </properties>
+                          </component>
+                        </children>
+                      </grid>
+                    </children>
+                  </grid>
+                  <component id="2c8f4" class="javax.swing.JProgressBar" binding="progressBar">
+                    <constraints>
+                      <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                      <gridbag top="5" left="5" bottom="5" right="5" weightx="0.0" weighty="0.0"/>
+                    </constraints>
+                    <properties/>
+                  </component>
+                </children>
+              </grid>
+            </children>
+          </grid>
+        </children>
+      </tabbedpane>
+    </children>
+  </grid>
+  <buttonGroups>
+    <group name="buttonGroup1">
+      <member id="2f3e7"/>
+      <member id="ff5eb"/>
+      <member id="b60c1"/>
+    </group>
+    <group name="buttonGroup2">
+      <member id="486fb"/>
+      <member id="3cd91"/>
+      <member id="efb5d"/>
+    </group>
+  </buttonGroups>
+</form>
