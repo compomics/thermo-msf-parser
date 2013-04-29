@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.compomics.thermo_msf_parser</groupId>
+    <artifactId>thermo_msf_parser_API</artifactId>
+    <version>2.0.3</version>
+    <parent>
+        <version>2.0.3</version>
+        <groupId>com.compomics</groupId>
+        <artifactId>thermo_msf_parser</artifactId>
+    </parent>
+    <url>http://code.google.com/p/thermo_msf_parser/</url>
+    
+    <properties>
+        <logging.level.default>ERROR</logging.level.default>
+        <logging.file.path.name>thermo-msf-parser.log</logging.file.path.name>
+        <logging.file.max.size>5000KB</logging.file.max.size>
+        <logging.pattern>[%d{dd-MMM-yyyy HH:mm:ss} - %p] "%m" (%C:%L)%n</logging.pattern>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+    <build>
+    </build>
+    <dependencies>
+        <dependency>
+            <groupId>com.compomics</groupId>
+            <artifactId>utilities</artifactId>
+            <version>3.10.37</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.7.2</version>
+        </dependency>
+    </dependencies>
+</project>

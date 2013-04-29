@@ -1,0 +1,73 @@
+package com.compomics.thermo_msf_parser_API.interfaces;
+
+
+
+import com.compomics.thermo_msf_parser_API.lowmeminstance.model.MsfFile;
+import com.compomics.thermo_msf_parser_API.lowmeminstance.model.ProteinLowMem;
+import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.List;
+
+/**
+ * Created by IntelliJ IDEA.
+ * User: Davy
+ * Date: 4/23/12
+ * Time: 2:00 PM
+ * To change this template use File | Settings | File Templates.
+ */
+public interface ProteinInterface {
+
+    /**
+    a method to fetch all the proteins stored in the msf file
+
+    @param iConnection connection to the msf file
+    @return an iterator containing all the proteins in Protein objects
+    @throws SQLException if something went wrong with the retrieving
+     */
+
+    public Iterator getAllProteins(MsfFile msfFile);
+
+    /**
+    get a protein from an accession
+
+     @return a Protein object
+    @throws SQLException if something went wrong with the retrieving
+
+     * @param proteinAccession an accession
+     * @param iConnection a connection to the msf file
+     */
+
+    public ProteinLowMem getProteinFromAccession(String proteinAccession, MsfFile msfFile);
+
+    /**
+    get the accession from a protein
+
+    @param proteinID a protein id in the db
+    @param iConnection a connection to the msf file
+    @return the accession for a given Protein object
+    @throws SQLException if something went wrong with the retrieving
+    */
+
+    public String getAccessionFromProteinID(int proteinID,MsfFile msfFile);
+
+    /**
+     * get the sequence stored in the db for a given ProteinID
+     *
+     * @param proteinID the ID of the protein in the SQLite DB
+     * @param iConnection connection to the SQLite DB
+     * @return string containing the sequence stored in the DB
+     * @throws SQLException if something went wrong with the retrieving
+     */
+
+    public String getSequenceForProteinID(int proteinID,MsfFile msfFile);
+
+    /**
+     * method for retrieving all the proteins connected to a given peptide in the DB
+     *
+     * @param PeptideID peptideID stored in the SQLite DB
+     * @param iConnection connection to the SQLite DB
+     * @return a vector containing all Protein objects connected to a given peptide
+     * @throws SQLException if something went wrong with the retrieving
+     */
+    public List<ProteinLowMem> getProteinsForPeptide(int PeptideID,MsfFile msfFile);
+}
