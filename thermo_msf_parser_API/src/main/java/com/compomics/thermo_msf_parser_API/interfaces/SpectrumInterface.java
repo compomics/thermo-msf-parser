@@ -20,26 +20,26 @@ public interface SpectrumInterface {
      *
      * @param lXml the unzipped XML spectrum file to retrieve the peaks from
      * @return List with all the MS/MS peaks
-     * @throws Exception
+     * @throws IndexOutOfBoundsException if the xml file could not be properly read
      */
 
-    public List<Peak> getMSMSPeaks(String lXml);
+    public List<Peak> getMSMSPeaks(String lXml) throws IndexOutOfBoundsException;
 
     /**
      * @param lXml the unzipped XML spectrum file to retrieve the peaks from
      * @return List with all the MS peaks
-     * @throws Exception
+     * @throws IndexOutOfBoundsException if the xml file could not be properly read
      */
 
-    public List<Peak> getMSPeaks(String lXml);
+    public List<Peak> getMSPeaks(String lXml) throws IndexOutOfBoundsException;
 
     /**
 
      @param lXml the unzipped XML spectrum file to retrieve the peaks from
      @return the fragmented MS peak from the XML file created with the createSpectrumXMLForPeptide method
-     @throws Exception
+     * @throws IndexOutOfBoundsException if the xml file could not be properly read
      */
-    public Peak getFragmentedMsPeak(String lXml);
+    public Peak getFragmentedMsPeak(String lXml) throws IndexOutOfBoundsException;
 
    
     /**
@@ -59,7 +59,7 @@ public interface SpectrumInterface {
     public void createSpectrumXMLForSpectrum(SpectrumLowMem lSpectrum, MsfFile msfFile) throws SQLException, IOException;
     
     /**
-     * fetches the zipped xml (if not yet added to the spectrum object) ,unzips it and adds it to the spectrum object
+     * fetches the zipped xml (if not yet added to the spectrum object), unzips it and adds it to the spectrum object
      * @param spectrum the spectrum of which we want the unzipped xml file
      */
     public void unzipXMLforSpectrum(SpectrumLowMem spectrum);

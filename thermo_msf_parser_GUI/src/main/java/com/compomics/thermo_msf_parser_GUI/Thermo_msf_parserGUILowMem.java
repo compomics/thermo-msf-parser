@@ -769,7 +769,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
 
                      }*/
                     for (int i = 0; i < iMsfFileLocations.size(); i++) {
-                        MsfFile msfFile = new MsfFile(iMsfFileLocations.get(i));
+                        msfFile = new MsfFile(iMsfFileLocations.get(i));
                         progressBar.setValue(i + 1);
                         progressBar.setString("Parsing: " + iMsfFileLocations.get(i).getName());
                         progressBar.updateUI();
@@ -1845,6 +1845,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
     private ArrayList<Object[]> collectPeptidesFromProtein(ArrayList<Object[]> lPeptides, ProteinLowMem lProtein, MsfFile iParsedMsf) {
         List<PeptideLowMem> peptides = lProtein.getPeptidesForProtein();
         for (PeptideLowMem lPeptide : peptides) {
+            lPeptide = new GUIPeptideLowMem(lPeptide,iParsedMsf.getAminoAcids(),iParsedMsf);
             int lConfidenceLevel = lPeptide.getConfidenceLevel();
             boolean lUse = false;
             if (chbHighConfident.isSelected() && lConfidenceLevel == 3) {
@@ -1944,7 +1945,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
             //only add the peptide line if we need to use it
             for (ProteinLowMem lProtein : iDisplayedProteins) {
                 for (PeptideLowMem lPeptide : lProtein.getPeptidesForProtein()) {
-                    lPeptideLines.add(createPeptideLine(lPeptide,((GUIProteinLowMem)lProtein).getMsfFile()));
+                    lPeptideLines.add(createPeptideLine(new GUIPeptideLowMem(lPeptide,((GUIProteinLowMem)lProtein).getMsfFile().getAminoAcids(),((GUIProteinLowMem)lProtein).getMsfFile()),((GUIProteinLowMem)lProtein).getMsfFile()));
                 }
             }
         }
