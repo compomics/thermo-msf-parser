@@ -4,6 +4,7 @@
  */
 package com.compomics.thermo_msf_parser_GUI.convenience;
 
+import com.compomics.thermo_msf_parser_API.enums.MsfVersion;
 import com.compomics.thermo_msf_parser_API.highmeminstance.AminoAcid;
 import com.compomics.thermo_msf_parser_API.lowmeminstance.model.MsfFile;
 import com.compomics.thermo_msf_parser_API.lowmeminstance.model.PeptideLowMem;
@@ -16,13 +17,18 @@ import java.util.List;
 public class GUIPeptideLowMem extends PeptideLowMem {
 
     private MsfFile msfFile;
-    
-    public GUIPeptideLowMem(PeptideLowMem peptide,List<AminoAcid> aminoAcids,MsfFile msfFile) {
-        super(peptide.getPeptideId(), peptide.getSpectrumId(), peptide.getConfidenceLevel(), peptide.getSequence(), peptide.getTotalIonsCount(), peptide.getMatchedIonsCount(), peptide.getAnnotation(), peptide.getProcessingNodeNumber(),aminoAcids);
+
+    public GUIPeptideLowMem(PeptideLowMem peptide, List<AminoAcid> aminoAcids, MsfFile msfFile) {
+        super(peptide.getPeptideId(), peptide.getSpectrumId(), peptide.getConfidenceLevel(), peptide.getSequence(), peptide.getTotalIonsCount(), peptide.getMatchedIonsCount(), peptide.getAnnotation(), peptide.getProcessingNodeNumber(), aminoAcids);
+        if (msfFile.getVersion() == MsfVersion.VERSION1_3) {
+            this.setMissedCleavage(peptide.getMissedCleavage());
+            this.setUniquePeptideSequenceId(peptide.getUniquePeptideSequenceId());
+        }
+        this.setParentSpectrum(peptide.getParentSpectrum());
         this.msfFile = msfFile;
     }
-    
-    public MsfFile getMsfFile(){
+
+    public MsfFile getMsfFile() {
         return msfFile;
     }
 }

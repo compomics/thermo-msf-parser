@@ -1,6 +1,5 @@
 package com.compomics.thermo_msf_parser_API.lowmeminstance.controllers;
 
-
 import com.compomics.thermo_msf_parser_API.lowmeminstance.model.MsfFile;
 import com.compomics.thermo_msf_parser_API.highmeminstance.Peak;
 import com.compomics.thermo_msf_parser_API.interfaces.SpectrumInterface;
@@ -34,9 +33,6 @@ public class SpectrumLowMemController implements SpectrumInterface {
             while (rs.next()) {
                 lZippedSpectrumXml = rs.getBytes(1);
             }
-
-            if (lZippedSpectrumXml == null) {
-            }
             File lZippedFile = File.createTempFile("zip", null);
             FileOutputStream fos = new FileOutputStream(lZippedFile);
             fos.write(lZippedSpectrumXml);
@@ -62,10 +58,9 @@ public class SpectrumLowMemController implements SpectrumInterface {
             lStream.close();
             rs.close();
             stat.close();
-            return lXml;
-        } else {
-            return lXml;
         }
+            return lXml;
+        
     }
 
     /**
@@ -76,9 +71,8 @@ public class SpectrumLowMemController implements SpectrumInterface {
      * @throws Exception
      */
     @Override
-    public List<Peak> getMSMSPeaks(String lXml) {
+    public List<Peak> getMSMSPeaks(String lXml) throws IndexOutOfBoundsException {
         List<Peak> lPeaks = new ArrayList<Peak>();
-        try {
             String xmlSubstring = lXml.substring(lXml.indexOf("<Peak ", lXml.indexOf("<PeakCentr")), lXml.lastIndexOf("</"));
             String[] lLines = xmlSubstring.split("\n");
             for (int i = 0; i < lLines.length; i++) {
@@ -86,9 +80,6 @@ public class SpectrumLowMemController implements SpectrumInterface {
                     lPeaks.add(new Peak(lLines[i]));
                 }
             }
-        } catch (IndexOutOfBoundsException e) {
-            //no peaks found
-        }
         return lPeaks;
     }
 
@@ -100,7 +91,7 @@ public class SpectrumLowMemController implements SpectrumInterface {
      * @throws Exception
      */
     @Override
-    public List<Peak> getMSPeaks(String lXml) {
+    public List<Peak> getMSPeaks(String lXml) throws IndexOutOfBoundsException {
         String xmlSubstring = lXml.substring(lXml.indexOf("<Peak ", lXml.indexOf("<IsotopeClusterPeakCentroids")), lXml.lastIndexOf("</"));
         String[] lLines = xmlSubstring.split("\n");
         List<Peak> lPeaks = new ArrayList<Peak>();
@@ -118,7 +109,7 @@ public class SpectrumLowMemController implements SpectrumInterface {
      * @return a peak object containing the fragmented MS peak
      */
     @Override
-    public Peak getFragmentedMsPeak(String lXml) {
+    public Peak getFragmentedMsPeak(String lXml) throws IndexOutOfBoundsException {
         String xmlSubstring = lXml.substring(lXml.indexOf("<MonoisotopicPeakCentroids"), lXml.lastIndexOf("</"));
         String[] lLines = xmlSubstring.split("\n");
         Peak lPeak = null;
@@ -154,9 +145,8 @@ public class SpectrumLowMemController implements SpectrumInterface {
         }
         return iSpectra;
     }
-    
-    
-        /**
+
+    /**
      *
      * @param aConnection connection to the msf file
      * @return a vector containing all the spectra (in spectrum objects) stored
@@ -199,10 +189,10 @@ public class SpectrumLowMemController implements SpectrumInterface {
             } catch (SQLException ex) {
                 logger.error(ex);
             }
-            return returnSpectrum;
-        } else {
-            return returnSpectrum;
+
         }
+        return returnSpectrum;
+
     }
 
     public SpectrumLowMem getSpectrumForPeptideID(int peptideOfInterest, MsfFile msfFile) {
@@ -259,6 +249,8 @@ public class SpectrumLowMemController implements SpectrumInterface {
         return spectrumTitle + "_" + lspectrum.getSpectrumId() + "_" + lspectrum.getFirstScan() + "_" + lspectrum.getCharge();
     }
 
+    //TODO redo this part properly
+    
     /**
      *
      * @param lSpectrum
@@ -268,6 +260,7 @@ public class SpectrumLowMemController implements SpectrumInterface {
      */
     @Override
     public void createSpectrumXMLForSpectrum(SpectrumLowMem lSpectrum, MsfFile msfFile) throws IOException {
+        //TODO make own spectrumfile object to return to avoid constantly going through this
         try {
             byte[] lZippedSpectrumXml = null;
             String lXml;
