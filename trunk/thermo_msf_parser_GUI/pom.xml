@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
- <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
     <groupId>com.compomics.thermo_msf_parser</groupId>
     <artifactId>thermo_msf_parser_GUI</artifactId>
     <version>2.0.3</version>
@@ -15,7 +15,7 @@
     <properties>
         <logging.level.default>ERROR</logging.level.default>
         <logging.file.path.name>thermo-msf-parser.log</logging.file.path.name>
-                <logging.file.max.size>5000KB</logging.file.max.size>
+        <logging.file.max.size>5000KB</logging.file.max.size>
         <logging.pattern>[%d{dd-MMM-yyyy HH:mm:ss} - %p] "%m" (%C:%L)%n</logging.pattern>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -27,13 +27,118 @@
         </license>
     </licenses>
     <build>
+        
+        <!-- Copy the resources required during building -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>thermo.msf.parser.properties</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>thermo.msf.parser.properties</exclude>
+                </excludes>
+            </resource>
+        </resources>
+        
+        <!-- Plugins -->
+        <plugins>
+        
+            <!-- Resources plugin -->
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.3</version>
+                <executions>
+                    <!-- Copy main resources to test resources before testing.  -->
+                    <execution>
+                        <id>copy-test-resources</id>
+                        <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <overwrite>true</overwrite>
+                            <outputDirectory>src/test/resources</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+
+                    <!-- Copy the resources -->
+                    <execution>
+                        <id>copy-package-resources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/
+                            </outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>./</directory>
+                                    <includes>
+                                        <include>resources/</include>
+                                        <include>README.txt</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+ 
+        </plugins>
+        
     </build>
     <dependencies>
         <dependency>
             <groupId>com.compomics</groupId>
             <artifactId>utilities</artifactId>
-            <version>3.10.37</version>
+            <version>3.13.1</version>
             <type>jar</type>
+            <exclusions>
+                <exclusion>
+                    <artifactId>mascotdatfile</artifactId>
+                    <groupId>com.compomics</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>omssa-parser</artifactId>
+                    <groupId>de.proteinms.omxparser</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>xtandem-parser</artifactId>
+                    <groupId>de.proteinms.xtandemparser</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>ms-lims</artifactId>
+                    <groupId>com.compomics</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jmzml</artifactId>
+                    <groupId>uk.ac.ebi.jmzml</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>batik-all</artifactId>
+                    <groupId>batik</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>pdf-transcoder</artifactId>
+                    <groupId>batik</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>xercesImpl</artifactId>
+                    <groupId>xerces</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -46,6 +151,11 @@
             <artifactId>thermo_msf_parser_API</artifactId>
             <version>2.0.3</version>
             <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.1</version>
         </dependency>
     </dependencies>
 </project>

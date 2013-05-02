@@ -2264,7 +2264,7 @@ public class Thermo_msf_parserGUI extends JFrame {
         Properties p = new Properties();
 
         try {
-            InputStream is = this.getClass().getClassLoader().getResourceAsStream("thermo_msf_parser.properties");
+            InputStream is = this.getClass().getClassLoader().getResourceAsStream("thermo.msf.parser.properties");
             p.load(is);
         } catch (IOException e) {
             logger.info(e);
