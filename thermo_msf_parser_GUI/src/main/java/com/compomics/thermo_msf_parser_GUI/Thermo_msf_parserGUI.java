@@ -2270,7 +2270,7 @@ public class Thermo_msf_parserGUI extends JFrame {
             logger.info(e);
         }
 
-        return p.getProperty("version");
+        return p.getProperty("thermo.msf.parser.version");
     }
 
     /**
