@@ -59,6 +59,7 @@ import java.util.Observer;
 import java.util.List;
 import java.util.Observable;
 import java.util.Properties;
+import java.util.logging.Level;
 
 /**
  * Created by IntelliJ IDEA. User: Davy Date: 4/25/12 Time: 1:45 PM
@@ -602,7 +603,11 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
         ActionListener spectrumViewChange = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                peptidesTableMouseClicked(null);
+                try {
+                    peptidesTableMouseClicked(null);
+                } catch (IOException ex) {
+                    java.util.logging.Logger.getLogger(Thermo_msf_parserGUILowMem.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         };
 
@@ -1222,13 +1227,21 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
         jtablePeptides.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent evt) {
-                peptidesTableKeyReleased(evt);
+                try {
+                    peptidesTableKeyReleased(evt);
+                } catch (IOException ex) {
+                    java.util.logging.Logger.getLogger(Thermo_msf_parserGUILowMem.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
         jtablePeptides.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent evt) {
-                peptidesTableMouseClicked(evt);
+                try {
+                    peptidesTableMouseClicked(evt);
+                } catch (IOException ex) {
+                    java.util.logging.Logger.getLogger(Thermo_msf_parserGUILowMem.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
         if (jscollPeptides == null) {
@@ -2245,7 +2258,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
         return p.getProperty("version");
     }
 
-    private void peptidesTableKeyReleased(KeyEvent evt) {
+    private void peptidesTableKeyReleased(KeyEvent evt) throws IOException {
         peptidesTableMouseClicked(null);
     }
 
@@ -2351,7 +2364,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
      *
      * @throws java.sql.SQLException
      */
-    private void peptidesTableMouseClicked(MouseEvent evt) {
+    private void peptidesTableMouseClicked(MouseEvent evt) throws IOException {
 
         // Set the cursor into the wait status.
         this.setCursor(new Cursor(Cursor.WAIT_CURSOR));
@@ -2369,7 +2382,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                 selectedProteinListModel.addElement(aArrayListEntry);
             }
             SpectrumLowMem spectrumOfPeptide = iSelectedPeptide.getParentSpectrum();
-            spectrumLowMemInstance.unzipXMLforSpectrum(spectrumOfPeptide);
+            spectrumLowMemInstance.createSpectrumXMLForSpectrum(spectrumOfPeptide, msfFile);
 
             try {
                 if (msmsCheckBox.isSelected()) {
