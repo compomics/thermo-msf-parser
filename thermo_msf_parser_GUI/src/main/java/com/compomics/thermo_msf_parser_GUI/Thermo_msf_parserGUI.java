@@ -40,19 +40,18 @@ import java.awt.event.*;
 import java.io.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Niklaas
- * Date: 23-Feb-2011
- * Time: 08:01:12
+ * Created by IntelliJ IDEA. User: Niklaas Date: 23-Feb-2011 Time: 08:01:12
  */
 public class Thermo_msf_parserGUI extends JFrame {
-    // Class specific log4j logger for Thermo_msf_parserGUI instances.
+    // Class specific log4j logger for Thermo_msf_parserGUI instance
+
     private static Logger logger = Logger.getLogger(Thermo_msf_parserGUI.class);
     //gui elements
     private JPanel jpanContent;
@@ -111,7 +110,6 @@ public class Thermo_msf_parserGUI extends JFrame {
     private SpectrumPanel iMSMSspectrumPanel;
     private SpectrumPanel iMSspectrumPanel;
     private SpectrumPanel iQuantificationSpectrumPanel;
-
     /**
      * A vector with the absolute paths to the msf file
      */
@@ -181,16 +179,15 @@ public class Thermo_msf_parserGUI extends JFrame {
      */
     private boolean hasPhosphoRS;
 
-
     /**
      * The constructor
      *
      * @param lStandAlone
      */
-    public Thermo_msf_parserGUI(boolean lStandAlone) {
+    public Thermo_msf_parserGUI(boolean lStandAlone, List<String> msfFileLocations) {
 
         this.iStandAlone = lStandAlone;
-
+        iMsfFileLocations = msfFileLocations;
         //create the gui
         jtablePeptides = new JTable();
         jscollPeptides = new JScrollPane();
@@ -231,16 +228,14 @@ public class Thermo_msf_parserGUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 loadData(true);
             }
-        }
-        );
+        });
         final JMenuItem lCloseItem = new JMenuItem("Close");
         lCloseItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 closeMethod();
             }
-        }
-        );
+        });
         final JMenuItem lAboutItem = new JMenuItem("About");
         lAboutItem.addActionListener(new ActionListener() {
             @Override
@@ -248,8 +243,7 @@ public class Thermo_msf_parserGUI extends JFrame {
                 HelpWindow lHelp = new HelpWindow(getFrame(), getClass().getResource("/about.html"));
                 lHelp.setTitle("About Thermo MSF Viewer");
             }
-        }
-        );
+        });
         lInfoMenu.add(lAboutItem);
         final JMenuItem lHelpItem = new JMenuItem("Help");
         lHelpItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
@@ -258,7 +252,7 @@ public class Thermo_msf_parserGUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 int lResult = JOptionPane.showOptionDialog(getFrame(),
                         "Are you experiencing unexpected failures or errors?\n"
-                                + "Or have a question about the program?",
+                        + "Or have a question about the program?",
                         "Help",
                         JOptionPane.YES_NO_OPTION,
                         JOptionPane.ERROR_MESSAGE,
@@ -271,8 +265,7 @@ public class Thermo_msf_parserGUI extends JFrame {
                     StartBrowser.start(lIssuesPage);
                 }
             }
-        }
-        );
+        });
         lInfoMenu.add(lHelpItem);
 
         // Create a menu item
@@ -336,16 +329,12 @@ public class Thermo_msf_parserGUI extends JFrame {
                         JOptionPane.showMessageDialog(new JFrame(), "Saving done", "Info", JOptionPane.INFORMATION_MESSAGE);
 
                     }
-
                 };
                 lCsvSaver.start();
 
 
             }
-        }
-
-
-        );
+        });
 
 
         // Create a menu item
@@ -432,8 +421,7 @@ public class Thermo_msf_parserGUI extends JFrame {
 
 
             }
-        }
-        );
+        });
 
 
         //add the menuitems to the menu
@@ -488,12 +476,13 @@ public class Thermo_msf_parserGUI extends JFrame {
                     iDisplayedProteins.add(iProteins.get(i));
                 }
                 filterDisplayedProteins();
+                proteinList.setListData(iDisplayedProteins.toArray());
                 proteinList.updateUI();
                 jtablePeptides.updateUI();
+                selectedProteinList.setListData(iDisplayedProteinsOfInterest.toArray());
                 selectedProteinList.updateUI();
             }
-        }
-        );
+        });
 
         jbuttonAlphabeticalSort.addActionListener(new ActionListener() {
             @Override
@@ -502,18 +491,21 @@ public class Thermo_msf_parserGUI extends JFrame {
                     //Collections.sort(iDisplayedProteins, (new ProteinSorter()).compareProteinByAccession(true));
                     filterDisplayedProteins();
                     jbuttonAlphabeticalSort.setText("Z -> A");
+                    proteinList.setListData(iDisplayedProteins.toArray());
                     proteinList.updateUI();
+                    selectedProteinList.setListData(iDisplayedProteinsOfInterest.toArray());
                     selectedProteinList.updateUI();
                 } else {
                     //Collections.sort(iDisplayedProteins, (new ProteinSorter()).compareProteinByAccession(true));
                     filterDisplayedProteins();
                     jbuttonAlphabeticalSort.setText("A -> Z");
+                    proteinList.setListData(iDisplayedProteins.toArray());
                     proteinList.updateUI();
+                    selectedProteinList.setListData(iDisplayedProteinsOfInterest.toArray());
                     selectedProteinList.updateUI();
                 }
             }
-        }
-        );
+        });
         jbuttonNumberSort.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -521,18 +513,21 @@ public class Thermo_msf_parserGUI extends JFrame {
                     //Collections.sort(iDisplayedProteins, new ProteinSorter());
                     filterDisplayedProteins();
                     jbuttonNumberSort.setText("20 -> 1");
+                    proteinList.setListData(iDisplayedProteins.toArray());
                     proteinList.updateUI();
+                    selectedProteinList.setListData(iDisplayedProteinsOfInterest.toArray());
                     selectedProteinList.updateUI();
                 } else {
                     //Collections.sort(iDisplayedProteins, new ProteinSorter());
                     filterDisplayedProteins();
                     jbuttonNumberSort.setText("1 -> 20");
+                    proteinList.setListData(iDisplayedProteins.toArray());
                     proteinList.updateUI();
+                    selectedProteinList.setListData(iDisplayedProteinsOfInterest.toArray());
                     selectedProteinList.updateUI();
                 }
             }
-        }
-        );
+        });
         ActionListener chbChangeActionListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -541,7 +536,9 @@ public class Thermo_msf_parserGUI extends JFrame {
                     formatProteinSequence(iSelectedProtein);
                 }
                 filterDisplayedProteins();
+                proteinList.setListData(iDisplayedProteins.toArray());
                 proteinList.updateUI();
+                selectedProteinList.setListData(iDisplayedProteinsOfInterest.toArray());
                 selectedProteinList.updateUI();
                 jtablePeptides.updateUI();
 
@@ -588,16 +585,13 @@ public class Thermo_msf_parserGUI extends JFrame {
             public void windowClosing(WindowEvent evt) {
                 closeMethod();
             }
-        }
-        );
+        });
 
 
         //load data
         loadData(false);
 
         startRoverButton.addActionListener(new ActionListener() {
-
-
             @Override
             public void actionPerformed(ActionEvent e) {
             }
@@ -676,7 +670,6 @@ public class Thermo_msf_parserGUI extends JFrame {
                         iMergedCustomSpectrumData = null;
                         iMergedRatioTypes = null;
                         iMsfFileLocations.clear();
-
                         proteinList.updateUI();
                         selectedProteinList.updateUI();
                         ((DefaultTableModel) jtablePeptides.getModel()).setNumRows(0);
@@ -685,27 +678,6 @@ public class Thermo_msf_parserGUI extends JFrame {
                         proteinSequenceCoverageJEditorPane.setText("");
                         iSelectedPeptide = null;
                         iSelectedProtein = null;
-                    }
-
-                    //open file chooser
-                    JFileChooser fc = new JFileChooser();
-                    fc.setMultiSelectionEnabled(true);
-                    //create the file filter to choose
-                    FileFilter lFilter = new MsfFileFilter();
-                    fc.setFileFilter(lFilter);
-                    int returnVal = fc.showOpenDialog(getFrame());
-                    File[] lFiles;
-                    if (returnVal == JFileChooser.APPROVE_OPTION) {
-                        lFiles = fc.getSelectedFiles();
-                        for (int i = 0; i < lFiles.length; i++) {
-                            iMsfFileLocations.add(lFiles[i].getAbsolutePath());
-                        }
-                    } else {
-                        JOptionPane.showMessageDialog(new JFrame(), "Open command cancelled by user.", "Info", JOptionPane.INFORMATION_MESSAGE);
-                        return true;
-                    }
-                    if (lFiles.length > 1) {
-                        JOptionPane.showMessageDialog(getFrame(), "The workflow of the different msf files that are loaded must be the same.\nUnexpected crashes can occur if files with different workflows are loaded!", "Info", JOptionPane.INFORMATION_MESSAGE);
                     }
 
                     progressBar.setVisible(true);
@@ -727,16 +699,16 @@ public class Thermo_msf_parserGUI extends JFrame {
                         }
                         System.gc();
                     }
-                    
+
                     hasPhosphoRS = iParsedMsfs.get(0).hasPhosphoRS();
-                    
+
                     //load processing nodes
                     processingNodeTabbedPane.removeAll();
                     for (int i = 0; i < iParsedMsfs.get(0).getProcessingNodes().size(); i++) {
                         if (iParsedMsfs.get(0).getQuantificationMethod() != null) {
                             iQuantitationFound = true;
                         }
-                        
+
                         ProcessingNode lNode = iParsedMsfs.get(0).getProcessingNodes().get(i);
                         String lTitle = lNode.getProcessingNodeNumber() + " " + lNode.getFriendlyName();
 
@@ -774,7 +746,6 @@ public class Thermo_msf_parserGUI extends JFrame {
                         DefaultTableModel jtablePeptideModel = new DefaultTableModel(
                                 ls,
                                 lTableColumnsTitle) {
-
                             Class[] types = lTableColumnsClass;
                             Boolean[] canEdit = lTableColumnsEditable;
 
@@ -817,11 +788,11 @@ public class Thermo_msf_parserGUI extends JFrame {
                     createPeptideTable(null);
                     iDisplayedProteins.clear();
                     iDisplayedProteinsOfInterest.clear();
-                    for (int i = 0; i < iProteins.size(); i++) {
-                        iDisplayedProteins.add(iProteins.get(i));
-                    }
+                    iDisplayedProteins.addAll(iProteins);
                     filterDisplayedProteins();
+                    proteinList.setListData(iDisplayedProteins.toArray());
                     proteinList.updateUI();
+                    selectedProteinList.setListData(iDisplayedProteinsOfInterest.toArray());
                     selectedProteinList.updateUI();
                     progressBar.setIndeterminate(false);
                     progressBar.setVisible(false);
@@ -850,7 +821,6 @@ public class Thermo_msf_parserGUI extends JFrame {
                     JOptionPane.showMessageDialog(null, "All data was loaded", "Info", JOptionPane.INFORMATION_MESSAGE);
                 }
             }
-
         };
         lParser.start();
     }
@@ -895,9 +865,9 @@ public class Thermo_msf_parserGUI extends JFrame {
     }
 
     /**
-     * This method will filter the proteins in the protein list. It will
-     * look if proteins still need to be displayed after that the peptide
-     * confidence level is changed
+     * This method will filter the proteins in the protein list. It will look if
+     * proteins still need to be displayed after that the peptide confidence
+     * level is changed
      */
     public void filterDisplayedProteins() {
         List<Protein> lProteinsToRemove = new ArrayList<Protein>();
@@ -942,9 +912,9 @@ public class Thermo_msf_parserGUI extends JFrame {
     }
 
     /**
-     * This method will create the peptide table based on the given protein.
-     * If no protein is given (null) all peptides found in the different msf
-     * files will be displayed
+     * This method will create the peptide table based on the given protein. If
+     * no protein is given (null) all peptides found in the different msf files
+     * will be displayed
      *
      * @param lProtein The protein to display the peptides off
      */
@@ -981,7 +951,7 @@ public class Thermo_msf_parserGUI extends JFrame {
         lPeptideTableColumnsTitleList.add("Modified Sequence");
         lPeptideTableColumnsEditableList.add(false);
         lPeptideTableColumnsClassList.add(String.class);
-        
+
         if (hasPhosphoRS) {
             lPeptideTableColumnsTitleList.add("pRS Score");
             lPeptideTableColumnsEditableList.add(false);
@@ -990,7 +960,7 @@ public class Thermo_msf_parserGUI extends JFrame {
             lPeptideTableColumnsEditableList.add(false);
             lPeptideTableColumnsClassList.add(Double.class);
         }
-        
+
         //get the different score types and add it as columns
         if (iMergedPeptidesScores == null) {
             this.collectPeptideScoreTypes();
@@ -1117,7 +1087,6 @@ public class Thermo_msf_parserGUI extends JFrame {
         DefaultTableModel jtablePeptideModel = new DefaultTableModel(
                 lPeptides,
                 lPeptideTableColumnsTitle) {
-
             Class[] types = lPeptideTableColumnsClass;
             Boolean[] canEdit = lPeptideTableColumnsEditable;
 
@@ -1217,29 +1186,29 @@ public class Thermo_msf_parserGUI extends JFrame {
 
 
         /*for (int i = 0; i < iMergedRatioTypes.size(); i++) {
-            double lLowScore = Double.MAX_VALUE;
-            double lHighScore = Double.MIN_VALUE;
+         double lLowScore = Double.MAX_VALUE;
+         double lHighScore = Double.MIN_VALUE;
 
-            for (int p = 0; p < lPeptides.length; p++) {
-                Peptide lPeptide = (Peptide) lPeptides[p][2];
-                if (lPeptide.getParentSpectrum().getQuanResult() != null && lPeptide.getParentSpectrum().getQuanResult().getRatioByRatioType(iMergedRatioTypes.get(i)) != null) {
-                lPeptide.getParentSpectrum().getQuanResult().getRatioByRatioType(iMergedRatioTypes.get(i));
-                    double lScore = lPeptide.getParentSpectrum().getQuanResult().getRatioByRatioType(iMergedRatioTypes.get(i));
-                    if (lLowScore > lScore) {
-                        lLowScore = lScore;
-                    }
-                    if (lHighScore < lScore) {
-                        lHighScore = lScore;
-                    }
-                }
-            }
+         for (int p = 0; p < lPeptides.length; p++) {
+         Peptide lPeptide = (Peptide) lPeptides[p][2];
+         if (lPeptide.getParentSpectrum().getQuanResult() != null && lPeptide.getParentSpectrum().getQuanResult().getRatioByRatioType(iMergedRatioTypes.get(i)) != null) {
+         lPeptide.getParentSpectrum().getQuanResult().getRatioByRatioType(iMergedRatioTypes.get(i));
+         double lScore = lPeptide.getParentSpectrum().getQuanResult().getRatioByRatioType(iMergedRatioTypes.get(i));
+         if (lLowScore > lScore) {
+         lLowScore = lScore;
+         }
+         if (lHighScore < lScore) {
+         lHighScore = lScore;
+         }
+         }
+         }
 
 
-            JSparklinesBarChartTableCellRenderer lScoreCellRenderer;
-            lScoreCellRenderer = new JSparklinesBarChartTableCellRenderer(PlotOrientation.HORIZONTAL, lLowScore, lHighScore, Color.RED, Color.GREEN);
-            jtablePeptides.getColumn(iMergedRatioTypes.get(i).getRatioType()).setCellRenderer(lScoreCellRenderer);
-            lScoreCellRenderer.showNumberAndChart(true, 50);
-        } */
+         JSparklinesBarChartTableCellRenderer lScoreCellRenderer;
+         lScoreCellRenderer = new JSparklinesBarChartTableCellRenderer(PlotOrientation.HORIZONTAL, lLowScore, lHighScore, Color.RED, Color.GREEN);
+         jtablePeptides.getColumn(iMergedRatioTypes.get(i).getRatioType()).setCellRenderer(lScoreCellRenderer);
+         lScoreCellRenderer.showNumberAndChart(true, 50);
+         } */
 
         jtablePeptides.setOpaque(false);
         jtablePeptides.addKeyListener(new KeyAdapter() {
@@ -1289,9 +1258,8 @@ public class Thermo_msf_parserGUI extends JFrame {
     }
 
     /**
-     * Method generated by IntelliJ IDEA GUI Designer
-     * >>> IMPORTANT!! <<<
-     * DO NOT edit this method OR call it in your code!
+     * Method generated by IntelliJ IDEA GUI Designer >>> IMPORTANT!! <<< DO NOT
+     * edit this method OR call it in your code!
      *
      * @noinspection ALL
      */
@@ -1801,16 +1769,17 @@ public class Thermo_msf_parserGUI extends JFrame {
     }
 
     public class ProcessingNodeRenderer extends DefaultTableCellRenderer {
+
         @Override
         public Component getTableCellRendererComponent(JTable table, Object lProcessingNodeObject, boolean isSelected, boolean hasFocus, int row, int column) {
             ProcessingNode lProcessingNode = (ProcessingNode) lProcessingNodeObject;
             Component cell = super.getTableCellRendererComponent(table, lProcessingNode.getProcessingNodeNumber() + ": " + lProcessingNode.getFriendlyName(), isSelected, hasFocus, row, column);
             /*String lToolTipHtml = "<html><b>" + lProcessingNode.getFriendlyName() + "</b>";
-            for (int i = 0; i < lProcessingNode.getProcessingNodeParameters().size(); i++) {
-                lToolTipHtml = lToolTipHtml + "<br>" + lProcessingNode.getProcessingNodeParameters().get(i).getFriendlyName() + ": " + lProcessingNode.getProcessingNodeParameters().get(i).getValueDisplayString();
-            }
-            lToolTipHtml = lToolTipHtml + "</html>";
-            setToolTipText(lToolTipHtml);           */
+             for (int i = 0; i < lProcessingNode.getProcessingNodeParameters().size(); i++) {
+             lToolTipHtml = lToolTipHtml + "<br>" + lProcessingNode.getProcessingNodeParameters().get(i).getFriendlyName() + ": " + lProcessingNode.getProcessingNodeParameters().get(i).getValueDisplayString();
+             }
+             lToolTipHtml = lToolTipHtml + "</html>";
+             setToolTipText(lToolTipHtml);           */
             return cell;
         }
     }
@@ -1825,10 +1794,11 @@ public class Thermo_msf_parserGUI extends JFrame {
     }
 
     /**
-     * This method will generete the object for the peptide table, based on a given protein
+     * This method will generete the object for the peptide table, based on a
+     * given protein
      *
      * @param lPeptides List to add the peptide line objects to it
-     * @param lProtein  The selected protein
+     * @param lProtein The selected protein
      * @return List with the peptide line objects
      */
     private List<Object[]> collectPeptidesFromProtein(List<Object[]> lPeptides, Protein lProtein) {
@@ -1868,7 +1838,8 @@ public class Thermo_msf_parserGUI extends JFrame {
     }
 
     /**
-     * This method will generete the object for the peptide table for all the peptides
+     * This method will generete the object for the peptide table for all the
+     * peptides
      *
      * @param lPeptides List to add the peptide line objects to it
      * @return List with the peptide line objects
@@ -1955,7 +1926,6 @@ public class Thermo_msf_parserGUI extends JFrame {
                         selectedProteinList.updateUI();
                     }
                 }
-
             });
             selectedProteinList.addMouseListener(new MouseAdapter() {
                 @Override
@@ -1977,10 +1947,11 @@ public class Thermo_msf_parserGUI extends JFrame {
                         proteinList.updateUI();
                     }
                 }
-
             });
             this.filterDisplayedProteins();
+            proteinList.setListData(iDisplayedProteins.toArray());
             proteinList.updateUI();
+            selectedProteinList.setListData(iDisplayedProteinsOfInterest.toArray());
             selectedProteinList.updateUI();
         }
         return lPeptides;
@@ -1998,7 +1969,7 @@ public class Thermo_msf_parserGUI extends JFrame {
         lPeptideObject.add(lPeptide.getParentSpectrum().getSpectrumTitle());
         lPeptideObject.add(lPeptide);
         lPeptideObject.add(lPeptide.getModifiedPeptide());
-        
+
         if (hasPhosphoRS) {
             Float pRSScore = lPeptide.getPhosphoRSScore();
             if (pRSScore != null) {
@@ -2013,7 +1984,7 @@ public class Thermo_msf_parserGUI extends JFrame {
                 lPeptideObject.add(null);
             }
         }
-        
+
         for (int j = 0; j < iMergedPeptidesScores.size(); j++) {
             if (!peptideInformationChb.isSelected()) {
                 if (iMergedPeptidesScores.get(j).getIsMainScore() == 1) {
@@ -2116,7 +2087,8 @@ public class Thermo_msf_parserGUI extends JFrame {
     }
 
     /**
-     * This method will collect the custom peptide data used in the different msf files
+     * This method will collect the custom peptide data used in the different
+     * msf files
      */
     private void collectCustomPeptideData() {
         iMergedCustomPeptideData = new ArrayList<CustomDataField>();
@@ -2136,9 +2108,9 @@ public class Thermo_msf_parserGUI extends JFrame {
 
     }
 
-
     /**
-     * This method will collect the custom spectrum data used in the different msf files
+     * This method will collect the custom spectrum data used in the different
+     * msf files
      */
     private void collectCustomSpectrumData() {
         iMergedCustomSpectrumData = new ArrayList<CustomDataField>();
@@ -2185,11 +2157,12 @@ public class Thermo_msf_parserGUI extends JFrame {
     }
 
     /**
-     * This method will generate the spectrum annotations based on the charge and the ion checkboxes
+     * This method will generate the spectrum annotations based on the charge
+     * and the ion checkboxes
      *
      * @param lAnnotations List to add the annotations to
-     * @param lCharge      The charge
-     * @param lPeptide     The peptide
+     * @param lCharge The charge
+     * @param lPeptide The peptide
      * @return List with the annotations
      */
     public List<DefaultSpectrumAnnotation> addIonAnnotationByCharge(List<DefaultSpectrumAnnotation> lAnnotations, int lCharge, Peptide lPeptide) {
@@ -2250,6 +2223,10 @@ public class Thermo_msf_parserGUI extends JFrame {
             String label = lIon.getIonType() + lIon.getNumber() + chargeAsString + lIon.getNeutralLoss();
             lAnno = new DefaultSpectrumAnnotation(lIon.theoreticMass, iMSMSerror, SpectrumPanel.determineColorOfPeak(label), label);
 
+            if (lAnno != null) {
+                lAnnotations.add(lAnno);
+            }
+
         }
         return lAnnotations;
     }
@@ -2280,10 +2257,9 @@ public class Thermo_msf_parserGUI extends JFrame {
         peptidesTableMouseClicked(null);
     }
 
-
     /**
-     * Formats the protein sequence such that both the covered parts of the sequence
-     * and the peptide selected in the peptide table is highlighted.
+     * Formats the protein sequence such that both the covered parts of the
+     * sequence and the peptide selected in the peptide table is highlighted.
      * This code is based on the compomics utilities sample code
      *
      * @param lProtein
@@ -2416,6 +2392,7 @@ public class Thermo_msf_parserGUI extends JFrame {
                 }
             }
             this.filterDisplayedProteins();
+            selectedProteinList.setListData(iDisplayedProteinsOfInterest.toArray());
             selectedProteinList.updateUI();
 
 
@@ -2527,88 +2504,88 @@ public class Thermo_msf_parserGUI extends JFrame {
 
                     //add the chromatograms
 
-                        jtabChromatogram.removeAll();
-                        if (jtabpanLower.indexOfTab("Chromatogram") == -1) {
-                            jtabpanLower.add("Chromatogram", jtabChromatogram);
-                        }
-                        List<Chromatogram> lChros = iSelectedPeptide.getParentSpectrum().getParser().getChromatograms();
-                        for (int c = 0; c < lChros.size(); c++) {
-                            Chromatogram lChro = lChros.get(c);
-                            if (lChro.getFileId() == iSelectedPeptide.getParentSpectrum().getFileId()) {
-                                List<Chromatogram.Point> lPoints = lChro.getPoints();
+                    jtabChromatogram.removeAll();
+                    if (jtabpanLower.indexOfTab("Chromatogram") == -1) {
+                        jtabpanLower.add("Chromatogram", jtabChromatogram);
+                    }
+                    List<Chromatogram> lChros = iSelectedPeptide.getParentSpectrum().getParser().getChromatograms();
+                    for (int c = 0; c < lChros.size(); c++) {
+                        Chromatogram lChro = lChros.get(c);
+                        if (lChro.getFileId() == iSelectedPeptide.getParentSpectrum().getFileId()) {
+                            List<Chromatogram.Point> lPoints = lChro.getPoints();
 
-                                double[] lXvalues = new double[lPoints.size()];
-                                double[] lYvalues = new double[lPoints.size()];
+                            double[] lXvalues = new double[lPoints.size()];
+                            double[] lYvalues = new double[lPoints.size()];
 
-                                double lMaxY = 0.0;
-                                for (int p = 0; p < lPoints.size(); p++) {
-                                    if (lPoints.get(p).getY() > 0.0) {
-                                        lXvalues[p] = lPoints.get(p).getT();
-                                        lYvalues[p] = lPoints.get(p).getY();
-                                        if (lPoints.get(p).getY() > lMaxY) {
-                                            lMaxY = lPoints.get(p).getY();
-                                        }
+                            double lMaxY = 0.0;
+                            for (int p = 0; p < lPoints.size(); p++) {
+                                if (lPoints.get(p).getY() > 0.0) {
+                                    lXvalues[p] = lPoints.get(p).getT();
+                                    lYvalues[p] = lPoints.get(p).getY();
+                                    if (lPoints.get(p).getY() > lMaxY) {
+                                        lMaxY = lPoints.get(p).getY();
                                     }
                                 }
-
-                                // create the chromatogram
-                                ChromatogramPanel chromatogramPanel = new ChromatogramPanel(
-                                        lXvalues, lYvalues, "Time (minutes)", "Intensity");
-                                chromatogramPanel.setMaxPadding(65);
-
-                                double lAreaDistance = chromatogramPanel.getMaxXAxisValue() / 500.0;
-                                if (iSelectedProtein != null) {
-                                    for (int p = 0; p < iSelectedProtein.getPeptides().size(); p++) {
-                                        Peptide lPeptide = iSelectedProtein.getPeptides().get(p);
-                                        int lConfidenceLevel = lPeptide.getConfidenceLevel();
-                                        boolean lUse = false;
-                                        if (chbHighConfident.isSelected() && lConfidenceLevel == 3) {
-                                            lUse = true;
-                                        }
-                                        if (chbMediumConfident.isSelected() && lConfidenceLevel == 2) {
-                                            lUse = true;
-                                        }
-                                        if (chbLowConfidence.isSelected() && lConfidenceLevel == 1) {
-                                            lUse = true;
-                                        }
-                                        if (onlyHighestScoringRadioButton.isSelected()) {
-                                            if (!lPeptide.getParentSpectrum().isHighestScoring(lPeptide, iMajorScoreTypes)) {
-                                                lUse = false;
-                                            }
-                                        }
-                                        if (onlyLowestScoringRadioButton.isSelected()) {
-                                            if (!lPeptide.getParentSpectrum().isLowestScoring(lPeptide, iMajorScoreTypes)) {
-                                                lUse = false;
-                                            }
-                                        }
-
-                                        if (lUse) {
-                                            if (lPeptide.getParentSpectrum().getParser().getFileName().equalsIgnoreCase(iSelectedPeptide.getParentSpectrum().getParser().getFileName()) && lPeptide.getParentSpectrum().getFileId() == iSelectedPeptide.getParentSpectrum().getFileId()) {
-                                                chromatogramPanel.addReferenceAreaXAxis(new ReferenceArea(String.valueOf(iSelectedProtein.getPeptides().get(p).getParentSpectrum().getFirstScan()), iSelectedProtein.getPeptides().get(p).getParentSpectrum().getRetentionTime() - lAreaDistance, iSelectedProtein.getPeptides().get(p).getParentSpectrum().getRetentionTime() + lAreaDistance, Color.blue, 0.1f, false, false));
-                                            } else {
-                                                chromatogramPanel.addReferenceAreaXAxis(new ReferenceArea(String.valueOf(iSelectedProtein.getPeptides().get(p).getParentSpectrum().getFirstScan()), iSelectedProtein.getPeptides().get(p).getParentSpectrum().getRetentionTime() - lAreaDistance, iSelectedProtein.getPeptides().get(p).getParentSpectrum().getRetentionTime() + lAreaDistance, Color.green, 0.1f, false, false));
-                                            }
-                                        }
-
-                                    }
-                                }
-                                chromatogramPanel.addReferenceAreaXAxis(new ReferenceArea(String.valueOf(iSelectedPeptide.getParentSpectrum().getFirstScan()), iSelectedPeptide.getParentSpectrum().getRetentionTime() - lAreaDistance, iSelectedPeptide.getParentSpectrum().getRetentionTime() + lAreaDistance, Color.red, 0.8f, true, false));
-
-
-                                //chromatogramPanel.setMiniature(true);
-
-                                String lTitle = iSelectedPeptide.getParentSpectrum().getParser().getRawfileNameByFileId(lChro.getFileId());
-                                lTitle = lTitle + " - " + lChro.getTraceType();
-                                jtabChromatogram.add(lTitle, chromatogramPanel);
-                                // remove the default chromatogram panel border, given that our
-                                // chromatogram panel already has a border
-                                chromatogramPanel.setBorder(null);
-
-                                // add the chromatogram panel to the frame
-                                chromatogramPanel.validate();
-                                chromatogramPanel.repaint();
                             }
+
+                            // create the chromatogram
+                            ChromatogramPanel chromatogramPanel = new ChromatogramPanel(
+                                    lXvalues, lYvalues, "Time (minutes)", "Intensity");
+                            chromatogramPanel.setMaxPadding(65);
+
+                            double lAreaDistance = chromatogramPanel.getMaxXAxisValue() / 500.0;
+                            if (iSelectedProtein != null) {
+                                for (int p = 0; p < iSelectedProtein.getPeptides().size(); p++) {
+                                    Peptide lPeptide = iSelectedProtein.getPeptides().get(p);
+                                    int lConfidenceLevel = lPeptide.getConfidenceLevel();
+                                    boolean lUse = false;
+                                    if (chbHighConfident.isSelected() && lConfidenceLevel == 3) {
+                                        lUse = true;
+                                    }
+                                    if (chbMediumConfident.isSelected() && lConfidenceLevel == 2) {
+                                        lUse = true;
+                                    }
+                                    if (chbLowConfidence.isSelected() && lConfidenceLevel == 1) {
+                                        lUse = true;
+                                    }
+                                    if (onlyHighestScoringRadioButton.isSelected()) {
+                                        if (!lPeptide.getParentSpectrum().isHighestScoring(lPeptide, iMajorScoreTypes)) {
+                                            lUse = false;
+                                        }
+                                    }
+                                    if (onlyLowestScoringRadioButton.isSelected()) {
+                                        if (!lPeptide.getParentSpectrum().isLowestScoring(lPeptide, iMajorScoreTypes)) {
+                                            lUse = false;
+                                        }
+                                    }
+
+                                    if (lUse) {
+                                        if (lPeptide.getParentSpectrum().getParser().getFileName().equalsIgnoreCase(iSelectedPeptide.getParentSpectrum().getParser().getFileName()) && lPeptide.getParentSpectrum().getFileId() == iSelectedPeptide.getParentSpectrum().getFileId()) {
+                                            chromatogramPanel.addReferenceAreaXAxis(new ReferenceArea(String.valueOf(iSelectedProtein.getPeptides().get(p).getParentSpectrum().getFirstScan()), iSelectedProtein.getPeptides().get(p).getParentSpectrum().getRetentionTime() - lAreaDistance, iSelectedProtein.getPeptides().get(p).getParentSpectrum().getRetentionTime() + lAreaDistance, Color.blue, 0.1f, false, false));
+                                        } else {
+                                            chromatogramPanel.addReferenceAreaXAxis(new ReferenceArea(String.valueOf(iSelectedProtein.getPeptides().get(p).getParentSpectrum().getFirstScan()), iSelectedProtein.getPeptides().get(p).getParentSpectrum().getRetentionTime() - lAreaDistance, iSelectedProtein.getPeptides().get(p).getParentSpectrum().getRetentionTime() + lAreaDistance, Color.green, 0.1f, false, false));
+                                        }
+                                    }
+
+                                }
+                            }
+                            chromatogramPanel.addReferenceAreaXAxis(new ReferenceArea(String.valueOf(iSelectedPeptide.getParentSpectrum().getFirstScan()), iSelectedPeptide.getParentSpectrum().getRetentionTime() - lAreaDistance, iSelectedPeptide.getParentSpectrum().getRetentionTime() + lAreaDistance, Color.red, 0.8f, true, false));
+
+
+                            //chromatogramPanel.setMiniature(true);
+
+                            String lTitle = iSelectedPeptide.getParentSpectrum().getParser().getRawfileNameByFileId(lChro.getFileId());
+                            lTitle = lTitle + " - " + lChro.getTraceType();
+                            jtabChromatogram.add(lTitle, chromatogramPanel);
+                            // remove the default chromatogram panel border, given that our
+                            // chromatogram panel already has a border
+                            chromatogramPanel.setBorder(null);
+
+                            // add the chromatogram panel to the frame
+                            chromatogramPanel.validate();
+                            chromatogramPanel.repaint();
                         }
+                    }
                 } else {
                     jtabpanLower.remove(jtabChromatogram);
                     jtabChromatogram.removeAll();
@@ -2821,9 +2798,15 @@ public class Thermo_msf_parserGUI extends JFrame {
         try {
             UtilitiesGUIDefaults.setLookAndFeel();
         } catch (IOException ex) {
-            java.util.logging.Logger.getLogger(Thermo_msf_parserGUI.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
         }
-        new Thermo_msf_parserGUI(true);
+        System.out.println(args[args.length - 1]);
+        try {
+            new Thermo_msf_parserGUI(true, Arrays.asList(args[args.length - 1].split(",")));
+        } catch (IndexOutOfBoundsException ioex) {
+            logger.error("file string had this length: "+args.length);
+            logger.error(ioex);
+        }
     }
 
     /**
@@ -3016,8 +2999,8 @@ public class Thermo_msf_parserGUI extends JFrame {
     }
 
     /**
-     * Makes sure that the sequence coverage area is rescaled to fit the new size
-     * of the frame.
+     * Makes sure that the sequence coverage area is rescaled to fit the new
+     * size of the frame.
      *
      * @param evt
      */
@@ -3027,12 +3010,13 @@ public class Thermo_msf_parserGUI extends JFrame {
         }
     }
 
-
     /**
-     * This method will load a protein. It will create the peptide table and format the protein sequence
+     * This method will load a protein. It will create the peptide table and
+     * format the protein sequence
      *
-     * @param aFromInterestedList A boolean that indicates if the selected protein should come from the proteinList (FALSE)
-     *                            or from the selectedProteinList (=TRUE)
+     * @param aFromInterestedList A boolean that indicates if the selected
+     * protein should come from the proteinList (FALSE) or from the
+     * selectedProteinList (=TRUE)
      */
     public void loadProtein(boolean aFromInterestedList) {
         if (aFromInterestedList) {
@@ -3041,14 +3025,14 @@ public class Thermo_msf_parserGUI extends JFrame {
             iSelectedProtein = (Protein) proteinList.getSelectedValue();
         }
         /*if (iRover != null) {
-            for (int i = 0; i < iRover.getProteinList().getModel().getSize(); i++) {
-                QuantitativeProtein lProtein = (QuantitativeProtein) iRover.getProteinList().getModel().getElementAt(i);
-                if (lProtein.getAccession().equalsIgnoreCase(iSelectedProtein.getUtilAccession())) {
-                    iRover.getProteinList().setSelectedValue(lProtein, true);
-                    iRover.loadProtein(true);
-                }
-            }
-        }*/
+         for (int i = 0; i < iRover.getProteinList().getModel().getSize(); i++) {
+         QuantitativeProtein lProtein = (QuantitativeProtein) iRover.getProteinList().getModel().getElementAt(i);
+         if (lProtein.getAccession().equalsIgnoreCase(iSelectedProtein.getUtilAccession())) {
+         iRover.getProteinList().setSelectedValue(lProtein, true);
+         iRover.loadProtein(true);
+         }
+         }
+         }*/
         createPeptideTable(iSelectedProtein);
         formatProteinSequence(iSelectedProtein);
         jtablePeptides.updateUI();
@@ -3059,6 +3043,7 @@ public class Thermo_msf_parserGUI extends JFrame {
      * A .msf file filter
      */
     class MsfFileFilter extends FileFilter {
+
         public boolean accept(File f) {
             return f.isDirectory() || f.getName().toLowerCase().endsWith(".msf");
         }
@@ -3067,5 +3052,4 @@ public class Thermo_msf_parserGUI extends JFrame {
             return ".msf files";
         }
     }
-
 }

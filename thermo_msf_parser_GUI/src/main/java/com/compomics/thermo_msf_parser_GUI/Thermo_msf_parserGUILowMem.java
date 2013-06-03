@@ -53,6 +53,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Observer;
@@ -222,7 +223,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
      *
      * @param lStandAlone
      */
-    public Thermo_msf_parserGUILowMem(boolean lStandAlone) {
+    public Thermo_msf_parserGUILowMem(boolean lStandAlone,List<String> msfFileLocations) {
 
         this.iStandAlone = lStandAlone;
 
@@ -736,24 +737,6 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                         iSelectedProtein = null;
                     }
 
-                    //open file chooser
-                    JFileChooser fc = new JFileChooser();
-                    fc.setMultiSelectionEnabled(true);
-                    //create the file filter to choose
-                    FileFilter lFilter = new MsfFileFilter();
-                    fc.setFileFilter(lFilter);
-                    int returnVal = fc.showOpenDialog(getFrame());
-                    File[] lFiles;
-                    if (returnVal == JFileChooser.APPROVE_OPTION) {
-                        lFiles = fc.getSelectedFiles();
-                        Collections.addAll(iMsfFileLocations, lFiles);
-                    } else {
-                        JOptionPane.showMessageDialog(new JFrame(), "Open command cancelled by user.", "Info", JOptionPane.INFORMATION_MESSAGE);
-                        return true;
-                    }
-                    if (lFiles.length > 1) {
-                        JOptionPane.showMessageDialog(getFrame(), "The workflow of the different msf files that are loaded must be the same.\nUnexpected crashes can occur if files with different workflows are loaded!", "Info", JOptionPane.INFORMATION_MESSAGE);
-                    }
                     progressBar.setIndeterminate(true);
                     progressBar.setVisible(true);
                     progressBar.setStringPainted(true);
@@ -2780,7 +2763,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
         } catch (IOException e) {
             logger.error(e);
         }
-        new Thermo_msf_parserGUILowMem(true);
+        new Thermo_msf_parserGUILowMem(true,Arrays.asList(args[args.length].split(",")));
     }
 
     /**

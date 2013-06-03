@@ -4,9 +4,9 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.compomics.thermo_msf_parser</groupId>
     <artifactId>thermo_msf_parser_GUI</artifactId>
-    <version>2.0.3</version>
+    <version>2.0.4</version>
     <parent>
-        <version>2.0.3</version>
+        <version>2.0.4</version>
         <groupId>com.compomics</groupId>
         <artifactId>thermo_msf_parser</artifactId>
     </parent>
@@ -55,23 +55,6 @@
                 <version>2.3</version>
                 <executions>
                     <!-- Copy main resources to test resources before testing.  -->
-                    <execution>
-                        <id>copy-test-resources</id>
-                        <phase>generate-test-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <overwrite>true</overwrite>
-                            <outputDirectory>src/test/resources</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>src/main/resources</directory>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-
                     <!-- Copy the resources -->
                     <execution>
                         <id>copy-package-resources</id>
@@ -95,6 +78,11 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.7</version>
+            </plugin>
  
         </plugins>
         
@@ -103,7 +91,7 @@
         <dependency>
             <groupId>com.compomics</groupId>
             <artifactId>utilities</artifactId>
-            <version>3.13.18</version>
+            <version>3.13.5</version>
             <type>jar</type>
             <exclusions>
                 <exclusion>
@@ -147,4 +135,22 @@
             <type>jar</type>
         </dependency>
     </dependencies>
+    
+    <!-- Repositores -->
+    <repositories>
+        <!-- UGent Genesis Maven 2 repository -->
+        <repository>
+            <id>genesis-maven2-repository</id>
+            <name>Genesis maven2 repository</name>
+            <url>http://genesis.UGent.be/maven2</url>
+            <layout>default</layout>
+        </repository>
+    </repositories>
+    <distributionManagement>
+        <repository>
+            <id>genesis-maven2-repo</id>
+            <name>Genesis Maven2 Repository</name>
+            <url>scp://genesis.ugent.be/home/maven/public_html/maven2</url>
+        </repository>
+    </distributionManagement>
 </project>
