@@ -1,7 +1,12 @@
 package com.compomics.thermo_msf_parser_GUI;
 
 import com.compomics.software.CompomicsWrapper;
+import com.compomics.thermo_msf_parser_API.util.MsfFileFilter;
 import java.io.*;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.logging.Level;
+import javax.swing.JFileChooser;
 import org.apache.log4j.Logger;
 
 /**
@@ -30,25 +35,42 @@ public class ThermoMsfParserGuiWrapper extends CompomicsWrapper {
      * @param args the arguments to pass to the tool
      */
     public ThermoMsfParserGuiWrapper(String[] args) {
+        try {
+            File jarFile = new File(ThermoMsfParserGuiWrapper.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+            // get the splash 
 
-        // get the version number set in the pom file
-        String jarFileName = "thermo_msf_parser_GUI-" + getVersion() + ".jar";
+            String mainClass = "com.compomics.thermo_msf_parser_GUI.Thermo_msf_parserGUI";
 
-        String path = this.getClass().getResource("ThermoMsfParserGuiWrapper.class").getPath();
-        // remove starting 'file:' tag if there
-        if (path.startsWith("file:")) {
-            path = path.substring("file:".length(), path.indexOf(jarFileName));
-        } else {
-            path = path.substring(0, path.indexOf(jarFileName));
+            StringBuilder fileLocations = new StringBuilder();
+
+            //open file chooser
+            JFileChooser fc = new JFileChooser();
+            fc.setMultiSelectionEnabled(true);
+            //create the file filter to choose
+            javax.swing.filechooser.FileFilter lFilter = new MsfFileFilter();
+            fc.setFileFilter(lFilter);
+            int returnVal = fc.showOpenDialog(null);
+            File[] lFiles;
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                lFiles = fc.getSelectedFiles();
+                for (int i = 0; i < lFiles.length; i++) {
+                    fileLocations.append(",").append(lFiles[i].getAbsolutePath());
+                    //arbitrary cutoff at 500 mb
+                    if (lFiles[i].length() > 524288000) {
+                        mainClass = "com.compomics.thermo_msf_parser_GUI.Thermo_msf_parserGUILowMem";
+                    }
+                }
+            }
+            fileLocations.delete(0, 1);
+
+            String[] argsAddedTo = Arrays.copyOf(args, args.length+1);
+            System.out.println(argsAddedTo.length);
+            argsAddedTo[argsAddedTo.length -1] = fileLocations.toString();
+            
+            launchTool("Thermo MSF Parser", jarFile, null, mainClass, argsAddedTo);
+        } catch (URISyntaxException ex) {
+            java.util.logging.Logger.getLogger(ThermoMsfParserGuiWrapper.class.getName()).log(Level.SEVERE, null, ex);
         }
-        path = path.replace("%20", " ");
-        path = path.replace("%5b", "[");
-        path = path.replace("%5d", "]");
-        File jarFile = new File(path, jarFileName);
-        // get the splash 
-        String mainClass = "com.compomics.thermo_msf_parser_GUI.Thermo_msf_parserGUI";
-
-        launchTool("Thermo MSF Parser", jarFile, null, mainClass, args);
     }
 
     /**
@@ -59,24 +81,5 @@ public class ThermoMsfParserGuiWrapper extends CompomicsWrapper {
      */
     public static void main(String[] args) {
         new ThermoMsfParserGuiWrapper(args);
-    }
-
-    /**
-     * Retrieves the version number set in the properties file.
-     *
-     * @return the version number of the thermo-msf parser
-     */
-    public String getVersion() {
-
-        java.util.Properties p = new java.util.Properties();
-
-        try {
-            InputStream is = this.getClass().getClassLoader().getResourceAsStream("thermo.msf.parser.properties");
-            p.load(is);
-        } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-        }
-
-        return p.getProperty("thermo.msf.parser.version");
     }
 }
