@@ -4,6 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.compomics.thermo_msf_parser</groupId>
     <artifactId>thermo_msf_parser_GUI</artifactId>
+    <name>thermo msf parser GUI implementation</name>
     <version>2.0.4</version>
     <parent>
         <version>2.0.4</version>
@@ -48,14 +49,30 @@
         
         <!-- Plugins -->
         <plugins>
+            
+            <!-- Jar plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.compomics.thermo_msf_parser_GUI.ThermoMsfParserGuiWrapper</mainClass>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib</classpathPrefix>
+                        </manifest>
+                    </archive>
+                    <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}
+                    </outputDirectory>
+                </configuration>
+            </plugin>
         
             <!-- Resources plugin -->
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>2.3</version>
                 <executions>
-                    <!-- Copy main resources to test resources before testing.  -->
-                    <!-- Copy the resources -->
                     <execution>
                         <id>copy-package-resources</id>
                         <phase>package</phase>
@@ -78,10 +95,56 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- Assembly plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.3</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/assembly/zip.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <!-- this is used for inheritance merges -->
+                        <phase>package</phase>
+                        <!-- append to the packaging phase. -->
+                        <goals>
+                            <goal>single</goal>
+                            <!-- goals == mojos -->
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+ 
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+            </plugin>
+            
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+            </plugin>
+            
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.7</version>
+            </plugin>
+            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+            </plugin>
+            
+            <plugin>                
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
             </plugin>
  
         </plugins>
@@ -91,43 +154,8 @@
         <dependency>
             <groupId>com.compomics</groupId>
             <artifactId>utilities</artifactId>
-            <version>3.13.5</version>
-            <type>jar</type>
-            <exclusions>
-                <exclusion>
-                    <artifactId>mascotdatfile</artifactId>
-                    <groupId>com.compomics</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>omssa-parser</artifactId>
-                    <groupId>de.proteinms.omxparser</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>xtandem-parser</artifactId>
-                    <groupId>de.proteinms.xtandemparser</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>ms-lims</artifactId>
-                    <groupId>com.compomics</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>jmzml</artifactId>
-                    <groupId>uk.ac.ebi.jmzml</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>batik-all</artifactId>
-                    <groupId>batik</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>pdf-transcoder</artifactId>
-                    <groupId>batik</groupId>
-                </exclusion>
-                <exclusion>
-                    <artifactId>xercesImpl</artifactId>
-                    <groupId>xerces</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
+        
         <dependency>
             <groupId>com.compomics.thermo_msf_parser</groupId>
             <artifactId>thermo_msf_parser_API</artifactId>
