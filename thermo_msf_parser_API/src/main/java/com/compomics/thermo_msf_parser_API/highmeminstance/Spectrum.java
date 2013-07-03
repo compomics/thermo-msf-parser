@@ -14,7 +14,7 @@ import java.util.zip.ZipInputStream;
 /**
  * Created by IntelliJ IDEA. User: Niklaas Date: 18-Feb-2011 Time: 11:33:33
  */
-public class Spectrum {
+public class Spectrum implements Cloneable {
 
     /**
      * The spectrum id
@@ -219,7 +219,7 @@ public class Spectrum {
         if (iZippedSpectrumXml == null) {
             ResultSet rs;
             Statement stat = iConnection.createStatement();
-            rs = stat.executeQuery("select * from Spectra where UniqueSpectrumID = " + iUniqueSpectrumId);
+            rs = stat.executeQuery(new StringBuilder().append("select * from Spectra where UniqueSpectrumID = ").append(iUniqueSpectrumId).toString());
             while (rs.next()) {
                 iZippedSpectrumXml = rs.getBytes("Spectrum");
             }

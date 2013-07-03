@@ -130,10 +130,9 @@ public class Chromatogram implements ChromatogramInterface{
                 fos.close();
                 BufferedOutputStream out;
                 ZipInputStream in = new ZipInputStream(new BufferedInputStream(new FileInputStream(lZippedFile)));
-                ZipEntry entry;
                 ByteArrayOutputStream lStream = new ByteArrayOutputStream(50);
                 out = new BufferedOutputStream(lStream, 50);
-                while ((entry = in.getNextEntry()) != null) {
+                while (in.getNextEntry() != null) {
                     int count;
                     byte data[] = new byte[50];
                     while ((count = in.read(data, 0, 50)) != -1) {
@@ -144,7 +143,7 @@ public class Chromatogram implements ChromatogramInterface{
                 out.flush();
                 out.close();
                 lZippedFile.delete();
-                iUnzippedChromatogramXml = lStream.toString();
+                iUnzippedChromatogramXml = lStream.toString("UTF-8");
                 lStream.close();
             } catch (IOException ioe) {
                 logger.error(ioe);

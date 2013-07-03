@@ -54,7 +54,7 @@ public class SpectrumLowMemController implements SpectrumInterface {
             out.flush();
             out.close();
             lZippedFile.delete();
-            lXml = lStream.toString();
+            lXml = lStream.toString("UTF-8");
             lStream.close();
             rs.close();
             stat.close();
@@ -277,10 +277,9 @@ public class SpectrumLowMemController implements SpectrumInterface {
             fos.close();
             BufferedOutputStream out;
             ZipInputStream in = new ZipInputStream(new BufferedInputStream(new FileInputStream(lZippedFile)));
-            ZipEntry entry;
             ByteArrayOutputStream lStream = new ByteArrayOutputStream(50);
             out = new BufferedOutputStream(lStream, 50);
-            while ((entry = in.getNextEntry()) != null) {
+            while (in.getNextEntry() != null) {
                 int count;
                 byte data[] = new byte[50];
                 while ((count = in.read(data, 0, 50)) != -1) {
@@ -291,7 +290,7 @@ public class SpectrumLowMemController implements SpectrumInterface {
             out.flush();
             out.close();
             lZippedFile.delete();
-            lXml = lStream.toString();
+            lXml = lStream.toString("UTF-8");
             lStream.close();
             rs.close();
             stat.close();
@@ -318,10 +317,9 @@ public class SpectrumLowMemController implements SpectrumInterface {
                     fos.close();
                     BufferedOutputStream out;
                     ZipInputStream in = new ZipInputStream(new BufferedInputStream(new FileInputStream(lZippedFile)));
-                    ZipEntry entry;
                     ByteArrayOutputStream lStream = new ByteArrayOutputStream(50);
                     out = new BufferedOutputStream(lStream, 50);
-                    while ((entry = in.getNextEntry()) != null) {
+                    while (in.getNextEntry() != null) {
                         int count;
                         byte data[] = new byte[50];
                         while ((count = in.read(data, 0, 50)) != -1) {
@@ -332,7 +330,7 @@ public class SpectrumLowMemController implements SpectrumInterface {
                     out.flush();
                     out.close();
                     lZippedFile.delete();
-                    lXml = lStream.toString();
+                    lXml = lStream.toString("UTF-8");
                     lStream.close();
                     spectrum.addSpectrumXML(lXml);
                 }
