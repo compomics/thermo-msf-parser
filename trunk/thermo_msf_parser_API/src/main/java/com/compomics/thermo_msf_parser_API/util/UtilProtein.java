@@ -329,7 +329,7 @@ public class UtilProtein {
      */
     public void writeToFASTAFile(PrintWriter aOut) throws IOException {
         aOut.println(this.getHeader().getAbbreviatedFASTAHeaderWithAddenda());
-        StringBuffer sequence = new StringBuffer(this.getSequence().getSequence());
+        StringBuilder sequence = new StringBuilder(this.getSequence().getSequence());
 
         // Next we want to ensure only 60 characters are present on each line.
         // So at every 59th character, insert and endline.
@@ -374,6 +374,7 @@ public class UtilProtein {
      * This method will check equality between this object
      * and another Protein instance.
      */
+    @Override
     public boolean equals(Object o) {
         boolean result = false;
         if(o instanceof UtilProtein) {
@@ -384,5 +385,15 @@ public class UtilProtein {
         }
 
         return result;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 83 * hash + (this.iSequence != null ? this.iSequence.hashCode() : 0);
+        hash = 83 * hash + (this.iHeader != null ? this.iHeader.hashCode() : 0);
+        hash = 83 * hash + (this.iTruncated ? 1 : 0);
+        hash = 83 * hash + this.iTruncationPosition;
+        return hash;
     }
 }
