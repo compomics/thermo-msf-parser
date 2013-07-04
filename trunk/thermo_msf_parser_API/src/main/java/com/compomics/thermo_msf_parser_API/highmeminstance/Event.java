@@ -183,7 +183,7 @@ public class Event {
 
         String lIdsString =  "";
         for(int i = 0; i<lIds.size(); i ++){
-            lIdsString = lIdsString  + lIds.get(i) + ",";
+            lIdsString = new StringBuilder().append(lIdsString).append(lIds.get(i)).append(",").toString();
         }
         if(lIds.size() > 0){
 
@@ -193,7 +193,7 @@ public class Event {
             ResultSet rs;
 
             //get all the events
-            rs = stat.executeQuery("select * from Events where EventID in (" + lIdsString + ")");
+            rs = stat.executeQuery(new StringBuilder().append("select * from Events where EventID in (").append(lIdsString).append(")").toString());
 
             while(rs.next()){
                 lEvents.add(new Event(rs));
@@ -220,7 +220,7 @@ public class Event {
         ResultSet rs;
 
         //get all the events
-        rs = stat.executeQuery("select * from Events where RT > " + lLowerRT + " and RT < " + lUpperRT + " and FileID = " + lFileId);
+        rs = stat.executeQuery(new StringBuilder().append("select * from Events where RT > ").append(lLowerRT).append(" and RT < ").append(lUpperRT).append(" and FileID = ").append(lFileId).toString());
 
         while(rs.next()){
             lEvents.add(new Event(rs));
@@ -247,7 +247,7 @@ public class Event {
         ResultSet rs;
 
         //get all the events
-        rs = stat.executeQuery("select * from Events where RT > " + lLowerRT + " and RT < " + lUpperRT + " and Mass > " + lLowerMass + " and Mass < " + lUpperMass + " and FileID = " + lFileId);
+        rs = stat.executeQuery(new StringBuilder().append("select * from Events where RT > ").append(lLowerRT).append(" and RT < ").append(lUpperRT).append(" and Mass > ").append(lLowerMass).append(" and Mass < ").append(lUpperMass).append(" and FileID = ").append(lFileId).toString());
 
         while(rs.next()){
             lEvents.add(new Event(rs));
@@ -272,7 +272,7 @@ public class Event {
         List<Event> lEvents = new ArrayList<Event>();
         String lIdsString =  "";
         for(int i = 0; i<lIds.size(); i ++){
-            lIdsString = lIdsString  + lIds.get(i) + ",";
+            lIdsString = new StringBuilder().append(lIdsString).append(lIds.get(i)).append(",").toString();
         }
         if(lIdsString.indexOf(",") >= 0){
             lIdsString = lIdsString.substring(0, lIdsString.lastIndexOf(","));
@@ -282,7 +282,7 @@ public class Event {
         ResultSet rs;
 
         //get all the events
-        rs = stat.executeQuery("select * from Events where RT > " + lLowerRT + " and RT < " + lUpperRT + " and Mass > " + lLowerMass + " and Mass < " + lUpperMass + " and EventID not in (" + lIdsString + ")and FileID = " + lFileId);
+        rs = stat.executeQuery(new StringBuilder().append("select * from Events where RT > ").append(lLowerRT).append(" and RT < ").append(lUpperRT).append(" and Mass > ").append(lLowerMass).append(" and Mass < ").append(lUpperMass).append(" and EventID not in (").append(lIdsString).append(")and FileID = ").append(lFileId).toString());
 
         while(rs.next()){
             lEvents.add(new Event(rs));

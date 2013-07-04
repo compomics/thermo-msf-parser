@@ -1,6 +1,6 @@
 package com.compomics.thermo_msf_parser_API.interfaces;
 
-import java.sql.Connection;
+import com.compomics.thermo_msf_parser_API.lowmeminstance.model.MsfFile;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -14,12 +14,11 @@ import java.util.List;
 public interface AminoAcidInterface {
 
     /**
-     *
+     * fetches the amino acids from the proteome discoverer database
      * @param iConnection connection to a msf file
      * @return a List containing all the amino acids stored in the msf file
      * @throws java.sql.SQLException if something went wrong with the retrieving
     */
 
-    public List getAminoAcidsFromDb(Connection iConnection) throws SQLException;
-    
+    public List getAminoAcidsFromDb(MsfFile msfFile) throws SQLException;   
 }

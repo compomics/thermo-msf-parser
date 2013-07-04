@@ -932,7 +932,7 @@ public class Parser {
             Statement st = conn.createStatement();
 
             // Obtain IDs for the pRS sequence probability in customdata
-            rs = st.executeQuery("select fieldid from customdatafields where guid='" + GUID.PRS_SEQUENCE_PROBABILITY + "'");
+            rs = st.executeQuery(new StringBuilder().append("select fieldid from customdatafields where guid='").append(GUID.PRS_SEQUENCE_PROBABILITY).append("'").toString());
             while (rs.next()) {
                 pRSProbabilityFieldIDs.add(rs.getInt("FieldID"));
             }

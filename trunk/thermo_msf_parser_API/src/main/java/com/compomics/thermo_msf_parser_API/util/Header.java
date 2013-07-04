@@ -201,7 +201,7 @@ public class Header implements Cloneable, Serializable {
 
                         // If there are any more elements, add them to the 'rest' section.
                         if (lSt.hasMoreTokens()) {
-                            StringBuffer lBuffer = new StringBuffer();
+                            StringBuilder lBuffer = new StringBuilder();
                             while (lSt.hasMoreTokens()) {
                                 lBuffer.append(lSt.nextToken());
                             }
@@ -260,7 +260,7 @@ public class Header implements Cloneable, Serializable {
                             result.iForeignAccession = lSt.nextToken();
                         }
                         // Append all the rest, regardless of further pipes (which have no structural meaning anymore).
-                        StringBuffer lSB = new StringBuffer();
+                        StringBuilder lSB = new StringBuilder();
                         while (lSt.hasMoreTokens()) {
                             lSB.append(lSt.nextToken());
                         }
@@ -444,7 +444,7 @@ public class Header implements Cloneable, Serializable {
                     result.iAccession = aFASTAHeader.substring(0, pepLoc).trim();
                     String possibleDescriptionPrefix = "";
                     // See if there is "(*xE*)" information wrongly assigned to the accession number.
-                    if (result.iAccession.indexOf("(*") > 0) {
+                    if (result.iAccession.contains("(*")) {
                         possibleDescriptionPrefix = result.iAccession.substring(result.iAccession.indexOf("(*"), result.iAccession.indexOf("*)") + 2) + " ";
                         result.iAccession = result.iAccession.substring(0, result.iAccession.indexOf("(*"));
                     }

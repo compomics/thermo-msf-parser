@@ -138,11 +138,9 @@ public class Spectrum implements Cloneable {
     }
 
     @Override
-    public Spectrum clone() {
-       return new Spectrum(iSpectrumId, iUniqueSpectrumId, iMassPeakId,
-                iLastScan, iFirstScan, iScan,
-                iCharge, iRetentionTime, iSinglyChargedMass,
-                iScanEventId, iConnection, iParser);
+    public Spectrum clone() throws CloneNotSupportedException {
+        //todo check if this works
+        return (Spectrum) super.clone();
     }
 
     //getters
@@ -216,17 +214,22 @@ public class Spectrum implements Cloneable {
     }
 
     public byte[] getZippedSpectrumXml() throws SQLException {
+        byte[] zippedSpectrumXML;
         if (iZippedSpectrumXml == null) {
             ResultSet rs;
             Statement stat = iConnection.createStatement();
-            rs = stat.executeQuery(new StringBuilder().append("select * from Spectra where UniqueSpectrumID = ").append(iUniqueSpectrumId).toString());
-            while (rs.next()) {
-                iZippedSpectrumXml = rs.getBytes("Spectrum");
+            try {
+                rs = stat.executeQuery(new StringBuilder().append("select * from Spectra where UniqueSpectrumID = ").append(iUniqueSpectrumId).toString());
+                while (rs.next()) {
+                    iZippedSpectrumXml = rs.getBytes("Spectrum");
+                }
+                rs.close();
+            } finally {
+                stat.close();
             }
-            rs.close();
-            stat.close();
         }
-        return iZippedSpectrumXml;
+        zippedSpectrumXML = iZippedSpectrumXml;
+        return zippedSpectrumXML;
     }
 
     public List<Peptide> getPeptides() {
@@ -258,7 +261,7 @@ public class Spectrum implements Cloneable {
             }
         }
 
-        String lResult = lStream.toString();
+        String lResult = lStream.toString("UTF-8");
         lStream.close();
         return lResult;
     }
@@ -350,7 +353,7 @@ public class Spectrum implements Cloneable {
     }
 
     public void setZippedBytes(byte[] lZipped) {
-        this.iZippedSpectrumXml = lZipped;
+        this.iZippedSpectrumXml = lZipped.clone();
     }
 
     public void setScanEvent(ScanEvent iScanEvent) {

@@ -44,7 +44,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Level;
 
 /**
  * Created by IntelliJ IDEA. User: Niklaas Date: 23-Feb-2011 Time: 08:01:12
@@ -293,7 +292,7 @@ public class Thermo_msf_parserGUI extends JFrame {
                     public Boolean construct() {
                         //create the writer
                         try {
-                            BufferedWriter out = new BufferedWriter(new FileWriter(lPath));
+                            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(lPath),"UTF-8"));
 
                             //write column headers
                             String lLine = "";
@@ -374,7 +373,7 @@ public class Thermo_msf_parserGUI extends JFrame {
                             progressBar.setString("Writing all spectra to " + lPath);
                             progressBar.setStringPainted(true);
                             progressBar.setVisible(true);
-                            BufferedWriter out = new BufferedWriter(new FileWriter(lPath));
+                            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(lPath),"UTF-8"));
 
                             for (int i = 0; i < iParsedMsfs.size(); i++) {
                                 for (int j = 0; j < iParsedMsfs.get(i).getSpectra().size(); j++) {
@@ -697,7 +696,6 @@ public class Thermo_msf_parserGUI extends JFrame {
                             logger.info(e);
                             iParsedMsfs.add(null);
                         }
-                        System.gc();
                     }
 
                     hasPhosphoRS = iParsedMsfs.get(0).hasPhosphoRS();
@@ -1899,9 +1897,6 @@ public class Thermo_msf_parserGUI extends JFrame {
                         }
                     }
                 }
-            }
-            if (iProteins.size() % 100 == 0) {
-                System.gc();
             }
         }
         if (lCreateProteins) {

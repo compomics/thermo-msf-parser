@@ -1,6 +1,7 @@
 package com.compomics.thermo_msf_parser_API.proteinsorter;
 
 
+import java.io.Serializable;
 import java.util.Comparator;
 
 /**
@@ -13,18 +14,21 @@ import java.util.Comparator;
 /**
  * This will sort proteins alphabetically 
  */
-public class ProteinSorterByAccession implements Comparator<String> {
+public class ProteinSorterByAccession implements Comparator<String>, Serializable {
     private boolean iAtoZ;
 
     public ProteinSorterByAccession(boolean lAtoZ){
         this.iAtoZ = lAtoZ;
     }
+    @Override
     public int compare(String o1, String o2) {
+        int comparator;
         if(iAtoZ){
-            return o1.toString().compareTo(o2.toString());
+            comparator = o1.compareTo(o2);
         } else {
-            return o1.toString().compareTo(o2.toString()) * -1;
+            comparator = o1.compareTo(o2) * -1;
         }
+        return comparator;
     }
 }
 

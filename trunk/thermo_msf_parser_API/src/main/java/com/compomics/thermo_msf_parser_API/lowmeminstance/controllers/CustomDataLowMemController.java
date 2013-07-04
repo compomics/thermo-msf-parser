@@ -23,36 +23,41 @@ public class CustomDataLowMemController implements CustomDataInterface {
     private static final Logger logger = Logger.getLogger(CustomDataLowMemController.class);
     private final HashMap<Integer, CustomDataField> customDataFieldHashMap = new HashMap<Integer, CustomDataField>();
 
-
     @Override
-    public Map<Integer, CustomDataField> getCustomDataFields (MsfFile msfFile) {
-        if(customDataFieldHashMap.isEmpty()){
-        try {
-            PreparedStatement stat = msfFile.getConnection().prepareStatement("select * from CustomDataFields");
-            ResultSet rs = stat.executeQuery();
-            while (rs.next()) {
-                CustomDataField lField = new CustomDataField(rs.getInt("FieldID"), rs.getString("DisplayName"));
-                customDataFieldHashMap.put(rs.getInt("FieldID"), lField);
+    public Map<Integer, CustomDataField> getCustomDataFields(MsfFile msfFile) {
+        if (customDataFieldHashMap.isEmpty()) {
+            try {
+                PreparedStatement stat = msfFile.getConnection().prepareStatement("select * from CustomDataFields");
+                ResultSet rs = stat.executeQuery();
+                try {
+                    while (rs.next()) {
+                        CustomDataField lField = new CustomDataField(rs.getInt("FieldID"), rs.getString("DisplayName"));
+                        customDataFieldHashMap.put(rs.getInt("FieldID"), lField);
+                    }
+                } finally {
+                    rs.close();
+                }
+                stat.close();
+            } catch (SQLException ex) {
+                logger.error(ex);
             }
-            rs.close();
-            stat.close();
-        } catch (SQLException ex) {
-            logger.error(ex);
         }
-        
-    }
         return customDataFieldHashMap;
     }
+
     @Override
     public List<CustomDataField> getCustomPeptideData(Map<Integer, CustomDataField> customData, MsfFile msfFile) {
         List<CustomDataField> iPeptideUsedCustomDataFields = new ArrayList<CustomDataField>();
         try {
             PreparedStatement stat = msfFile.getConnection().prepareStatement("select FieldID,FieldValue from CustomDataPeptides group by FieldID");
             ResultSet rs = stat.executeQuery();
-            while (rs.next()) {
-                iPeptideUsedCustomDataFields.add(customData.get(rs.getInt("FieldID")));
+            try {
+                while (rs.next()) {
+                    iPeptideUsedCustomDataFields.add(customData.get(rs.getInt("FieldID")));
+                }
+            } finally {
+                rs.close();
             }
-            rs.close();
             stat.close();
         } catch (SQLException ex) {
             logger.error(ex);
@@ -73,16 +78,18 @@ public class CustomDataLowMemController implements CustomDataInterface {
             PreparedStatement stat = msfFile.getConnection().prepareStatement("select FieldValue,FieldID from CustomDataProteins where ProteinID = ?");
             stat.setInt(1, protein.getProteinID());
             ResultSet rs = stat.executeQuery();
-            while (rs.next()) {
-                protein.addCustomDataField(rs.getInt(2), rs.getString(1));
+            try {
+                while (rs.next()) {
+                    protein.addCustomDataField(rs.getInt(2), rs.getString(1));
+                }
+            } finally {
+                rs.close();
             }
-            rs.close();
             stat.close();
         } catch (SQLException ex) {
             logger.error(ex);
         }
     }
-
 
     @Override
     public List<CustomDataField> getCustomSpectraData(Map<Integer, CustomDataField> iCustomDataFieldsMap, MsfFile msfFile) {
@@ -90,10 +97,13 @@ public class CustomDataLowMemController implements CustomDataInterface {
         try {
             PreparedStatement stat = msfFile.getConnection().prepareStatement("select fieldid from CustomDataSpectra group by fieldid");
             ResultSet rs = stat.executeQuery();
-            while (rs.next()) {
-                iSpectrumUsedCustomDataFields.add(iCustomDataFieldsMap.get(rs.getInt("FieldID")));
+            try {
+                while (rs.next()) {
+                    iSpectrumUsedCustomDataFields.add(iCustomDataFieldsMap.get(rs.getInt("FieldID")));
+                }
+            } finally {
+                rs.close();
             }
-            rs.close();
             stat.close();
         } catch (SQLException ex) {
             logger.error(ex);

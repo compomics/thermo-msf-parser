@@ -146,8 +146,8 @@ public class UtilProtein {
             this.iHeader = Header.parseFromFASTA(br.readLine());
 
             // Next, read the remaining lines that make up the sequence.
-            StringBuffer lSB = new StringBuffer();
-            String line = null;
+            StringBuilder lSB = new StringBuilder();
+            String line;
             while((line = br.readLine()) != null) {
                 lSB.append(line);
             }
