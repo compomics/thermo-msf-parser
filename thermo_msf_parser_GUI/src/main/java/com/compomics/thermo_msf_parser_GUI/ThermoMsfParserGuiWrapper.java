@@ -20,13 +20,6 @@ public class ThermoMsfParserGuiWrapper extends CompomicsWrapper {
     // Class specific log4j logger for ParserStarter instances.
     private static Logger logger = Logger.getLogger(ThermoMsfParserGuiWrapper.class);
 
-    /**
-     * Starts the launcher by calling the launch method. Use this as the main
-     * class in the jar file.
-     */
-    public ThermoMsfParserGuiWrapper() {
-        this(null);
-    }
 
     /**
      * Starts the launcher by calling the launch method. Use this as the main

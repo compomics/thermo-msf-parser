@@ -6,7 +6,6 @@ import org.apache.log4j.Logger;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 /**
@@ -15,7 +14,7 @@ import java.util.zip.ZipInputStream;
 /**
  * This class represents a chromatogram
  */
-public class Chromatogram implements ChromatogramInterface{
+public class Chromatogram implements ChromatogramInterface {
     // Class specific log4j logger for Thermo_msf_parserGUI instances.
 
     private static Logger logger = Logger.getLogger(Chromatogram.class);
@@ -39,7 +38,6 @@ public class Chromatogram implements ChromatogramInterface{
      * The unzipped chromatogram xml
      */
     private String iUnzippedChromatogramXml;
-    
     private List points;
 
     public List getPointsVector() {
@@ -47,7 +45,7 @@ public class Chromatogram implements ChromatogramInterface{
     }
 
     public void setPoints() {
-                String lXml = getUnzippedChromatogramXml();
+        String lXml = getUnzippedChromatogramXml();
         String[] lLines = lXml.split("\n");
         List<Point> lPoints = new ArrayList<Point>();
         for (int i = 0; i < lLines.length; i++) {
@@ -110,7 +108,7 @@ public class Chromatogram implements ChromatogramInterface{
      * @return byte[] with the zipped chromatogram xml
      */
     public byte[] getZippedChromatogramXml() {
-        return iZippedChromatogramXml;
+        return iZippedChromatogramXml.clone();
     }
 
     /**
@@ -125,26 +123,42 @@ public class Chromatogram implements ChromatogramInterface{
             try {
                 File lZippedFile = File.createTempFile("zip", null);
                 FileOutputStream fos = new FileOutputStream(lZippedFile);
-                fos.write(iZippedChromatogramXml);
-                fos.flush();
-                fos.close();
+                try {
+                    fos.write(iZippedChromatogramXml);
+                    fos.flush();
+                } finally {
+                    fos.close();
+                }
                 BufferedOutputStream out;
                 ZipInputStream in = new ZipInputStream(new BufferedInputStream(new FileInputStream(lZippedFile)));
                 ByteArrayOutputStream lStream = new ByteArrayOutputStream(50);
                 out = new BufferedOutputStream(lStream, 50);
-                while (in.getNextEntry() != null) {
-                    int count;
-                    byte data[] = new byte[50];
-                    while ((count = in.read(data, 0, 50)) != -1) {
-                        out.write(data, 0, count);
+                try {
+                    while (in.getNextEntry() != null) {
+                        int count;
+                        byte data[] = new byte[50];
+                        try {
+                            while ((count = in.read(data, 0, 50)) != -1) {
+                                out.write(data, 0, count);
+                            }
+                            out.flush();
+                        } finally {
+                            out.close();
+                        }
                     }
+                } finally {
+                    in.close();
                 }
-                in.close();
-                out.flush();
-                out.close();
-                lZippedFile.delete();
-                iUnzippedChromatogramXml = lStream.toString("UTF-8");
-                lStream.close();
+
+                if(!lZippedFile.delete()){
+                   throw new IOException("could not delete temp files"); 
+                }
+                try {
+                    iUnzippedChromatogramXml = lStream.toString("UTF-8");
+                } finally {
+                    lStream.close();
+                }
+
             } catch (IOException ioe) {
                 logger.error(ioe);
             }
@@ -173,7 +187,7 @@ public class Chromatogram implements ChromatogramInterface{
 
     @Override
     public int getChromatogramFileNumber() {
-       return iFileId;
+        return iFileId;
     }
 
     @Override
@@ -188,7 +202,7 @@ public class Chromatogram implements ChromatogramInterface{
 
     @Override
     public void setTraceTypeID(int newTraceTypeID) {
-       this.iTraceTypeId = newTraceTypeID;
+        this.iTraceTypeId = newTraceTypeID;
     }
 
     /**

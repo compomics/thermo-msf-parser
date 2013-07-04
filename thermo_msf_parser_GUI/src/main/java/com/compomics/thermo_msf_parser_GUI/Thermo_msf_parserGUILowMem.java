@@ -331,9 +331,8 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                     @Override
                     public Boolean construct() {
                         //create the writer
-                        BufferedWriter out;
                         try {
-                            out = new BufferedWriter(new FileWriter(lPath));
+                            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(lPath),"UTF-8"));
 
                             //write column headers
                             String lLine = "";
@@ -409,7 +408,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                             progressBar.setString("Writing all spectra to " + lPath);
                             progressBar.setStringPainted(true);
                             progressBar.setVisible(true);
-                            BufferedWriter out = new BufferedWriter(new FileWriter(lPath));
+                            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(lPath),"UTF-8"));
                             StringBuilder stringBuffer = new StringBuilder();
                             //if works use counting for this
                             for (MsfFile iParsedMsf : iParsedMsfs) {

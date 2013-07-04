@@ -192,7 +192,7 @@ public class SpectrumLowMem {
     }
 
     public byte[] getZippedSpectrumXml(){
-        return iZippedSpectrumXml;
+        return iZippedSpectrumXml.clone();
     }
     
     public void setFileId(int iFileId) {
