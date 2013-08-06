@@ -27,17 +27,23 @@ public class CustomDataLowMemController implements CustomDataInterface {
     public Map<Integer, CustomDataField> getCustomDataFields(MsfFile msfFile) {
         if (customDataFieldHashMap.isEmpty()) {
             try {
-                PreparedStatement stat = msfFile.getConnection().prepareStatement("select * from CustomDataFields");
-                ResultSet rs = stat.executeQuery();
+                PreparedStatement stat = null;
                 try {
-                    while (rs.next()) {
-                        CustomDataField lField = new CustomDataField(rs.getInt("FieldID"), rs.getString("DisplayName"));
-                        customDataFieldHashMap.put(rs.getInt("FieldID"), lField);
+                    stat = msfFile.getConnection().prepareStatement("select * from CustomDataFields");
+                    ResultSet rs = stat.executeQuery();
+                    try {
+                        while (rs.next()) {
+                            CustomDataField lField = new CustomDataField(rs.getInt("FieldID"), rs.getString("DisplayName"));
+                            customDataFieldHashMap.put(rs.getInt("FieldID"), lField);
+                        }
+                    } finally {
+                        rs.close();
                     }
                 } finally {
-                    rs.close();
+                    if (stat != null) {
+                        stat.close();
+                    }
                 }
-                stat.close();
             } catch (SQLException ex) {
                 logger.error(ex);
             }
@@ -49,16 +55,22 @@ public class CustomDataLowMemController implements CustomDataInterface {
     public List<CustomDataField> getCustomPeptideData(Map<Integer, CustomDataField> customData, MsfFile msfFile) {
         List<CustomDataField> iPeptideUsedCustomDataFields = new ArrayList<CustomDataField>();
         try {
-            PreparedStatement stat = msfFile.getConnection().prepareStatement("select FieldID,FieldValue from CustomDataPeptides group by FieldID");
-            ResultSet rs = stat.executeQuery();
+            PreparedStatement stat = null;
             try {
-                while (rs.next()) {
-                    iPeptideUsedCustomDataFields.add(customData.get(rs.getInt("FieldID")));
+                stat = msfFile.getConnection().prepareStatement("select FieldID,FieldValue from CustomDataPeptides group by FieldID");
+                ResultSet rs = stat.executeQuery();
+                try {
+                    while (rs.next()) {
+                        iPeptideUsedCustomDataFields.add(customData.get(rs.getInt("FieldID")));
+                    }
+                } finally {
+                    rs.close();
                 }
             } finally {
-                rs.close();
+                if (stat != null) {
+                    stat.close();
+                }
             }
-            stat.close();
         } catch (SQLException ex) {
             logger.error(ex);
         }
@@ -75,17 +87,23 @@ public class CustomDataLowMemController implements CustomDataInterface {
     @Override
     public void addCustomProteinsData(ProteinLowMem protein, MsfFile msfFile) {
         try {
-            PreparedStatement stat = msfFile.getConnection().prepareStatement("select FieldValue,FieldID from CustomDataProteins where ProteinID = ?");
-            stat.setInt(1, protein.getProteinID());
-            ResultSet rs = stat.executeQuery();
+            PreparedStatement stat = null;
             try {
-                while (rs.next()) {
-                    protein.addCustomDataField(rs.getInt(2), rs.getString(1));
+                stat = msfFile.getConnection().prepareStatement("select FieldValue,FieldID from CustomDataProteins where ProteinID = ?");
+                stat.setInt(1, protein.getProteinID());
+                ResultSet rs = stat.executeQuery();
+                try {
+                    while (rs.next()) {
+                        protein.addCustomDataField(rs.getInt(2), rs.getString(1));
+                    }
+                } finally {
+                    rs.close();
                 }
             } finally {
-                rs.close();
+                if (stat != null) {
+                    stat.close();
+                }
             }
-            stat.close();
         } catch (SQLException ex) {
             logger.error(ex);
         }
@@ -95,16 +113,22 @@ public class CustomDataLowMemController implements CustomDataInterface {
     public List<CustomDataField> getCustomSpectraData(Map<Integer, CustomDataField> iCustomDataFieldsMap, MsfFile msfFile) {
         List<CustomDataField> iSpectrumUsedCustomDataFields = new ArrayList<CustomDataField>();
         try {
-            PreparedStatement stat = msfFile.getConnection().prepareStatement("select fieldid from CustomDataSpectra group by fieldid");
-            ResultSet rs = stat.executeQuery();
+            PreparedStatement stat = null;
             try {
-                while (rs.next()) {
-                    iSpectrumUsedCustomDataFields.add(iCustomDataFieldsMap.get(rs.getInt("FieldID")));
+                stat = msfFile.getConnection().prepareStatement("select fieldid from CustomDataSpectra group by fieldid");
+                ResultSet rs = stat.executeQuery();
+                try {
+                    while (rs.next()) {
+                        iSpectrumUsedCustomDataFields.add(iCustomDataFieldsMap.get(rs.getInt("FieldID")));
+                    }
+                } finally {
+                    rs.close();
                 }
             } finally {
-                rs.close();
+                if (stat != null) {
+                    stat.close();
+                }
             }
-            stat.close();
         } catch (SQLException ex) {
             logger.error(ex);
         }

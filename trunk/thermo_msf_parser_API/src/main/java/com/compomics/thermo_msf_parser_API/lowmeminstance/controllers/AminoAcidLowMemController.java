@@ -24,17 +24,23 @@ public class AminoAcidLowMemController implements AminoAcidInterface {
     @Override
     public List<AminoAcid> getAminoAcidsFromDb(MsfFile msfFile) throws SQLException {
         List<AminoAcid> iAminoAcids = new ArrayList<AminoAcid>();
-        PreparedStatement stat = msfFile.getConnection().prepareStatement("select * from AminoAcids");
-        ResultSet rs = stat.executeQuery();
+        PreparedStatement stat = null;
         try {
-            while (rs.next()) {
-                AminoAcid lAA = new AminoAcid(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getDouble(5), rs.getDouble(6), rs.getString(7));
-                iAminoAcids.add(lAA);
+            stat = msfFile.getConnection().prepareStatement("select * from AminoAcids");
+            ResultSet rs = stat.executeQuery();
+            try {
+                while (rs.next()) {
+                    AminoAcid lAA = new AminoAcid(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getDouble(5), rs.getDouble(6), rs.getString(7));
+                    iAminoAcids.add(lAA);
+                }
+            } finally {
+                rs.close();
             }
         } finally {
-            rs.close();
+            if (stat != null) {
+                stat.close();
+            }
         }
-        stat.close();
         return iAminoAcids;
     }
 }

@@ -2231,18 +2231,19 @@ public class Thermo_msf_parserGUI extends JFrame {
      *
      * @return the version number of the thermo-msf parser
      */
-    private String getVersion() {
-
-        Properties p = new Properties();
-
+    public final String getVersion() {
+        String version = "0";
         try {
-            InputStream is = this.getClass().getClassLoader().getResourceAsStream("thermo.msf.parser.properties");
+            Properties p = new Properties();
+            InputStream is = this.getClass().getClassLoader().getResourceAsStream("META-INF\\maven\\com.compomics.thermo_msf_parser\\thermo_msf_parser_GUI\\pom.properties");
             p.load(is);
+            p.getProperty("version");
         } catch (IOException e) {
-            logger.info(e);
+            logger.error(e);
+        } catch (NullPointerException e) {
+            logger.error(e);
         }
-
-        return p.getProperty("thermo.msf.parser.version");
+        return version;
     }
 
     /**

@@ -1,7 +1,6 @@
 package com.compomics.thermo_msf_parser_API.proteinsorter;
 
 import com.compomics.thermo_msf_parser_API.lowmeminstance.model.ProteinLowMem;
-import java.io.Serializable;
 
 
 /**
@@ -14,37 +13,37 @@ import java.io.Serializable;
 /**
  * This will sort proteins based on the number of peptides
  */
-public class ProteinSorter implements ProteinSorterInterface, Serializable {
+public class ProteinSorter implements ProteinSorterInterface {
 
     private Boolean i1to20;
     private Boolean iAtoZ;
 
 
     @Override
-    public int compare(ProteinLowMem o1, ProteinLowMem o2) {
+    public int compare(ProteinLowMem protein1, ProteinLowMem protein2) {
         int comparison = 0;
         if(i1to20 != null){
             if (i1to20){
-                if(o2.getNumberOfPeptides() - o1.getNumberOfPeptides() > 0){
+                if(protein2.getNumberOfPeptides() - protein1.getNumberOfPeptides() > 0){
                     comparison = -1;
                 }
 
-                if(o2.getNumberOfPeptides() - o1.getNumberOfPeptides() < 0){
+                if(protein2.getNumberOfPeptides() - protein1.getNumberOfPeptides() < 0){
                     comparison = 1;
                 }
         } else if (!i1to20 && iAtoZ == null) {
-                if((o2.getNumberOfPeptides() - o1.getNumberOfPeptides()) > 0){
+                if((protein2.getNumberOfPeptides() - protein1.getNumberOfPeptides()) > 0){
                     comparison = 1;
                 }
-                if(o2.getNumberOfPeptides() - o1.getNumberOfPeptides() < 0){
+                if(protein2.getNumberOfPeptides() - protein1.getNumberOfPeptides() < 0){
                     comparison = -1;
                 }
         }
     } else  {
         if (iAtoZ) {
-            comparison = o1.toString().compareTo(o2.toString());
+            comparison = protein1.getAccession().compareTo(protein2.getAccession());
         } else {
-            comparison = o1.toString().compareTo(o2.toString()) * -1;
+            comparison = protein1.getAccession().compareTo(protein2.getAccession()) * -1;
         }
     }
     return comparison;

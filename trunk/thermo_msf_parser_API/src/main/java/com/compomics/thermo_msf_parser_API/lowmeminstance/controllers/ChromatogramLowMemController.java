@@ -70,22 +70,22 @@ public class ChromatogramLowMemController {
             }
             ByteArrayOutputStream lStream = new ByteArrayOutputStream(50);
             BufferedOutputStream out = new BufferedOutputStream(lStream, 50);
+            ZipInputStream in = null;
             try {
-                ZipInputStream in = new ZipInputStream(new BufferedInputStream(new FileInputStream(lZippedFile)));
+                in = new ZipInputStream(new BufferedInputStream(new FileInputStream(lZippedFile)));
                 while (in.getNextEntry() != null) {
                     int count;
                     byte data[] = new byte[50];
                     out = new BufferedOutputStream(lStream, 50);
-                    try {
-                        while ((count = in.read(data, 0, 50)) != -1) {
-                            out.write(data, 0, count);
-                        }
-                        out.flush();
-                    } finally {
-                        in.close();
+                    while ((count = in.read(data, 0, 50)) != -1) {
+                        out.write(data, 0, count);
                     }
+                    out.flush();
                 }
             } finally {
+                if (in != null) {
+                    in.close();
+                }
                 out.close();
             }
             if (!lZippedFile.delete()) {
@@ -126,16 +126,23 @@ public class ChromatogramLowMemController {
     public Collection<? extends Chromatogram> getChromatogramFilesForMsfFile(MsfFile msfFile) {
         List<Chromatogram> chromatogramFiles = new ArrayList<Chromatogram>();
         try {
-            PreparedStatement stat = msfFile.getConnection().prepareStatement("select chro.Chromatogram,chro.TraceType,chro.FileID from Chromatograms as chro");
-            ResultSet rs = stat.executeQuery();
+            PreparedStatement stat = null;
+
             try {
-                while (rs.next()) {
-                    chromatogramFiles.add(new Chromatogram(rs.getInt("FileID"), rs.getInt("TraceType"), rs.getBytes("Chromatogram")));
+                stat = msfFile.getConnection().prepareStatement("select chro.Chromatogram,chro.TraceType,chro.FileID from Chromatograms as chro");
+                ResultSet rs = stat.executeQuery();
+                try {
+                    while (rs.next()) {
+                        chromatogramFiles.add(new Chromatogram(rs.getInt("FileID"), rs.getInt("TraceType"), rs.getBytes("Chromatogram")));
+                    }
+                } finally {
+                    rs.close();
                 }
             } finally {
-                rs.close();
+                if (stat != null) {
+                    stat.close();
+                }
             }
-            stat.close();
         } catch (SQLException ex) {
             logger.error(ex);
         }

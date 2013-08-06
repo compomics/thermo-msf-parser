@@ -28,33 +28,43 @@ public class QuanResultLowMemController {
     public Map<Integer, IsotopePattern> getIsotopePatternMap(MsfFile msfFile) {
         Map<Integer, IsotopePattern> iIsotopePatternMap = new HashMap<Integer, IsotopePattern>();
         try {
-            PreparedStatement stat = msfFile.getConnection().prepareStatement("select * from EventAnnotations");
-            ResultSet rs = stat.executeQuery();
-            while (rs.next()) {
-                int lIsotopePatternId = rs.getInt("IsotopePatternID");
-                EventAnnotation lEventAnno = new EventAnnotation(rs.getInt("EventID"), rs.getInt("IsotopePatternID"), rs.getInt("QuanResultID"), rs.getInt("QuanChannelID"));
-                if (iIsotopePatternMap.get(lIsotopePatternId) == null) {
-                    IsotopePattern lIso = new IsotopePattern(lIsotopePatternId);
-                    lIso.addEventAnnotation(lEventAnno);
-                    iIsotopePatternMap.put(lIsotopePatternId, lIso);
-                } else {
-                    iIsotopePatternMap.get(lIsotopePatternId).addEventAnnotation(lEventAnno);
+            PreparedStatement stat = null;
+            try {
+                stat = msfFile.getConnection().prepareStatement("select * from EventAnnotations");
+                ResultSet rs = stat.executeQuery();
+                try {
+                    while (rs.next()) {
+                        int lIsotopePatternId = rs.getInt("IsotopePatternID");
+                        EventAnnotation lEventAnno = new EventAnnotation(rs.getInt("EventID"), rs.getInt("IsotopePatternID"), rs.getInt("QuanResultID"), rs.getInt("QuanChannelID"));
+                        if (iIsotopePatternMap.get(lIsotopePatternId) == null) {
+                            IsotopePattern lIso = new IsotopePattern(lIsotopePatternId);
+                            lIso.addEventAnnotation(lEventAnno);
+                            iIsotopePatternMap.put(lIsotopePatternId, lIso);
+                        } else {
+                            iIsotopePatternMap.get(lIsotopePatternId).addEventAnnotation(lEventAnno);
+                        }
+                    }
+
+                    rs = stat.executeQuery("select * from EventAreaAnnotations");
+                    while (rs.next()) {
+                        int lIsotopePatternId = rs.getInt("IsotopePatternID");
+                        EventAnnotation lEventAnno = new EventAnnotation(rs.getInt("EventID"), rs.getInt("IsotopePatternID"), rs.getInt("QuanResultID"), -1);
+                        if (iIsotopePatternMap.get(lIsotopePatternId) == null) {
+                            IsotopePattern lIso = new IsotopePattern(lIsotopePatternId);
+                            lIso.addEventAnnotation(lEventAnno);
+                            iIsotopePatternMap.put(lIsotopePatternId, lIso);
+                        } else {
+                            iIsotopePatternMap.get(lIsotopePatternId).addEventAnnotation(lEventAnno);
+                        }
+                    }
+                } finally {
+                    rs.close();
+                }
+            } finally {
+                if (stat != null) {
+                    stat.close();
                 }
             }
-            rs = stat.executeQuery("select * from EventAreaAnnotations");
-            while (rs.next()) {
-                int lIsotopePatternId = rs.getInt("IsotopePatternID");
-                EventAnnotation lEventAnno = new EventAnnotation(rs.getInt("EventID"), rs.getInt("IsotopePatternID"), rs.getInt("QuanResultID"), -1);
-                if (iIsotopePatternMap.get(lIsotopePatternId) == null) {
-                    IsotopePattern lIso = new IsotopePattern(lIsotopePatternId);
-                    lIso.addEventAnnotation(lEventAnno);
-                    iIsotopePatternMap.put(lIsotopePatternId, lIso);
-                } else {
-                    iIsotopePatternMap.get(lIsotopePatternId).addEventAnnotation(lEventAnno);
-                }
-            }
-            rs.close();
-            stat.close();
         } catch (SQLException ex) {
             logger.error(ex);
         }
@@ -70,36 +80,45 @@ public class QuanResultLowMemController {
     public HashMap getQuanResults(MsfFile msfFile) {
         HashMap<Integer, QuanResult> iQuanResultsMap = new HashMap<Integer, QuanResult>();
         try {
-            PreparedStatement stat = msfFile.getConnection().prepareStatement("select * from PrecursorIonQuanResults");
-            ResultSet rs = stat.executeQuery();
-            while (rs.next()) {
-                int lQuantId = rs.getInt("QuanResultID");
-                if (iQuanResultsMap.get(lQuantId) != null) {
-                    iQuanResultsMap.get(lQuantId).addQuanValues(rs.getInt("QuanChannelID"), rs.getDouble("Mass"), rs.getInt("Charge"), rs.getDouble("Area"), rs.getDouble("RetentionTime"));
-                } else {
-                    QuanResult lQuant = new QuanResult(rs.getInt("QuanResultID"));
-                    lQuant.addQuanValues(rs.getInt("QuanChannelID"), rs.getDouble("Mass"), rs.getInt("Charge"), rs.getDouble("Area"), rs.getDouble("RetentionTime"));
-                    iQuanResultsMap.put(lQuant.getQuanResultId(), lQuant);
+            PreparedStatement stat = null;
+            try {
+                stat = msfFile.getConnection().prepareStatement("select * from PrecursorIonQuanResults");
+                ResultSet rs = stat.executeQuery();
+                try {
+                    while (rs.next()) {
+                        int lQuantId = rs.getInt("QuanResultID");
+                        if (iQuanResultsMap.get(lQuantId) != null) {
+                            iQuanResultsMap.get(lQuantId).addQuanValues(rs.getInt("QuanChannelID"), rs.getDouble("Mass"), rs.getInt("Charge"), rs.getDouble("Area"), rs.getDouble("RetentionTime"));
+                        } else {
+                            QuanResult lQuant = new QuanResult(rs.getInt("QuanResultID"));
+                            lQuant.addQuanValues(rs.getInt("QuanChannelID"), rs.getDouble("Mass"), rs.getInt("Charge"), rs.getDouble("Area"), rs.getDouble("RetentionTime"));
+                            iQuanResultsMap.put(lQuant.getQuanResultId(), lQuant);
+                        }
+                    }
+                    //add the spectrumid
+                    rs = stat.executeQuery("select * from PrecursorIonAreaSearchSpectra");
+                    while (rs.next()) {
+                        int lQuantId = rs.getInt("QuanResultID");
+                        if (iQuanResultsMap.get(lQuantId) != null) {
+                            iQuanResultsMap.get(lQuantId).addSpectrumId(rs.getInt("SearchSpectrumID"));
+                            iQuanResultsMap.get(lQuantId).addProcessingNodeNumber(-1);
+                        } else {
+                            QuanResult lQuant = new QuanResult(rs.getInt("QuanResultID"));
+                            lQuant.addSpectrumId(rs.getInt("SearchSpectrumID"));
+                            lQuant.addProcessingNodeNumber(-1);
+                            iQuanResultsMap.put(lQuant.getQuanResultId(), lQuant);
+                        }
+                    }
+                } finally {
+                    rs.close();
+                }
+            } finally {
+                if (stat != null) {
+                    stat.close();
                 }
             }
-            //add the spectrumid
-            rs = stat.executeQuery("select * from PrecursorIonAreaSearchSpectra");
-            while (rs.next()) {
-                int lQuantId = rs.getInt("QuanResultID");
-                if (iQuanResultsMap.get(lQuantId) != null) {
-                    iQuanResultsMap.get(lQuantId).addSpectrumId(rs.getInt("SearchSpectrumID"));
-                    iQuanResultsMap.get(lQuantId).addProcessingNodeNumber(-1);
-                } else {
-                    QuanResult lQuant = new QuanResult(rs.getInt("QuanResultID"));
-                    lQuant.addSpectrumId(rs.getInt("SearchSpectrumID"));
-                    lQuant.addProcessingNodeNumber(-1);
-                    iQuanResultsMap.put(lQuant.getQuanResultId(), lQuant);
-                }
-            }
-            rs.close();
-            stat.close();
         } catch (SQLException ex) {
-        logger.error(ex);    
+            logger.error(ex);
         }
         return iQuanResultsMap;
     }
