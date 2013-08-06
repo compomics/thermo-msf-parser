@@ -6,5 +6,15 @@ package com.compomics.thermo_msf_parser_API.enums;
  */
 public enum MsfVersion {
 
-    VERSION1_2, VERSION1_3, VERSION1_4
+    VERSION1_2 ("1.2"), VERSION1_3 ("1.3"), VERSION1_4("1.4");
+    
+    private final String version;
+    
+    MsfVersion(String aVersion){
+        version = aVersion;
+    }
+    
+    public String getVersion(){
+        return version;
+    }
 }

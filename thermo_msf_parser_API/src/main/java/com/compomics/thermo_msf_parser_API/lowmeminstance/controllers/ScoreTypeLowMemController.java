@@ -30,17 +30,26 @@ public class ScoreTypeLowMemController implements ScoreTypeInterface {
     public List<ScoreTypeLowMem> getScoreTypesOfMsfFileList(List<MsfFile> MsfFiles) {
         for (MsfFile msfFile : MsfFiles) {
             try {
-                PreparedStatement stat = msfFile.getConnection().prepareStatement("select * from ProcessingNodeScores");
-                //get the score types
-                if (iScoreTypes.isEmpty()) {
-                    ResultSet rs = stat.executeQuery();
-                    while (rs.next()) {
-                        ScoreTypeLowMem lScoreType = new ScoreTypeLowMem(rs.getInt("ScoreID"), rs.getString("ScoreName"), rs.getString("FriendlyName"), rs.getString("Description"), rs.getInt("ScoreCategory"), rs.getInt("IsMainScore"));
-                        iScoreTypes.add(lScoreType);
+                PreparedStatement stat = null;
+                try {
+                    stat = msfFile.getConnection().prepareStatement("select * from ProcessingNodeScores");
+                    //get the score types
+                    if (iScoreTypes.isEmpty()) {
+                        ResultSet rs = stat.executeQuery();
+                        try {
+                            while (rs.next()) {
+                                ScoreTypeLowMem lScoreType = new ScoreTypeLowMem(rs.getInt("ScoreID"), rs.getString("ScoreName"), rs.getString("FriendlyName"), rs.getString("Description"), rs.getInt("ScoreCategory"), rs.getInt("IsMainScore"));
+                                iScoreTypes.add(lScoreType);
+                            }
+                        } finally {
+                            rs.close();
+                        }
                     }
-                    rs.close();
+                } finally {
+                    if (stat != null) {
+                        stat.close();
+                    }
                 }
-                stat.close();
             } catch (SQLException ex) {
                 logger.error(ex);
             }
@@ -54,15 +63,25 @@ public class ScoreTypeLowMemController implements ScoreTypeInterface {
         try {
             int scoreID;
             double scoreValue;
-            PreparedStatement stat = msfFile.getConnection().prepareStatement("select ScoreID,ScoreValue from PeptideScores where PeptideID = " + peptide.getPeptideId());
-            ResultSet rs = stat.executeQuery();
-            while (rs.next()) {
-                scoreID = rs.getInt(1);
-                scoreValue = rs.getDouble(2);
-                peptideScores.put(scoreID, scoreValue);
+            PreparedStatement stat = null;
+            try {
+                stat = msfFile.getConnection().prepareStatement("select ScoreID,ScoreValue from PeptideScores where PeptideID = ?");
+                stat.setInt(1, peptide.getPeptideId());
+                ResultSet rs = stat.executeQuery();
+                try {
+                    while (rs.next()) {
+                        scoreID = rs.getInt(1);
+                        scoreValue = rs.getDouble(2);
+                        peptideScores.put(scoreID, scoreValue);
+                    }
+                } finally {
+                    rs.close();
+                }
+            } finally {
+                if (stat != null) {
+                    stat.close();
+                }
             }
-            rs.close();
-            stat.close();
         } catch (SQLException ex) {
             logger.error(ex);
         }
@@ -75,15 +94,25 @@ public class ScoreTypeLowMemController implements ScoreTypeInterface {
             int scoreID;
             double scoreValue;
             List<ScoreTypeLowMem> scoreTypes = getScoreTypes(msfFile);
-            PreparedStatement stat = msfFile.getConnection().prepareStatement("select ScoreID,ScoreValue from PeptideScores where PeptideID = " + peptide.getPeptideId());
-            ResultSet rs = stat.executeQuery();
-            while (rs.next()) {
-                scoreID = rs.getInt(1);
-                scoreValue = rs.getDouble(2);
-                peptide.setScore(scoreValue, scoreID, scoreTypes);
+            PreparedStatement stat = null;
+            try {
+                stat = msfFile.getConnection().prepareStatement("select ScoreID,ScoreValue from PeptideScores where PeptideID = ?");
+                stat.setInt(1, peptide.getPeptideId());
+                ResultSet rs = stat.executeQuery();
+                try {
+                    while (rs.next()) {
+                        scoreID = rs.getInt(1);
+                        scoreValue = rs.getDouble(2);
+                        peptide.setScore(scoreValue, scoreID, scoreTypes);
+                    }
+                } finally {
+                    rs.close();
+                }
+            } finally {
+                if (stat != null) {
+                    stat.close();
+                }
             }
-            rs.close();
-            stat.close();
         } catch (SQLException ex) {
             logger.error(ex);
         }
@@ -94,19 +123,29 @@ public class ScoreTypeLowMemController implements ScoreTypeInterface {
         String listOfPeptideids = "";
         HashMap<Integer, PeptideLowMem> pepidToPeptide = new HashMap<Integer, PeptideLowMem>();
         for (PeptideLowMem aPeptide : peptideLowMemList) {
-            listOfPeptideids = "," + aPeptide.getPeptideId() + listOfPeptideids;
+            listOfPeptideids = String.format(",%s%s", aPeptide.getPeptideId(), listOfPeptideids);
             pepidToPeptide.put(aPeptide.getPeptideId(), aPeptide);
         }
         listOfPeptideids = listOfPeptideids.replaceFirst(",", "");
         try {
             iScoreTypes = getScoreTypes(msfFile);
-            PreparedStatement stat = msfFile.getConnection().prepareStatement("select PeptideID,ScoreID,ScoreValue from PeptideScores where PeptideID in (" + listOfPeptideids + ")");
-            ResultSet rs = stat.executeQuery();
-            while (rs.next()) {
-                pepidToPeptide.get(rs.getInt("PeptideID")).setScore(rs.getDouble("ScoreValue"), rs.getInt("ScoreID"), iScoreTypes);
+            PreparedStatement stat = null;
+            try {
+                stat = msfFile.getConnection().prepareStatement("select PeptideID,ScoreID,ScoreValue from PeptideScores where PeptideID in (?)");
+                stat.setString(1, listOfPeptideids);
+                ResultSet rs = stat.executeQuery();
+                try {
+                    while (rs.next()) {
+                        pepidToPeptide.get(rs.getInt("PeptideID")).setScore(rs.getDouble("ScoreValue"), rs.getInt("ScoreID"), iScoreTypes);
+                    }
+                } finally {
+                    rs.close();
+                }
+            } finally {
+                if (stat != null) {
+                    stat.close();
+                }
             }
-            rs.close();
-            stat.close();
         } catch (SQLException e) {
             logger.error(e);
         }
@@ -117,14 +156,23 @@ public class ScoreTypeLowMemController implements ScoreTypeInterface {
         //get the score types
         if (iScoreTypes.isEmpty()) {
             try {
-                PreparedStatement stat = msfFile.getConnection().prepareStatement("select * from ProcessingNodeScores");
-                ResultSet rs = stat.executeQuery();
-                while (rs.next()) {
-                    ScoreTypeLowMem lScoreType = new ScoreTypeLowMem(rs.getInt("ScoreID"), rs.getString("ScoreName"), rs.getString("FriendlyName"), rs.getString("Description"), rs.getInt("ScoreCategory"), rs.getInt("IsMainScore"));
-                    iScoreTypes.add(lScoreType);
+                PreparedStatement stat = null;
+                try {
+                    stat = msfFile.getConnection().prepareStatement("select * from ProcessingNodeScores");
+                    ResultSet rs = stat.executeQuery();
+                    try {
+                        while (rs.next()) {
+                            ScoreTypeLowMem lScoreType = new ScoreTypeLowMem(rs.getInt("ScoreID"), rs.getString("ScoreName"), rs.getString("FriendlyName"), rs.getString("Description"), rs.getInt("ScoreCategory"), rs.getInt("IsMainScore"));
+                            iScoreTypes.add(lScoreType);
+                        }
+                    } finally {
+                        rs.close();
+                    }
+                } finally {
+                    if (stat != null) {
+                        stat.close();
+                    }
                 }
-                rs.close();
-                stat.close();
             } catch (SQLException ex) {
                 logger.error(ex);
             }

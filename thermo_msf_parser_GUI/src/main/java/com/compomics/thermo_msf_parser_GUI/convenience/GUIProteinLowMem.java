@@ -8,24 +8,37 @@ import com.compomics.thermo_msf_parser_API.lowmeminstance.model.ProteinLowMem;
  * @author Davy
  */
 public class GUIProteinLowMem extends ProteinLowMem {
-    
-    MsfFile msfFileForProtein;
-    
-    public GUIProteinLowMem(String aAccession,int aProteinID,MsfFile aMsfFile){
+
+    /**
+     * convenience reference to proteome discoverer file
+     */
+    private MsfFile msfFileForProtein;
+
+    /**
+     * convenience constructor to reference proteome discoverer file from protein
+     * @param aAccession the protein accession
+     * @param aProteinID the protein id
+     * @param aMsfFile the proteome discoverer file to reference
+     */
+    public GUIProteinLowMem(String aAccession, int aProteinID, MsfFile aMsfFile) {
         super(aAccession, aProteinID);
-        this.msfFileForProtein = aMsfFile;
+        msfFileForProtein = aMsfFile;
     }
-    
-        public GUIProteinLowMem(String aAccession,int aProteinID){
+
+    /**
+     * convenience constructor to reference proteome discoverer file from protein
+     * @param aAccession the protein accession
+     * @param aProteinID the protein id
+     */
+    public GUIProteinLowMem(String aAccession, int aProteinID) {
         super(aAccession, aProteinID);
     }
-    
-    public void setMsfFile(MsfFile msfFile){
-        this.msfFileForProtein = msfFile;
+
+    public void setMsfFile(MsfFile msfFile) {
+        msfFileForProtein = msfFile;
     }
-    
-    public MsfFile getMsfFile(){
+
+    public MsfFile getMsfFile() {
         return msfFileForProtein;
     }
-    
 }

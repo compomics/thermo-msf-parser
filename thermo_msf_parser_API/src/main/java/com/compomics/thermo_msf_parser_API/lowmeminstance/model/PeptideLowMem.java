@@ -7,7 +7,6 @@ import com.compomics.thermo_msf_parser_API.highmeminstance.PeptideFragmentIon;
 import com.compomics.thermo_msf_parser_API.highmeminstance.Charge;
 import org.apache.log4j.Logger;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -134,10 +133,10 @@ public class PeptideLowMem {
      * int of the unique peptide id
      */
     private int iUniquePeptideSequenceId;
+
     /**
      * connection to the msf file
      */
-    
     /**
      * Constructor for a low memory instance peptide
      *
@@ -179,7 +178,7 @@ public class PeptideLowMem {
      * @param rs 
      */
 
-    public PeptideLowMem(ResultSet rs, List<AminoAcid> iAminoAcids, Connection aConn) {
+    public PeptideLowMem(ResultSet rs, List<AminoAcid> iAminoAcids) {
         try {
             this.iPeptideId = rs.getInt("PeptideID");
             this.iSpectrumId = rs.getInt("SpectrumID");
@@ -480,7 +479,7 @@ public class PeptideLowMem {
             if (iHasNTermModification) {
                 for (int m = 0; m < iPeptideModifications.size(); m++) {
                     if (iPeptideModifications.get(m).getPositionType() == 1) {
-                        iModifiedPeptide = iPeptideModifications.get(m).getAbbreviation() + "-";
+                        iModifiedPeptide = String.format("%s-", iPeptideModifications.get(m).getAbbreviation());
                     }
                 }
             } else {
@@ -492,9 +491,9 @@ public class PeptideLowMem {
                 for (int m = 0; m < iPeptideModifications.size(); m++) {
                     if (iPeptideModificationPositions.get(m).getPosition() == c && !iPeptideModificationPositions.get(m).isNterm()) {
 
-                        iModifiedPeptide = iModifiedPeptide + "<" + iPeptideModifications.get(m).getAbbreviation();
+                        iModifiedPeptide = String.format("%s<%s", iModifiedPeptide, iPeptideModifications.get(m).getAbbreviation());
                         if (iPhosphoRSSiteProbabilities.get(m) != null) {
-                            iModifiedPeptide += ":" + (iPhosphoRSSiteProbabilities.get(m) * 100) + "%";
+                            iModifiedPeptide += String.format(":%s%", iPhosphoRSSiteProbabilities.get(m) * 100);
                         }
                         iModifiedPeptide += ">";
                     }
@@ -811,5 +810,22 @@ public class PeptideLowMem {
 
     public void setSequence(String iSequence) {
         this.iSequence = iSequence;
+    }
+
+    @Override
+    public boolean equals(Object peptideLowMemToCompare) {
+        boolean equals = false;
+        if (peptideLowMemToCompare != null && peptideLowMemToCompare instanceof PeptideLowMem) {
+            equals = (((PeptideLowMem) peptideLowMemToCompare).getPeptideId() == this.getPeptideId() && ((PeptideLowMem) peptideLowMemToCompare).getSequence().equalsIgnoreCase(this.getSequence()));
+        }
+        return equals;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + this.iPeptideId;
+        hash = 97 * hash + (this.iSequence != null ? this.iSequence.hashCode() : 0);
+        return hash;
     }
 }

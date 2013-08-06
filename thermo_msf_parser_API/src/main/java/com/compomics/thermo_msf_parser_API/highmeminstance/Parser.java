@@ -256,7 +256,7 @@ public class Parser {
             String lVersion = rs.getString("SoftwareVersion");
             if (lVersion.startsWith("1.2")) {
                 iMsfVersion = MsfVersion.VERSION1_2;
-            } else if (lVersion.startsWith("1.3") || lVersion.startsWith("1.4")) { //TODO: create VERSION1_4
+            } else if (lVersion.startsWith("1.3") || lVersion.startsWith("1.4")) {
                 iMsfVersion = MsfVersion.VERSION1_3;
             }
         }

@@ -2,11 +2,11 @@ package com.compomics.thermo_msf_parser_API.lowmeminstance.controllers;
 
 import com.compomics.thermo_msf_parser_API.lowmeminstance.model.MsfFile;
 import com.compomics.thermo_msf_parser_API.lowmeminstance.model.ProteinGroupLowMem;
+import java.sql.PreparedStatement;
 import org.apache.log4j.Logger;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 /**
  *
@@ -25,15 +25,22 @@ public class ProteinGroupLowMemController {
     public int getProteinGroupIDForProteinID(int proteinID, MsfFile msfFile) {
         int proteinGroupID = 0;
         try {
-            Statement stat = msfFile.getConnection().createStatement();
-            ResultSet rs = stat.executeQuery("select ProteinGroupID from ProteinsProteinGroups where ProteinID = " + proteinID);
+            PreparedStatement stat = null;
             try {
-                rs.next();
-                proteinGroupID = rs.getInt("ProteinGroupID");
+                stat = msfFile.getConnection().prepareStatement("select ProteinGroupID from ProteinsProteinGroups where ProteinID = ?");
+                stat.setInt(1,proteinID);
+                ResultSet rs = stat.executeQuery();
+                try {
+                    rs.next();
+                    proteinGroupID = rs.getInt("ProteinGroupID");
+                } finally {
+                    rs.close();
+                }
             } finally {
-                rs.close();
+                if (stat != null) {
+                    stat.close();
+                }
             }
-            stat.close();
         } catch (SQLException sqle) {
             logger.error(sqle);
         }

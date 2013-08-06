@@ -60,6 +60,7 @@ import java.util.Observer;
 import java.util.List;
 import java.util.Observable;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Level;
 
 /**
@@ -223,7 +224,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
      *
      * @param lStandAlone
      */
-    public Thermo_msf_parserGUILowMem(boolean lStandAlone,List<String> msfFileLocations) {
+    public Thermo_msf_parserGUILowMem(boolean lStandAlone) {
 
         this.iStandAlone = lStandAlone;
 
@@ -332,7 +333,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                     public Boolean construct() {
                         //create the writer
                         try {
-                            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(lPath),"UTF-8"));
+                            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(lPath), "UTF-8"));
 
                             //write column headers
                             String lLine = "";
@@ -408,7 +409,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                             progressBar.setString("Writing all spectra to " + lPath);
                             progressBar.setStringPainted(true);
                             progressBar.setVisible(true);
-                            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(lPath),"UTF-8"));
+                            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(lPath), "UTF-8"));
                             StringBuilder stringBuffer = new StringBuilder();
                             //if works use counting for this
                             for (MsfFile iParsedMsf : iParsedMsfs) {
@@ -736,25 +737,44 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                         iSelectedProtein = null;
                     }
 
+                    //open file chooser
+                    JFileChooser fc = new JFileChooser();
+                    fc.setMultiSelectionEnabled(true);
+                    //create the file filter to choose
+                    FileFilter lFilter = new MsfFileFilter();
+                    fc.setFileFilter(lFilter);
+                    int returnVal = fc.showOpenDialog(getFrame());
+                    File[] lFiles = null;
+                    if (returnVal == JFileChooser.APPROVE_OPTION) {
+                        lFiles = fc.getSelectedFiles();
+                            iMsfFileLocations.addAll(Arrays.asList(lFiles));
+                    } else {
+                        JOptionPane.showMessageDialog(new JFrame(), "Open command cancelled by user.", "Info", JOptionPane.INFORMATION_MESSAGE);
+                        return true;
+                    }
+                    if (lFiles.length > 1) {
+                        JOptionPane.showMessageDialog(getFrame(), "The workflow of the differnt msf files that are loaded must be the same.\nUnexpected crashes can occur if files with different workflows are loaded!", "Info", JOptionPane.INFORMATION_MESSAGE);
+                    }
+
                     progressBar.setIndeterminate(true);
                     progressBar.setVisible(true);
                     progressBar.setStringPainted(true);
                     progressBar.setMaximum(iMsfFileLocations.size() + 1);
                     progressBar.setIndeterminate(false);
                     //parse the msf files
-                    /*int confidencelevel = 3;
+                    int confidenceLevel = 3;
                      if (chbHighConfident.isSelected()) {
-                     confidencelevel = 3;
+                     confidenceLevel = 3;
 
                      }
                      if (chbMediumConfident.isSelected()) {
-                     confidencelevel = 2;
+                     confidenceLevel = 2;
 
                      }
                      if (chbLowConfident.isSelected()) {
-                     confidencelevel = 1;
+                     confidenceLevel = 1;
 
-                     }*/
+                     }
                     for (int i = 0; i < iMsfFileLocations.size(); i++) {
                         msfFile = new MsfFile(iMsfFileLocations.get(i));
                         progressBar.setValue(i + 1);
@@ -841,7 +861,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                     }
                     int totalNumberOfPeptides = 0;
                     for (MsfFile iParsedMsf : iParsedMsfs) {
-                        totalNumberOfPeptides += peptideLowMemInstance.getNumberOfPeptidesForConfidenceLevel(3, iParsedMsf);
+                        totalNumberOfPeptides += peptideLowMemInstance.getNumberOfPeptidesForConfidenceLevel(confidenceLevel, iParsedMsf);
                     }
                     progressBar.setIndeterminate(false);
                     progressBar.setValue(0);
@@ -1126,7 +1146,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
 
         for (Object[] lPeptide1 : lPeptides) {
             PeptideLowMem lPeptide = (PeptideLowMem) lPeptide1[2];
-            SpectrumLowMem spectrumOfPeptide = spectrumLowMemInstance.getSpectrumForPeptideID(lPeptide, msfFile);
+            SpectrumLowMem spectrumOfPeptide = spectrumLowMemInstance.getSpectrumForPeptide(lPeptide, msfFile);
             if (lLowRT > spectrumOfPeptide.getRetentionTime()) {
                 lLowRT = spectrumOfPeptide.getRetentionTime();
             }
@@ -1838,9 +1858,9 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
      * @return ArrayList with the peptide line objects
      */
     private ArrayList<Object[]> collectPeptidesFromProtein(ArrayList<Object[]> lPeptides, ProteinLowMem lProtein, MsfFile iParsedMsf) {
-        List<PeptideLowMem> peptides = lProtein.getPeptidesForProtein();
+        Set<PeptideLowMem> peptides = lProtein.getPeptidesForProtein();
         for (PeptideLowMem lPeptide : peptides) {
-            lPeptide = new GUIPeptideLowMem(lPeptide,iParsedMsf.getAminoAcids(),iParsedMsf);
+            lPeptide = new GUIPeptideLowMem(lPeptide, iParsedMsf);
             int lConfidenceLevel = lPeptide.getConfidenceLevel();
             boolean lUse = false;
             if (chbHighConfident.isSelected() && lConfidenceLevel == 3) {
@@ -1891,19 +1911,19 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
         if (chbHighConfident.isSelected()) {
             confidencelevel = 3;
             for (MsfFile iParsedMsf : iParsedMsfs) {
-                totalNumberOfProteins += proteinLowMemInstance.getNumberOfProteinsForConfidenceLevel(confidencelevel, iParsedMsf);
+                totalNumberOfProteins += proteinLowMemInstance.getNumberOfProteinsWithAPeptideAtConfidenceLevel(confidencelevel, iParsedMsf);
             }
         }
         if (chbMediumConfident.isSelected()) {
             confidencelevel = 2;
             for (MsfFile iParsedMsf : iParsedMsfs) {
-                totalNumberOfProteins += proteinLowMemInstance.getNumberOfProteinsForConfidenceLevel(confidencelevel, iParsedMsf);
+                totalNumberOfProteins += proteinLowMemInstance.getNumberOfProteinsWithAPeptideAtConfidenceLevel(confidencelevel, iParsedMsf);
             }
         }
         if (chbLowConfident.isSelected()) {
             confidencelevel = 1;
             for (MsfFile iParsedMsf : iParsedMsfs) {
-                totalNumberOfProteins += proteinLowMemInstance.getNumberOfProteinsForConfidenceLevel(confidencelevel, iParsedMsf);
+                totalNumberOfProteins += proteinLowMemInstance.getNumberOfProteinsWithAPeptideAtConfidenceLevel(confidencelevel, iParsedMsf);
             }
         }
         progressBar.setMaximum(totalNumberOfProteins);
@@ -1928,7 +1948,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
             progressBar.setIndeterminate(true);
             progressBar.setString("creating table of all peptides");
             if (chbHighConfident.isSelected()) {
-                peptideLowMemInstance.getPeptidesForProteinList(iDisplayedProteins, iParsedMsf);
+                peptideLowMemInstance.getPeptidesForProteinList(iDisplayedProteins, iParsedMsf, 3);
             }
             if (chbMediumConfident.isSelected()) {
                 peptideLowMemInstance.getPeptidesForProteinList(iDisplayedProteins, iParsedMsf, 2);
@@ -1940,7 +1960,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
             //only add the peptide line if we need to use it
             for (ProteinLowMem lProtein : iDisplayedProteins) {
                 for (PeptideLowMem lPeptide : lProtein.getPeptidesForProtein()) {
-                    lPeptideLines.add(createPeptideLine(new GUIPeptideLowMem(lPeptide,((GUIProteinLowMem)lProtein).getMsfFile().getAminoAcids(),((GUIProteinLowMem)lProtein).getMsfFile()),((GUIProteinLowMem)lProtein).getMsfFile()));
+                    lPeptideLines.add(createPeptideLine(new GUIPeptideLowMem(lPeptide, ((GUIProteinLowMem) lProtein).getMsfFile()), ((GUIProteinLowMem) lProtein).getMsfFile()));
                 }
             }
         }
@@ -2230,14 +2250,18 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
      * @return the version number of the thermo-msf parser
      */
     public final String getVersion() {
-        Properties p = new Properties();
+        String version = "0";
         try {
-            InputStream is = this.getClass().getClassLoader().getResourceAsStream("thermo_msf_parser.properties");
+            Properties p = new Properties();
+            InputStream is = this.getClass().getClassLoader().getResourceAsStream("/META-INF/maven/com.compomics.thermo_msf_parser/thermo_msf_parser_GUI/pom.properties");
             p.load(is);
+           version = p.getProperty("version");
         } catch (IOException e) {
             logger.error(e);
+        } catch (NullPointerException e) {
+            logger.error(e);
         }
-        return p.getProperty("version");
+        return version;
     }
 
     private void peptidesTableKeyReleased(KeyEvent evt) throws IOException {
@@ -2291,7 +2315,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
         // an array containing the coverage index for each residue
         int[] coverage = new int[lCleanProteinSequence.length() + 1];
 
-        List<PeptideLowMem> lPeptides = lProtein.getPeptidesForProtein();
+        Set<PeptideLowMem> lPeptides = lProtein.getPeptidesForProtein();
         // iterate the peptide table and store the coverage for each peptide
         for (PeptideLowMem lPeptide : lPeptides) {
             int lConfidenceLevel = lPeptide.getConfidenceLevel();
@@ -2505,7 +2529,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
 
                             double lAreaDistance = chromatogramPanel.getMaxXAxisValue() / 500.0;
                             if (iSelectedProtein != null) {
-                                List<PeptideLowMem> peptideArrayList = iSelectedProtein.getPeptidesForProtein();
+                                Set<PeptideLowMem> peptideArrayList = iSelectedProtein.getPeptidesForProtein();
                                 for (PeptideLowMem lPeptide : peptideArrayList) {
                                     SpectrumLowMem tempSpectrum = lPeptide.getParentSpectrum();
                                     int lConfidenceLevel = lPeptide.getConfidenceLevel();
@@ -2762,7 +2786,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
         } catch (IOException e) {
             logger.error(e);
         }
-        new Thermo_msf_parserGUILowMem(true,Arrays.asList(args[args.length].split(",")));
+        new Thermo_msf_parserGUILowMem(true);
     }
 
     /**

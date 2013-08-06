@@ -5,7 +5,6 @@ import com.compomics.thermo_msf_parser_API.util.MsfFileFilter;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.util.Arrays;
-import java.util.logging.Level;
 import javax.swing.JFileChooser;
 import org.apache.log4j.Logger;
 
@@ -32,9 +31,12 @@ public class ThermoMsfParserGuiWrapper extends CompomicsWrapper {
             File jarFile = new File(ThermoMsfParserGuiWrapper.class.getProtectionDomain().getCodeSource().getLocation().toURI());
             // get the splash 
 
-            String mainClass = "com.compomics.thermo_msf_parser_GUI.Thermo_msf_parserGUI";
-
+            String mainClass = "com.compomics.thermo_msf_parser_GUI.Thermo_msf_parserGUILowMem";
+            
+            //String mainClass = "com.compomics.thermo_msf_parser_GUI.Thermo_msf_parserGUI";
             StringBuilder fileLocations = new StringBuilder();
+            /**
+            
 
             //open file chooser
             JFileChooser fc = new JFileChooser();
@@ -55,14 +57,14 @@ public class ThermoMsfParserGuiWrapper extends CompomicsWrapper {
                 }
             }
             fileLocations.delete(0, 1);
-
+*/
             String[] argsAddedTo = Arrays.copyOf(args, args.length+1);
             System.out.println(argsAddedTo.length);
             argsAddedTo[argsAddedTo.length -1] = fileLocations.toString();
             
             launchTool("Thermo MSF Parser", jarFile, null, mainClass, argsAddedTo);
         } catch (URISyntaxException ex) {
-            java.util.logging.Logger.getLogger(ThermoMsfParserGuiWrapper.class.getName()).log(Level.SEVERE, null, ex);
+            logger.error(ex);
         }
     }
 

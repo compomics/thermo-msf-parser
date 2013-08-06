@@ -24,7 +24,7 @@ public class MsfFile {
     public MsfFile(File aMsfFile) throws ClassNotFoundException, SQLException {
         this.msfFile = aMsfFile;
         Class.forName("org.sqlite.JDBC");
-        this.iConnection = DriverManager.getConnection("jdbc:sqlite:" + msfFile.getAbsolutePath());
+        this.iConnection = DriverManager.getConnection(String.format("jdbc:sqlite:%s", msfFile.getAbsolutePath()));
     }
 
     public File getMsfFile() {
@@ -38,17 +38,23 @@ public class MsfFile {
     public List<AminoAcid> getAminoAcids() {
         if (iAminoAcid.isEmpty()) {
             try {
-                PreparedStatement stat = this.iConnection.prepareStatement("select * from AminoAcids order by AminoAcidID");
-                ResultSet rs = stat.executeQuery();
+                PreparedStatement stat = null;
                 try {
-                    while (rs.next()) {
-                        AminoAcid aminoAcid = new AminoAcid(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getDouble(5), rs.getDouble(6), rs.getString(7));
-                        iAminoAcid.add(aminoAcid);
+                    stat = this.iConnection.prepareStatement("select * from AminoAcids order by AminoAcidID");
+                    ResultSet rs = stat.executeQuery();
+                    try {
+                        while (rs.next()) {
+                            AminoAcid aminoAcid = new AminoAcid(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4), rs.getDouble(5), rs.getDouble(6), rs.getString(7));
+                            iAminoAcid.add(aminoAcid);
+                        }
+                    } finally {
+                        rs.close();
                     }
                 } finally {
-                    rs.close();
+                    if (stat != null) {
+                        stat.close();
+                    }
                 }
-                stat.close();
             } catch (SQLException e) {
                 logger.error(e);
             }
@@ -59,21 +65,28 @@ public class MsfFile {
     public MsfVersion getVersion() {
         if (iMsfVersion == null) {
             try {
-                Statement stat = getConnection().createStatement();
-                ResultSet rs = stat.executeQuery("select * from SchemaInfo");
+                PreparedStatement stat = null;
                 try {
-                    while (rs.next()) {
-                        String lVersion = rs.getString("SoftwareVersion");
-                        if (lVersion.startsWith("1.2")) {
-                            iMsfVersion = MsfVersion.VERSION1_2;
-                        } else if (lVersion.startsWith("1.3")) {
-                            iMsfVersion = MsfVersion.VERSION1_3;
+                    stat = getConnection().prepareStatement("select * from SchemaInfo");
+                    ResultSet rs = stat.executeQuery();
+                    try {
+                        while (rs.next()) {
+                            String lVersion = rs.getString("SoftwareVersion");
+                            for (MsfVersion version : MsfVersion.values()) {
+                                if (lVersion.startsWith(version.getVersion())) {
+                                    iMsfVersion = version;
+                                    break;
+                                }
+                            }
                         }
+                    } finally {
+                        rs.close();
                     }
                 } finally {
-                    rs.close();
+                    if (stat != null) {
+                        stat.close();
+                    }
                 }
-                stat.close();
             } catch (SQLException ex) {
                 logger.error(ex);
             }

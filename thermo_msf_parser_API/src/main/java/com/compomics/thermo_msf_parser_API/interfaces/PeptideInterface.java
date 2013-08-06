@@ -3,7 +3,6 @@ package com.compomics.thermo_msf_parser_API.interfaces;
 import com.compomics.thermo_msf_parser_API.lowmeminstance.model.MsfFile;
 import com.compomics.thermo_msf_parser_API.lowmeminstance.model.PeptideLowMem;
 import com.compomics.thermo_msf_parser_API.lowmeminstance.model.ProteinLowMem;
-import java.sql.Connection;
 import java.util.List;
 
 /**
@@ -36,12 +35,12 @@ public interface PeptideInterface {
 
     /**
     @param peptideID: the peptide ID in the sqlite database
-    @param msfFileConnection: a connection to the SQLite database
+    @param msfFile the msf file to get the data from
     @param fullInfo if the returned information should be concise or not
     @return a vector containing the different values to present in the thermo-msf-parser, empty if none are found
     */
 
-    public List getInformationForPeptide(int peptideID,Connection msfFileConnection,boolean fullInfo);
+    public List getInformationForPeptide(int peptideID,MsfFile msfFile,boolean fullInfo);
 
     
      /**
@@ -70,14 +69,6 @@ public interface PeptideInterface {
      * @param confidenceLevel the confidence level we want to retrieve the peptides at
      */
     public void getPeptidesForProteinList(List<ProteinLowMem> proteinLowMemList,MsfFile msfFile,int confidenceLevel);
-    
-    /**
-     * @param proteinLowMemList a vector containing the protein objects we want to retrieve the peptides for
-     * @param msfFileConnection a connection to the msf file
-     * @param iAminoAcids a vector of the amino acids retrieved from the msf file
-     * @param iMsfVersion the msf file version
-     */
-    public void getPeptidesForProteinList(List<ProteinLowMem> proteinLowMemList,MsfFile msfFile);
     
     /**
      * 

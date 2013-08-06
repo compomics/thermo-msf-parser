@@ -19,13 +19,12 @@ public interface ModificationInterface {
      a method to return a peptide sequence with its modifications
 
      @param peptide a Peptide object
-     @param modificationMap a hashmap returned from the modification method createModificationMap
-     @param iConnection connection to the SQLite db
+     @param msfFile the proteome discoverer file to get the modifications from
      @return a string of the modified peptide
      @throws SQLException if something went wrong with the retrieving
      */
 
-    public String addModificationsToPeptideSequence(PeptideLowMem peptide,Map modificationMap,MsfFile msfFile);
+    public String addModificationsToPeptideSequence(PeptideLowMem peptide,MsfFile msfFile);
 
     /**
     creates a hashmap containing the modifications stored in the msf file
