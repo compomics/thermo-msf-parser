@@ -161,17 +161,7 @@ public class PeptideLowMem {
         this.iMatchedIonsCount = iMatchedIonsCount;
         this.iAnnotation = iAnnotation;
         this.iProcessingNodeNumber = iProcessingNodeNumber;
-        iAminoAcidSequence = new ArrayList<AminoAcid>();
-        for (int i = 0; i < iSequence.length(); i++) {
-            String lAaOneLetterCode = String.valueOf(iSequence.charAt(i));
-            for (int a = 0; a < iAminoAcids.size(); a++) {
-                if (iAminoAcids.get(a).getOneLetterCode() != null) {
-                    if (iAminoAcids.get(a).getOneLetterCode().equalsIgnoreCase(lAaOneLetterCode)) {
-                        iAminoAcidSequence.add(iAminoAcids.get(a));
-                    }
-                }
-            }
-        }
+        createAminoAcidSequence(iSequence, iAminoAcids);
     }
     /*
      * constructor for a peptidelowmem instance
@@ -189,19 +179,24 @@ public class PeptideLowMem {
             this.iAnnotation = rs.getString("Annotation");
             this.iProcessingNodeNumber = rs.getInt("ProcessingNodeNumber");
             iAminoAcidSequence = new ArrayList<AminoAcid>();
-            for (int i = 0; i < iSequence.length(); i++) {
-                String lAaOneLetterCode = String.valueOf(iSequence.charAt(i));
-                for (int a = 0; a < iAminoAcids.size(); a++) {
-                    if (iAminoAcids.get(a).getOneLetterCode() != null) {
-                        if (iAminoAcids.get(a).getOneLetterCode().equalsIgnoreCase(lAaOneLetterCode)) {
-                            iAminoAcidSequence.add(iAminoAcids.get(a));
-                        }
-                    }
-                }
-            }
+            createAminoAcidSequence(iSequence,iAminoAcids);
         } catch (SQLException ex) {
             logger.error(ex);
         }
+    }
+
+    private void createAminoAcidSequence(String sequence, List<AminoAcid> iAminoAcids) {
+        for (int i = 0; i < sequence.length(); i++) {
+            String lAaOneLetterCode = String.valueOf(sequence.charAt(i));
+            for (int a = 0; a < iAminoAcids.size(); a++) {
+                if (iAminoAcids.get(a).getOneLetterCode() != null) {
+                    if (iAminoAcids.get(a).getOneLetterCode().equalsIgnoreCase(lAaOneLetterCode)) {
+                        iAminoAcidSequence.add(iAminoAcids.get(a));
+                    }
+                }
+            }
+        }
+
     }
 
     /**
@@ -493,7 +488,7 @@ public class PeptideLowMem {
 
                         iModifiedPeptide = String.format("%s<%s", iModifiedPeptide, iPeptideModifications.get(m).getAbbreviation());
                         if (iPhosphoRSSiteProbabilities.get(m) != null) {
-                            iModifiedPeptide += String.format(":%s%", iPhosphoRSSiteProbabilities.get(m) * 100);
+                            iModifiedPeptide += new StringBuilder().append(":").append(iPhosphoRSSiteProbabilities.get(m) * 100).append("%").toString();
                         }
                         iModifiedPeptide += ">";
                     }

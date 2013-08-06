@@ -61,7 +61,6 @@ public class ThermoMsfParserGuiWrapper extends CompomicsWrapper {
             String[] argsAddedTo = Arrays.copyOf(args, args.length+1);
             System.out.println(argsAddedTo.length);
             argsAddedTo[argsAddedTo.length -1] = fileLocations.toString();
-            
             launchTool("Thermo MSF Parser", jarFile, null, mainClass, argsAddedTo);
         } catch (URISyntaxException ex) {
             logger.error(ex);
