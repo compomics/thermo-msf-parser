@@ -1,6 +1,6 @@
 package com.compomics.thermo_msf_parser_API.highmeminstance;
 
-import com.compomics.thermo_msf_parser_API.util.UrParameter;
+import com.compomics.util.experiment.personalization.UrParameter;
 
 /**
  * A class needed to be able to add charge to PeptideFragmentIon objects, as 

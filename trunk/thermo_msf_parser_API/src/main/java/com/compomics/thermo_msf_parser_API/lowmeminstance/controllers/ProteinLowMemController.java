@@ -4,8 +4,8 @@ import com.compomics.thermo_msf_parser_API.lowmeminstance.model.MsfFile;
 import com.compomics.thermo_msf_parser_API.interfaces.ProteinControllerInterface;
 import com.compomics.thermo_msf_parser_API.lowmeminstance.model.PeptideLowMem;
 import com.compomics.thermo_msf_parser_API.lowmeminstance.model.ProteinLowMem;
-import com.compomics.thermo_msf_parser_API.util.Header;
 import com.compomics.thermo_msf_parser_API.util.UtilProtein;
+import com.compomics.util.protein.Header;
 import java.sql.*;
 import java.util.*;
 

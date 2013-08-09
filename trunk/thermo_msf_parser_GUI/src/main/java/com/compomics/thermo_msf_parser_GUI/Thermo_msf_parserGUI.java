@@ -17,7 +17,10 @@ import com.compomics.util.Util;
 import com.compomics.util.examples.HelpWindow;
 import com.compomics.util.gui.UtilitiesGUIDefaults;
 import com.compomics.util.gui.protein.ProteinSequencePane;
+import com.compomics.util.gui.spectrum.ChromatogramPanel;
 import com.compomics.util.gui.spectrum.DefaultSpectrumAnnotation;
+import com.compomics.util.gui.spectrum.ReferenceArea;
+import com.compomics.util.gui.spectrum.SpectrumPanel;
 import com.compomics.util.io.StartBrowser;
 import no.uib.jsparklines.renderers.JSparklinesBarChartTableCellRenderer;
 import no.uib.jsparklines.renderers.JSparklinesIntegerColorTableCellRenderer;
@@ -44,6 +47,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
+import java.util.Vector;
 
 /**
  * Created by IntelliJ IDEA. User: Niklaas Date: 23-Feb-2011 Time: 08:01:12
@@ -2131,7 +2135,7 @@ public class Thermo_msf_parserGUI extends JFrame {
      * @param lPeptide The peptide to set the annotation for
      */
     public void setSpectrumMSMSAnnotations(Peptide lPeptide) {
-        List<DefaultSpectrumAnnotation> lAnnotations = new ArrayList<DefaultSpectrumAnnotation>();
+        Vector lAnnotations = new Vector();
         if (iMSMSspectrumPanel != null && lPeptide != null) {
             int lMaximumCharge = iSelectedPeptide.getParentSpectrum().getCharge();
             if (chargeOneJCheckBox.isSelected()) {
@@ -2445,7 +2449,7 @@ public class Thermo_msf_parserGUI extends JFrame {
                     List<Peak> lMSPeaks = iSelectedPeptide.getParentSpectrum().getMSPeaks();
                     double[] lMSMzValues = new double[lMSPeaks.size()];
                     double[] lMSIntensityValues = new double[lMSPeaks.size()];
-                    List<DefaultSpectrumAnnotation> lMSAnnotations = new ArrayList<DefaultSpectrumAnnotation>();
+                    Vector lMSAnnotations = new Vector();
                     double lMinMZvalue = Double.MAX_VALUE;
                     double lMaxMZvalue = Double.MIN_VALUE;
                     for (int i = 0; i < lMSPeaks.size(); i++) {
@@ -2479,9 +2483,9 @@ public class Thermo_msf_parserGUI extends JFrame {
                     iMSspectrumPanel.setProfileMode(false);
                     iMSspectrumPanel.setAnnotations(lMSAnnotations);
                     iMSspectrumPanel.setXAxisStartAtZero(false);
-                    Peak lFragmentedPeak = iSelectedPeptide.getParentSpectrum().getFragmentedMsPeak();
-                    double lDistance = (lMaxMZvalue - lMinMZvalue) / 50.0;
-                    iMSspectrumPanel.addReferenceAreaXAxis(new ReferenceArea("", lFragmentedPeak.getX() - lDistance, lFragmentedPeak.getX() + lDistance, Color.blue, 0.1f, false, true));
+                    //Peak lFragmentedPeak = iSelectedPeptide.getParentSpectrum().getFragmentedMsPeak(); // @TODO: what is this annotating..????
+                    //double lDistance = (lMaxMZvalue - lMinMZvalue) / 50.0;
+                    //iMSspectrumPanel.addReferenceAreaXAxis(new ReferenceArea("A", "A", lFragmentedPeak.getX() - lDistance, lFragmentedPeak.getX() + lDistance, Color.blue, 0.1f, false, false));
 
                     this.jpanMS.add(iMSspectrumPanel);
                     this.jpanMS.validate();
@@ -2554,18 +2558,21 @@ public class Thermo_msf_parserGUI extends JFrame {
                                             lUse = false;
                                         }
                                     }
+                                    
+                                    // @TODO: lUse is always false???
 
                                     if (lUse) {
                                         if (lPeptide.getParentSpectrum().getParser().getFileName().equalsIgnoreCase(iSelectedPeptide.getParentSpectrum().getParser().getFileName()) && lPeptide.getParentSpectrum().getFileId() == iSelectedPeptide.getParentSpectrum().getFileId()) {
-                                            chromatogramPanel.addReferenceAreaXAxis(new ReferenceArea(String.valueOf(iSelectedProtein.getPeptides().get(p).getParentSpectrum().getFirstScan()), iSelectedProtein.getPeptides().get(p).getParentSpectrum().getRetentionTime() - lAreaDistance, iSelectedProtein.getPeptides().get(p).getParentSpectrum().getRetentionTime() + lAreaDistance, Color.blue, 0.1f, false, false));
+                                            chromatogramPanel.addReferenceAreaXAxis(new ReferenceArea(String.valueOf(iSelectedProtein.getPeptides().get(p).getParentSpectrum().getFirstScan()), "", iSelectedProtein.getPeptides().get(p).getParentSpectrum().getRetentionTime() - lAreaDistance, iSelectedProtein.getPeptides().get(p).getParentSpectrum().getRetentionTime() + lAreaDistance, Color.blue, 0.5f, false, false));
                                         } else {
-                                            chromatogramPanel.addReferenceAreaXAxis(new ReferenceArea(String.valueOf(iSelectedProtein.getPeptides().get(p).getParentSpectrum().getFirstScan()), iSelectedProtein.getPeptides().get(p).getParentSpectrum().getRetentionTime() - lAreaDistance, iSelectedProtein.getPeptides().get(p).getParentSpectrum().getRetentionTime() + lAreaDistance, Color.green, 0.1f, false, false));
+                                            chromatogramPanel.addReferenceAreaXAxis(new ReferenceArea(String.valueOf(iSelectedProtein.getPeptides().get(p).getParentSpectrum().getFirstScan()), "", iSelectedProtein.getPeptides().get(p).getParentSpectrum().getRetentionTime() - lAreaDistance, iSelectedProtein.getPeptides().get(p).getParentSpectrum().getRetentionTime() + lAreaDistance, Color.green, 0.5f, false, false));
                                         }
                                     }
 
                                 }
                             }
-                            chromatogramPanel.addReferenceAreaXAxis(new ReferenceArea(String.valueOf(iSelectedPeptide.getParentSpectrum().getFirstScan()), iSelectedPeptide.getParentSpectrum().getRetentionTime() - lAreaDistance, iSelectedPeptide.getParentSpectrum().getRetentionTime() + lAreaDistance, Color.red, 0.8f, true, false));
+
+                            chromatogramPanel.addReferenceAreaXAxis(new ReferenceArea(String.valueOf(iSelectedPeptide.getParentSpectrum().getFirstScan()), "", iSelectedPeptide.getParentSpectrum().getRetentionTime() - lAreaDistance, iSelectedPeptide.getParentSpectrum().getRetentionTime() + lAreaDistance, Color.red, 0.5f, false, false));
 
 
                             //chromatogramPanel.setMiniature(true);
@@ -2677,7 +2684,7 @@ public class Thermo_msf_parserGUI extends JFrame {
                             iQuantificationSpectrumPanel.rescale(lMinMass, lMaxMass);
                             iQuantificationSpectrumPanel.setProfileMode(false);
                             iQuantificationSpectrumPanel.setXAxisStartAtZero(false);
-                            List<DefaultSpectrumAnnotation> lQuanAnnotations = new ArrayList<DefaultSpectrumAnnotation>();
+                            Vector lQuanAnnotations = new Vector();
                             for (int i = 0; i < lQuan.getIsotopePatterns().size(); i++) {
                                 double[] lQuanPatternMzValues = new double[lQuanEventsByPattern.get(i).size()];
                                 double[] lQuanPatternIntensityValues = new double[lQuanEventsByPattern.get(i).size()];
