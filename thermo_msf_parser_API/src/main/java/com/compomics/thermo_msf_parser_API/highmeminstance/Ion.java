@@ -1,6 +1,6 @@
 package com.compomics.thermo_msf_parser_API.highmeminstance;
 
-import com.compomics.thermo_msf_parser_API.util.ExperimentObject;
+import com.compomics.util.experiment.personalization.ExperimentObject;
 
 /**
  * This class models an ion.

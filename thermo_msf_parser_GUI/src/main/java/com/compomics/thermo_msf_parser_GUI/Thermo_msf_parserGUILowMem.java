@@ -30,7 +30,10 @@ import com.compomics.util.Util;
 import com.compomics.util.examples.HelpWindow;
 import com.compomics.util.gui.UtilitiesGUIDefaults;
 import com.compomics.util.gui.protein.ProteinSequencePane;
+import com.compomics.util.gui.spectrum.ChromatogramPanel;
 import com.compomics.util.gui.spectrum.DefaultSpectrumAnnotation;
+import com.compomics.util.gui.spectrum.ReferenceArea;
+import com.compomics.util.gui.spectrum.SpectrumPanel;
 import com.compomics.util.io.StartBrowser;
 import no.uib.jsparklines.renderers.JSparklinesBarChartTableCellRenderer;
 import no.uib.jsparklines.renderers.JSparklinesIntegerColorTableCellRenderer;
@@ -61,6 +64,7 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Properties;
 import java.util.Set;
+import java.util.Vector;
 import java.util.logging.Level;
 
 /**
@@ -747,7 +751,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                     File[] lFiles = null;
                     if (returnVal == JFileChooser.APPROVE_OPTION) {
                         lFiles = fc.getSelectedFiles();
-                            iMsfFileLocations.addAll(Arrays.asList(lFiles));
+                        iMsfFileLocations.addAll(Arrays.asList(lFiles));
                     } else {
                         JOptionPane.showMessageDialog(new JFrame(), "Open command cancelled by user.", "Info", JOptionPane.INFORMATION_MESSAGE);
                         return true;
@@ -763,18 +767,18 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                     progressBar.setIndeterminate(false);
                     //parse the msf files
                     int confidenceLevel = 3;
-                     if (chbHighConfident.isSelected()) {
-                     confidenceLevel = 3;
+                    if (chbHighConfident.isSelected()) {
+                        confidenceLevel = 3;
 
-                     }
-                     if (chbMediumConfident.isSelected()) {
-                     confidenceLevel = 2;
+                    }
+                    if (chbMediumConfident.isSelected()) {
+                        confidenceLevel = 2;
 
-                     }
-                     if (chbLowConfident.isSelected()) {
-                     confidenceLevel = 1;
+                    }
+                    if (chbLowConfident.isSelected()) {
+                        confidenceLevel = 1;
 
-                     }
+                    }
                     for (int i = 0; i < iMsfFileLocations.size(); i++) {
                         msfFile = new MsfFile(iMsfFileLocations.get(i));
                         progressBar.setValue(i + 1);
@@ -2152,7 +2156,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
      * @throws java.sql.SQLException
      */
     public void setSpectrumMSMSAnnotations(PeptideLowMem lPeptide) throws SQLException {
-        ArrayList<DefaultSpectrumAnnotation> lAnnotations = new ArrayList<DefaultSpectrumAnnotation>();
+        Vector lAnnotations = new Vector();
         if (iMSMSspectrumPanel != null && lPeptide != null) {
             int lMaximumCharge = (iSelectedPeptide).getParentSpectrum().getCharge();
             if (chargeOneJCheckBox.isSelected()) {
@@ -2181,7 +2185,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
      * @param lPeptide The peptide
      * @return ArrayList with the annotations
      */
-    public ArrayList<DefaultSpectrumAnnotation> addIonAnnotationByCharge(ArrayList<DefaultSpectrumAnnotation> lAnnotations, int lCharge, PeptideLowMem lPeptide) {
+    public Vector addIonAnnotationByCharge(Vector lAnnotations, int lCharge, PeptideLowMem lPeptide) {
         ArrayList<PeptideFragmentIon.PeptideFragmentIonType> lIonTypes = new ArrayList<PeptideFragmentIon.PeptideFragmentIonType>();
         if (aIonsJCheckBox.isSelected()) {
             lIonTypes.add(PeptideFragmentIon.PeptideFragmentIonType.A_ION);
@@ -2255,7 +2259,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
             Properties p = new Properties();
             InputStream is = this.getClass().getClassLoader().getResourceAsStream("/META-INF/maven/com.compomics.thermo_msf_parser/thermo_msf_parser_GUI/pom.properties");
             p.load(is);
-           version = p.getProperty("version");
+            version = p.getProperty("version");
         } catch (IOException e) {
             logger.error(e);
         } catch (NullPointerException e) {
@@ -2443,7 +2447,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                     List<Peak> lMSPeaks = spectrumLowMemInstance.getMSPeaks(spectrumOfPeptide.getSpectrumXML());
                     double[] lMSMzValues = new double[lMSPeaks.size()];
                     double[] lMSIntensityValues = new double[lMSPeaks.size()];
-                    ArrayList<DefaultSpectrumAnnotation> lMSAnnotations = new ArrayList<DefaultSpectrumAnnotation>();
+                    Vector lMSAnnotations = new Vector();
                     double lMinMZvalue = Double.MAX_VALUE;
                     double lMaxMZvalue = Double.MIN_VALUE;
                     for (int i = 0; i < lMSPeaks.size(); i++) {
@@ -2477,9 +2481,9 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                     iMSspectrumPanel.setProfileMode(false);
                     iMSspectrumPanel.setAnnotations(lMSAnnotations);
                     iMSspectrumPanel.setXAxisStartAtZero(false);
-                    Peak lFragmentedPeak = spectrumLowMemInstance.getFragmentedMsPeak(spectrumOfPeptide.getSpectrumXML());
-                    double lDistance = (lMaxMZvalue - lMinMZvalue) / 50.0;
-                    iMSspectrumPanel.addReferenceAreaXAxis(new ReferenceArea("", lFragmentedPeak.getX() - lDistance, lFragmentedPeak.getX() + lDistance, Color.blue, 0.1f, false, true));
+                    //Peak lFragmentedPeak = spectrumLowMemInstance.getFragmentedMsPeak(spectrumOfPeptide.getSpectrumXML()); // @TODO: what is this annotating..????
+                    //double lDistance = (lMaxMZvalue - lMinMZvalue) / 50.0;
+                    //iMSspectrumPanel.addReferenceAreaXAxis(new ReferenceArea("A", "A", lFragmentedPeak.getX() - lDistance, lFragmentedPeak.getX() + lDistance, Color.blue, 0.1f, false, false));
 
                     this.jpanMS.add(iMSspectrumPanel);
                     this.jpanMS.validate();
@@ -2547,25 +2551,39 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                                         if (!tempSpectrum.isHighestScoring(lPeptide, iMajorScoreTypes)) {
                                             lUse = false;
                                         }
-                                    }
-                                    if (onlyLowestScoringRadioButton.isSelected()) {
+                                    } else if (onlyLowestScoringRadioButton.isSelected()) {
                                         if (!tempSpectrum.isLowestScoring(lPeptide, iMajorScoreTypes)) {
                                             lUse = false;
                                         }
                                     }
-
+                                    
+                                    // @TODO: lUse is always false???
 
                                     if (lUse) {
-                                        if (rawFileLowMemInstance.getRawFileNameForFileID(tempSpectrum.getFileId(), iSelectedPeptide.getMsfFile()).equalsIgnoreCase(rawFileLowMemInstance.getRawFileNameForFileID(tempSpectrum.getFileId(), iSelectedPeptide.getMsfFile()))) {
-                                            chromatogramPanel.addReferenceAreaXAxis(new ReferenceArea(String.valueOf(tempSpectrum.getFirstScan()), tempSpectrum.getRetentionTime() - lAreaDistance, tempSpectrum.getRetentionTime() + lAreaDistance, Color.blue, 0.1f, false, false));
+                                        if (rawFileLowMemInstance.getRawFileNameForFileID(tempSpectrum.getFileId(), iSelectedPeptide.getMsfFile()).equalsIgnoreCase(
+                                                rawFileLowMemInstance.getRawFileNameForFileID(tempSpectrum.getFileId(), iSelectedPeptide.getMsfFile()))) {
+                                            chromatogramPanel.addReferenceAreaXAxis(new ReferenceArea(
+                                                    String.valueOf(tempSpectrum.getFirstScan()), 
+                                                    "B", tempSpectrum.getRetentionTime() - lAreaDistance, 
+                                                    tempSpectrum.getRetentionTime() + lAreaDistance, 
+                                                    Color.blue, 0.5f, false, false));
                                         } else {
-                                            chromatogramPanel.addReferenceAreaXAxis(new ReferenceArea(String.valueOf(tempSpectrum.getFirstScan()), tempSpectrum.getRetentionTime() - lAreaDistance, tempSpectrum.getRetentionTime() + lAreaDistance, Color.green, 0.1f, false, false));
+                                            chromatogramPanel.addReferenceAreaXAxis(new ReferenceArea(
+                                                    String.valueOf(tempSpectrum.getFirstScan()), 
+                                                    "", tempSpectrum.getRetentionTime() - lAreaDistance, 
+                                                    tempSpectrum.getRetentionTime() + lAreaDistance, 
+                                                    Color.green, 0.5f, false, false));
                                         }
                                     }
 
                                 }
                             }
-                            chromatogramPanel.addReferenceAreaXAxis(new ReferenceArea(String.valueOf(spectrumOfPeptide.getFirstScan()), spectrumOfPeptide.getRetentionTime() - lAreaDistance, spectrumOfPeptide.getRetentionTime() + lAreaDistance, Color.red, 0.8f, true, false));
+
+                            chromatogramPanel.addReferenceAreaXAxis(new ReferenceArea(
+                                    String.valueOf(spectrumOfPeptide.getFirstScan()), 
+                                    "", spectrumOfPeptide.getRetentionTime() - lAreaDistance, 
+                                    spectrumOfPeptide.getRetentionTime() + lAreaDistance, 
+                                    Color.red, 0.5f, false, false));
 
 
                             //chromatogramPanel.setMiniature(true);
@@ -2671,7 +2689,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
                         iQuantificationSpectrumPanel.rescale(lMinMass, lMaxMass);
                         iQuantificationSpectrumPanel.setProfileMode(false);
                         iQuantificationSpectrumPanel.setXAxisStartAtZero(false);
-                        List<DefaultSpectrumAnnotation> lQuanAnnotations = new ArrayList<DefaultSpectrumAnnotation>();
+                        Vector lQuanAnnotations = new Vector();
                         for (int i = 0; i < lQuan.getIsotopePatterns().size(); i++) {
                             double[] lQuanPatternMzValues = new double[lQuanEventsByPattern.get(i).size()];
                             double[] lQuanPatternIntensityValues = new double[lQuanEventsByPattern.get(i).size()];

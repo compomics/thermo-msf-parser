@@ -12,6 +12,7 @@
  */
 package com.compomics.thermo_msf_parser_API.util;
 import com.compomics.util.protein.AASequenceImpl;
+import com.compomics.util.protein.Header;
 import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;

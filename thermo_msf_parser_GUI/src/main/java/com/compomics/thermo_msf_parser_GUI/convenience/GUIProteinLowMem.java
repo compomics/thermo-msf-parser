@@ -15,7 +15,9 @@ public class GUIProteinLowMem extends ProteinLowMem {
     private MsfFile msfFileForProtein;
 
     /**
-     * convenience constructor to reference proteome discoverer file from protein
+     * convenience constructor to reference proteome discoverer file from
+     * protein
+     *
      * @param aAccession the protein accession
      * @param aProteinID the protein id
      * @param aMsfFile the proteome discoverer file to reference
@@ -26,7 +28,9 @@ public class GUIProteinLowMem extends ProteinLowMem {
     }
 
     /**
-     * convenience constructor to reference proteome discoverer file from protein
+     * convenience constructor to reference proteome discoverer file from
+     * protein
+     *
      * @param aAccession the protein accession
      * @param aProteinID the protein id
      */
