@@ -86,7 +86,7 @@ public class SpectrumLowMemController implements SpectrumInterface {
     @Override
     public List<Peak> getMSMSPeaks(String lXml) {
         List<Peak> lPeaks = new ArrayList<Peak>();
-        String xmlSubstring = lXml.substring(lXml.indexOf("<Peak ", lXml.indexOf("<PeakCentr")), lXml.lastIndexOf("</"));
+        String xmlSubstring = lXml.substring(lXml.indexOf("<Peak ", lXml.indexOf("<PeakCentr")), lXml.lastIndexOf("</PeakCentroids>"));
         String[] lLines = xmlSubstring.split("\n");
         for (int i = 0; i < lLines.length; i++) {
             if (lLines[i].trim().startsWith("<Peak ")) {
@@ -106,7 +106,7 @@ public class SpectrumLowMemController implements SpectrumInterface {
      */
     @Override
     public List<Peak> getMSPeaks(String lXml) {
-        String xmlSubstring = lXml.substring(lXml.indexOf("<Peak ", lXml.indexOf("<IsotopeClusterPeakCentroids")), lXml.lastIndexOf("</"));
+        String xmlSubstring = lXml.substring(lXml.indexOf("<Peak ", lXml.indexOf("<IsotopeClusterPeakCentroids")), lXml.lastIndexOf("</IsotopeClusterPeakCentroids>"));
         String[] lLines = xmlSubstring.split("\n");
         List<Peak> lPeaks = new ArrayList<Peak>();
         for (int i = 0; i < lLines.length; i++) {
@@ -125,12 +125,13 @@ public class SpectrumLowMemController implements SpectrumInterface {
      */
     @Override
     public Peak getFragmentedMsPeak(String lXml) {
-        String xmlSubstring = lXml.substring(lXml.indexOf("<MonoisotopicPeakCentroids"), lXml.lastIndexOf("</"));
+        String xmlSubstring = lXml.substring(lXml.indexOf("<MonoisotopicPeakCentroids"), lXml.indexOf("</MonoisotopicPeakCentroids>"));
         String[] lLines = xmlSubstring.split("\n");
         Peak lPeak = null;
         for (int i = 0; i < lLines.length; i++) {
             if (lLines[i].trim().startsWith("<Peak ")) {
                 lPeak = new Peak(lLines[i]);
+                break;
             }
         }
         return lPeak;
@@ -279,30 +280,33 @@ public class SpectrumLowMemController implements SpectrumInterface {
     public SpectrumLowMem getSpectrumForSpectrumID(int spectrumOfInterestID, MsfFile msfFile) {
         SpectrumLowMem returnSpectrum = null;
         try {
-            Statement stat = msfFile.getConnection().createStatement();
-            ResultSet rs;
-            rs = stat.executeQuery(new StringBuilder().append("select s.*, FileID from spectrumheaders as s, masspeaks where masspeaks.masspeakid = s.masspeakid and s.SpectrumID = ").append(spectrumOfInterestID).toString());
-            rs.next();
-            returnSpectrum = new SpectrumLowMem(rs.getInt("SpectrumID"), rs.getInt("UniqueSpectrumID"), rs.getInt("MassPeakID"), rs.getInt("LastScan"), rs.getInt("FirstScan"), rs.getInt("ScanNumbers"), rs.getInt("Charge"), rs.getDouble("RetentionTime"), rs.getDouble("Mass"), rs.getInt("ScanEventID"));
-            returnSpectrum.setFileId(rs.getInt("FileID"));
-            rs = stat.executeQuery(new StringBuilder().append("select * from CustomDataSpectra where SpectrumID = ").append(returnSpectrum.getSpectrumId()).toString());
-            while (rs.next()) {
-                returnSpectrum.addCustomDataField(rs.getInt("FieldID"), rs.getString("FieldValue"));
+            Statement stat = null;
+            try {
+                stat = msfFile.getConnection().createStatement();
+                ResultSet rs;
+                rs = stat.executeQuery(new StringBuilder().append("select s.*, FileID from spectrumheaders as s, masspeaks where masspeaks.masspeakid = s.masspeakid and s.SpectrumID = ").append(spectrumOfInterestID).toString());
+                try {
+                    rs.next();
+                    returnSpectrum = new SpectrumLowMem(rs.getInt("SpectrumID"), rs.getInt("UniqueSpectrumID"), rs.getInt("MassPeakID"), rs.getInt("LastScan"), rs.getInt("FirstScan"), rs.getInt("ScanNumbers"), rs.getInt("Charge"), rs.getDouble("RetentionTime"), rs.getDouble("Mass"), rs.getInt("ScanEventID"));
+                    returnSpectrum.setFileId(rs.getInt("FileID"));
+                    rs = stat.executeQuery(new StringBuilder().append("select * from CustomDataSpectra where SpectrumID = ").append(returnSpectrum.getSpectrumId()).toString());
+                    while (rs.next()) {
+                        returnSpectrum.addCustomDataField(rs.getInt("FieldID"), rs.getString("FieldValue"));
+                    }
+                } finally {
+                    rs.close();
+                }
+            } finally {
+                if (stat != null) {
+                    stat.close();
+                }
             }
-            rs.close();
-            stat.close();
         } catch (SQLException ex) {
             logger.error(ex);
         }
         return returnSpectrum;
     }
 
-    /**
-     *
-     * @param rawFileName the raw file name connected to the spectrum
-     * @param lspectrum the spectrum object we want the title from
-     * @return a processed title
-     */
     @Override
     public String getSpectrumTitle(String rawFileName, SpectrumLowMem lspectrum) {
         String spectrumTitle = rawFileName.substring(0, rawFileName.toLowerCase().lastIndexOf("."));
@@ -310,30 +314,44 @@ public class SpectrumLowMemController implements SpectrumInterface {
     }
 
     //TODO redo this part properly
-    /**
-     *
-     * @param lSpectrum
-     * @return the unzipped XML file in a string object
-     * @throws java.sql.SQLException
-     * @throws java.io.IOException
-     */
+
     @Override
     public void createSpectrumXMLForSpectrum(SpectrumLowMem lSpectrum, MsfFile msfFile) throws IOException {
         //TODO make own spectrumfile object to return to avoid constantly going through this
         try {
             byte[] lZippedSpectrumXml = null;
             String lXml;
-            ResultSet rs;
-            Statement stat = msfFile.getConnection().createStatement();
-            rs = stat.executeQuery(new StringBuilder().append("select Spectrum from Spectra where UniqueSpectrumID = ").append(lSpectrum.getUniqueSpectrumId()).toString());
-            while (rs.next()) {
-                lZippedSpectrumXml = rs.getBytes(1);
+            ResultSet rs = null;
+            Statement stat = null;
+            try {
+                stat = msfFile.getConnection().createStatement();
+
+                try {
+                    rs = stat.executeQuery(new StringBuilder().append("select Spectrum from Spectra where UniqueSpectrumID = ").append(lSpectrum.getUniqueSpectrumId()).toString());
+                    while (rs.next()) {
+                        lZippedSpectrumXml = rs.getBytes(1);
+                    }
+                } finally {
+                    if (rs != null) {
+                        rs.close();
+                    }
+                }
+            } finally {
+                if (stat != null) {
+                    stat.close();
+                }
             }
             File lZippedFile = File.createTempFile("zip", null);
-            FileOutputStream fos = new FileOutputStream(lZippedFile);
-            fos.write(lZippedSpectrumXml);
-            fos.flush();
-            fos.close();
+            FileOutputStream fos = null;
+            try {
+                fos = new FileOutputStream(lZippedFile);
+                fos.write(lZippedSpectrumXml);
+            } finally {
+                if (fos != null) {
+                    fos.flush();
+                    fos.close();
+                }
+            }
             BufferedOutputStream out;
             ZipInputStream in = new ZipInputStream(new BufferedInputStream(new FileInputStream(lZippedFile)));
             ByteArrayOutputStream lStream = new ByteArrayOutputStream(50);
@@ -351,56 +369,51 @@ public class SpectrumLowMemController implements SpectrumInterface {
             lZippedFile.delete();
             lXml = lStream.toString("UTF-8");
             lStream.close();
-            rs.close();
-            stat.close();
             lSpectrum.addSpectrumXML(lXml);
         } catch (SQLException ex) {
             logger.error(ex);
         }
     }
 
-    /**
-     * unzips the spectrum xml file for the spectrum and attaches it
-     *
-     * @param spectrum the spectrum to unzip the spectrum xml for
-     */
     @Override
-    public void unzipXMLforSpectrum(SpectrumLowMem spectrum) {
+    public boolean unzipXMLforSpectrum(SpectrumLowMem spectrum) {
+        boolean returnvalue = false;
         File lZippedFile;
         String lXml;
         if (spectrum.getSpectrumXML() == null) {
             try {
-                if (spectrum.getZippedSpectrumXml() != null) {
-                }
-                byte[] lZippedSpectrumXml = spectrum.getZippedSpectrumXml();
-                lZippedFile = File.createTempFile("zip", null);
-                FileOutputStream fos = new FileOutputStream(lZippedFile);
-                fos.write(lZippedSpectrumXml);
-                fos.flush();
-                fos.close();
-                BufferedOutputStream out;
-                ZipInputStream in = new ZipInputStream(new BufferedInputStream(new FileInputStream(lZippedFile)));
-                ByteArrayOutputStream lStream = new ByteArrayOutputStream(50);
-                out = new BufferedOutputStream(lStream, 50);
-                while (in.getNextEntry() != null) {
-                    int count;
-                    byte data[] = new byte[50];
-                    while ((count = in.read(data, 0, 50)) != -1) {
-                        out.write(data, 0, count);
+                byte[] lZippedSpectrumXml;
+                if ((lZippedSpectrumXml = spectrum.getZippedSpectrumXml()) != null) {
+                    lZippedFile = File.createTempFile("zip", null);
+                    FileOutputStream fos = new FileOutputStream(lZippedFile);
+                    fos.write(lZippedSpectrumXml);
+                    fos.flush();
+                    fos.close();
+                    BufferedOutputStream out;
+                    ZipInputStream in = new ZipInputStream(new BufferedInputStream(new FileInputStream(lZippedFile)));
+                    ByteArrayOutputStream lStream = new ByteArrayOutputStream(50);
+                    out = new BufferedOutputStream(lStream, 50);
+                    while (in.getNextEntry() != null) {
+                        int count;
+                        byte data[] = new byte[50];
+                        while ((count = in.read(data, 0, 50)) != -1) {
+                            out.write(data, 0, count);
+                        }
                     }
+                    in.close();
+                    out.flush();
+                    out.close();
+                    lZippedFile.delete();
+                    lXml = lStream.toString("UTF-8");
+                    lStream.close();
+                    spectrum.addSpectrumXML(lXml);
+                    returnvalue = true;
                 }
-                in.close();
-                out.flush();
-                out.close();
-                lZippedFile.delete();
-                lXml = lStream.toString("UTF-8");
-                lStream.close();
-                spectrum.addSpectrumXML(lXml);
-
             } catch (IOException e) {
                 logger.error(e);
             }
         }
+        return returnvalue;
     }
 
     /**

@@ -62,7 +62,7 @@ public interface SpectrumInterface {
      * fetches the zipped xml (if not yet added to the spectrum object), unzips it and adds it to the spectrum object
      * @param spectrum the spectrum of which we want the unzipped xml file
      */
-    public void unzipXMLforSpectrum(SpectrumLowMem spectrum);
+    public boolean unzipXMLforSpectrum(SpectrumLowMem spectrum);
     
 
 }

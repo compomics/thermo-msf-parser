@@ -20,8 +20,8 @@ import java.util.List;
 public class PeptideLowMem {
 
     private int counter = 0;
-    // Class specific log4j logger for Thermo_msf_parserGUI instances.
-    private static final Logger logger = Logger.getLogger(PeptideLowMem.class);
+    // Class specific log4j LOGGER for Thermo_msf_parserGUI instances.
+    private static final Logger LOGGER = Logger.getLogger(PeptideLowMem.class);
     /**
      * The peptide id
      */
@@ -76,7 +76,7 @@ public class PeptideLowMem {
      */
     private final List<ModificationPosition> iPeptideModificationPositions = new ArrayList<ModificationPosition>();
     /**
-     * The site probabilities of the Phospho modifications
+     * The site probabilities of the Phospho modifications, contents can be {@code null}
      */
     private final List<Float> iPhosphoRSSiteProbabilities = new ArrayList<Float>();
     /**
@@ -138,7 +138,7 @@ public class PeptideLowMem {
      * connection to the msf file
      */
     /**
-     * Constructor for a low memory instance peptide
+     * Constructor for a low memory instance peptide.
      *
      * @param iPeptideId SQLite id for peptide
      * @param iSpectrumId SQLite id for spectrum
@@ -150,7 +150,6 @@ public class PeptideLowMem {
      * @param iProcessingNodeNumber the procession number
      * @param iAminoAcids List containing the amino acids used in the SQLite
      * database. returned from the AminoAcidLowMem class
-     * @param aConn connection to the msf file
      */
     public PeptideLowMem(int iPeptideId, int iSpectrumId, int iConfidenceLevel, String iSequence, int iTotalIonsCount, int iMatchedIonsCount, String iAnnotation, int iProcessingNodeNumber, List<AminoAcid> iAminoAcids) {
         this.iPeptideId = iPeptideId;
@@ -165,7 +164,7 @@ public class PeptideLowMem {
     }
     /*
      * constructor for a peptidelowmem instance
-     * @param rs 
+     * @param rs
      */
 
     public PeptideLowMem(ResultSet rs, List<AminoAcid> iAminoAcids) {
@@ -181,10 +180,15 @@ public class PeptideLowMem {
             iAminoAcidSequence = new ArrayList<AminoAcid>();
             createAminoAcidSequence(iSequence,iAminoAcids);
         } catch (SQLException ex) {
-            logger.error(ex);
+            LOGGER.error(ex);
         }
     }
 
+    /**
+     * create the amino acid sequence for the peptide
+     * @param sequence
+     * @param iAminoAcids 
+     */
     private void createAminoAcidSequence(String sequence, List<AminoAcid> iAminoAcids) {
         for (int i = 0; i < sequence.length(); i++) {
             String lAaOneLetterCode = String.valueOf(sequence.charAt(i));
@@ -440,10 +444,11 @@ public class PeptideLowMem {
     }
 
     /**
-     * This method will add an amino acid modification to this peptide
+     * This method will add an amino acid modification and the chance it is a phospho site to this peptide 
      *
      * @param lMod The modification
      * @param lModPos The modification position
+     * @param pRSSiteMod chance that the modification is a phospho site
      */
     public void addModification(Modification lMod, ModificationPosition lModPos, Float pRSSiteMod) {
         iPeptideModifications.add(lMod);
@@ -455,6 +460,17 @@ public class PeptideLowMem {
     }
 
     /**
+     * adds an amino acid modification to the peptide
+     * 
+     * @param lMod the modification to add
+     * @param lModPos the location of the modification on the peptide
+     */
+    public void addModification(Modification lMod, ModificationPosition lModPos) {
+        addModification(lMod, lModPos, null);
+    }
+
+    
+    /**
      * Getter for the proteins linked to this peptide
      *
      * @return List with the proteins linked to this peptide
@@ -464,11 +480,11 @@ public class PeptideLowMem {
     }
 
     /**
-     * Getter for the modified peptide
+     * Getter for the modified peptide sequence
      *
-     * @return String with the modified peptide
+     * @return String with the modified peptide sequence
      */
-    public String getModifiedPeptide() {
+    public String getModifiedPeptideSequence() {
         if (iModifiedPeptide == null) {
             //do the N terminus
             if (iHasNTermModification) {

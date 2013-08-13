@@ -4,6 +4,7 @@ import com.compomics.thermo_msf_parser_API.lowmeminstance.model.MsfFile;
 import com.compomics.thermo_msf_parser_API.enums.MsfVersion;
 import com.compomics.thermo_msf_parser_API.highmeminstance.AminoAcid;
 import com.compomics.thermo_msf_parser_API.highmeminstance.Modification;
+import com.compomics.thermo_msf_parser_API.highmeminstance.ModificationPosition;
 import com.compomics.thermo_msf_parser_API.highmeminstance.NeutralLoss;
 import com.compomics.thermo_msf_parser_API.highmeminstance.ProcessingNode;
 import com.compomics.thermo_msf_parser_API.highmeminstance.ProcessingNodeParameter;
@@ -27,9 +28,10 @@ public class ModificationLowMemController implements ModificationInterface {
 
     private static final Logger logger = Logger.getLogger(ModificationLowMemController.class);
     private final ProcessingNodeLowMemController processingNodes = new ProcessingNodeLowMemController();
+    private HashMap<Integer, Modification> modshashMap = new HashMap<Integer, Modification>();
 
     @Override
-    public String addModificationsToPeptideSequence(PeptideLowMem peptide, MsfFile msfFile) {
+    public String getModifiedSequenceForPeptide(PeptideLowMem peptide, MsfFile msfFile) {
         String modifiedSequence = peptide.getSequence();
         try {
             int lengthChanged = 0;
@@ -113,7 +115,7 @@ public class ModificationLowMemController implements ModificationInterface {
             PreparedStatement stat = null;
 
             try {
-                stat = msfFile.getConnection().prepareStatement("select Abbreviation from AminoAcidModifications");
+                stat = msfFile.getConnection().prepareStatement("select Abbreviation from AminoAcidModifications order by Abbreviation");
                 ResultSet rs = stat.executeQuery();
                 try {
                     while (rs.next()) {
@@ -133,7 +135,15 @@ public class ModificationLowMemController implements ModificationInterface {
         return allModificationNames;
     }
 
-    public List<PeptideLowMem> getPeptidesWithModification(String modification, MsfFile msfFile) {
+    /**
+     * get all peptides who have the specific modification, but does not add the
+     * modification to the peptide
+     *
+     * @param modification the modification to get the peptides for
+     * @param msfFile the proteome discoverer file to fetch from
+     * @return a list of peptides who have that specific modification
+     */
+    public List<PeptideLowMem> getPeptidesWithModification(String modification, MsfFile msfFile, boolean addModificationToPeptide) {
         List<PeptideLowMem> peptidesWithModList = new ArrayList<PeptideLowMem>();
         try {
             PreparedStatement stat = null;
@@ -143,7 +153,11 @@ public class ModificationLowMemController implements ModificationInterface {
                 ResultSet rs = stat.executeQuery();
                 try {
                     while (rs.next()) {
-                        peptidesWithModList.add(new PeptideLowMem(rs, msfFile.getAminoAcids()));
+                        PeptideLowMem aPeptideLowMem = new PeptideLowMem(rs, msfFile.getAminoAcids());
+                        peptidesWithModList.add(aPeptideLowMem);
+                        if (addModificationToPeptide) {
+                            this.getModifiedSequenceForPeptide(aPeptideLowMem, msfFile);
+                        }
                     }
                 } finally {
                     rs.close();
@@ -225,34 +239,37 @@ public class ModificationLowMemController implements ModificationInterface {
                 }
             }
         }
-        try {
-            modNumbersToFetch.deleteCharAt(modNumbersToFetch.length() - 1);
-            PreparedStatement stat = null;
+        if (modNumbersToFetch.length() > 0) {
             try {
-                stat = msfFile.getConnection().prepareStatement("select * from AminoAcidModifications where AminoAcidModificationID in (?)");
-                stat.setString(1, modNumbersToFetch.toString());
-                ResultSet rs = null;
+                modNumbersToFetch.deleteCharAt(modNumbersToFetch.length() - 1);
+                PreparedStatement stat = null;
                 try {
-                rs = stat.executeQuery();
-                    while (rs.next()) {
-                        Modification modToAdd = new Modification(rs.getInt(1), rs.getString(2), rs.getDouble(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getInt(7), rs.getInt(8), rs.getDouble(9), rs.getInt(10), rs.getInt(11), fixedMods.contains(rs.getInt(1)));
-                        for (String aminoAcidNumber : modsToAminoAcidNumbers.get(rs.getInt(1))) {
-                            modToAdd.getSelectedAminoAcids().add(msfFile.getAminoAcids().get(Integer.parseInt(aminoAcidNumber) - 1));
+                    stat = msfFile.getConnection().prepareStatement("select * from AminoAcidModifications where AminoAcidModificationID in (?)");
+                    stat.setString(1, modNumbersToFetch.toString());
+                    ResultSet rs = null;
+                    try {
+                        rs = stat.executeQuery();
+                        while (rs.next()) {
+                            Modification modToAdd = new Modification(rs.getInt(1), rs.getString(2), rs.getDouble(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getInt(7), rs.getInt(8), rs.getDouble(9), rs.getInt(10), rs.getInt(11), fixedMods.contains(rs.getInt(1)));
+                            for (String aminoAcidNumber : modsToAminoAcidNumbers.get(rs.getInt(1))) {
+                                modToAdd.getSelectedAminoAcids().add(msfFile.getAminoAcids().get(Integer.parseInt(aminoAcidNumber) - 1));
+                            }
+                            addAminoAcidsToModification(modToAdd, msfFile.getAminoAcids(), msfFile);
+                            modsToReturn.add(modToAdd);
                         }
-                        addAminoAcidsToModification(modToAdd, msfFile.getAminoAcids(), msfFile);
-                        modsToReturn.add(modToAdd);
+                    } finally {
+                        if (rs != null) {
+                            rs.close();
+                        }
                     }
                 } finally {
-                    if(rs != null){
-                    rs.close();}
+                    if (stat != null) {
+                        stat.close();
+                    }
                 }
-            } finally {
-                if (stat != null) {
-                    stat.close();
-                }
+            } catch (SQLException sqle) {
+                logger.error(sqle);
             }
-        } catch (SQLException sqle) {
-            logger.error(sqle);
         }
         return modsToReturn;
     }
@@ -326,6 +343,39 @@ public class ModificationLowMemController implements ModificationInterface {
             }
         } catch (SQLException ex) {
             logger.error(ex);
+        }
+    }
+
+    @Override
+    public void addModificationsToPeptide(PeptideLowMem peptide, MsfFile msfFile) {
+        try {
+            PreparedStatement stat = null;
+            try {
+                stat = msfFile.getConnection().prepareStatement("select amod.*,pepamod.position from aminoacidmodifications as amod,peptideaminoacidmodifications as pepamod where amod.modificationid = pepamod.modificationid and pepamod.peptideid = ?");
+                stat.setInt(1, peptide.getPeptideId());
+                ResultSet rs = null;
+                try {
+                    rs = stat.executeQuery();
+                    Modification mod;
+                    ModificationPosition modpos;
+                    while (rs.next()) {
+                        //@TODO make this work
+                        mod = new Modification(rs.getInt(1), rs.getString(2), rs.getDouble(3), rs.getString(4), rs.getString(5), rs.getString(6), rs.getInt(7), rs.getInt(8), rs.getDouble(9), rs.getInt(10), rs.getInt(11), false);
+                        modpos = new ModificationPosition(0, false, false);
+                        peptide.addModification(mod, modpos);
+                    }
+                } finally {
+                    if (rs != null) {
+                        rs.close();
+                    }
+                }
+            } finally {
+                if (stat != null) {
+                    stat.close();
+                }
+            }
+        } catch (SQLException sqle) {
+            logger.error(sqle);
         }
     }
 }
