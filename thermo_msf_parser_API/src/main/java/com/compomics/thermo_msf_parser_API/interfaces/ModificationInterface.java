@@ -24,8 +24,16 @@ public interface ModificationInterface {
      @throws SQLException if something went wrong with the retrieving
      */
 
-    public String addModificationsToPeptideSequence(PeptideLowMem peptide,MsfFile msfFile);
+    public String getModifiedSequenceForPeptide(PeptideLowMem peptide,MsfFile msfFile);
 
+    /**
+     * add the modifications to the peptide
+     * @param peptide peptide to get and add the modifications to
+     * @param msfFile the proteome discoverer file to fetch from
+     */
+    public void addModificationsToPeptide(PeptideLowMem peptide, MsfFile msfFile);
+    
+    
     /**
     creates a hashmap containing the modifications stored in the msf file
 

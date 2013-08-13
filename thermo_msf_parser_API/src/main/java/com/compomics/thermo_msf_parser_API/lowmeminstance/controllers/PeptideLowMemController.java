@@ -21,8 +21,13 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  * this template use File | Settings | File Templates.
  */
 public class PeptideLowMemController extends Observable implements PeptideInterface {
-
+/**
+ * logger instance
+ */
     private static final Logger logger = Logger.getLogger(PeptideLowMemController.class);
+/**
+ * 
+ */
     private final ScoreTypeLowMemController scoreTypeInstance = new ScoreTypeLowMemController();
     private int counter = 0;
 
@@ -58,7 +63,7 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
                         lPeptide.setParentSpectrum(new SpectrumLowMem(rs.getInt("SpectrumID"), rs.getInt("UniqueSpectrumID"), rs.getInt("MassPeakID"), rs.getInt("LastScan"), rs.getInt("FirstScan"), rs.getInt("ScanNumbers"), rs.getInt("Charge"), rs.getDouble("RetentionTime"), rs.getDouble("Mass"), rs.getInt("ScanEventID")));
                         //TODO make initializer with fileID argument)
                         lPeptide.getParentSpectrum().setFileId(rs.getInt("file"));
-                        //lPeptide.getParentSpectrum().setZippedBytes(rs.getBytes("Spectra"));
+                        //lPeptide.getParentSpectrum().setZippedSpectrumXML(rs.getBytes("Spectra"));
                         //TODO check speed of this
                         Statement customStat = msfFile.getConnection().createStatement();
                         ResultSet customRs = customStat.executeQuery("select * from CustomDataPeptides where PeptideID = " + lPeptide.getPeptideId());
@@ -184,7 +189,7 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
                             PeptideLowMem lPeptide = new PeptideLowMem(rs.getInt("PeptideID"), rs.getInt("SpectrumID"), rs.getInt("ConfidenceLevel"), rs.getString("Sequence"), rs.getInt("TotalIonsCount"), rs.getInt("MatchedIonsCount"), rs.getString("Annotation"), rs.getInt("ProcessingNodeNumber"), msfFile.getAminoAcids());
                             lPeptide.setParentSpectrum(new SpectrumLowMem(rs.getInt("SpectrumID"), rs.getInt("UniqueSpectrumID"), rs.getInt("MassPeakID"), rs.getInt("LastScan"), rs.getInt("FirstScan"), rs.getInt("ScanNumbers"), rs.getInt("Charge"), rs.getDouble("RetentionTime"), rs.getDouble("Mass"), rs.getInt("ScanEventID")));
                             lPeptide.getParentSpectrum().setFileId(rs.getInt("file"));
-                            lPeptide.getParentSpectrum().setZippedBytes(rs.getBytes("Spectrum"));
+                            lPeptide.getParentSpectrum().setZippedSpectrumXML(rs.getBytes("Spectrum"));
                             confidenceLevelPeptides.add(lPeptide);
                             counter++;
                             internalcounter++;
@@ -204,7 +209,7 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
                             lPeptide.setParentSpectrum(new SpectrumLowMem(rs.getInt("SpectrumID"), rs.getInt("UniqueSpectrumID"), rs.getInt("MassPeakID"), rs.getInt("LastScan"), rs.getInt("FirstScan"), rs.getInt("ScanNumbers"), rs.getInt("Charge"), rs.getDouble("RetentionTime"), rs.getDouble("Mass"), rs.getInt("ScanEventID")));
                             //TODO make initializer with fileID argument
                             lPeptide.getParentSpectrum().setFileId(rs.getInt("file"));
-                            lPeptide.getParentSpectrum().setZippedBytes(rs.getBytes("Spectrum"));
+                            lPeptide.getParentSpectrum().setZippedSpectrumXML(rs.getBytes("Spectrum"));
                             confidenceLevelPeptides.add(lPeptide);
                             counter++;
                             internalcounter++;
@@ -287,7 +292,7 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
                             PeptideLowMem lPeptide = new PeptideLowMem(rs.getInt("PeptideID"), rs.getInt("SpectrumID"), rs.getInt("ConfidenceLevel"), rs.getString("Sequence"), rs.getInt("TotalIonsCount"), rs.getInt("MatchedIonsCount"), rs.getString("Annotation"), rs.getInt("ProcessingNodeNumber"), msfFile.getAminoAcids());
                             lPeptide.setParentSpectrum(new SpectrumLowMem(rs.getInt("SpectrumID"), rs.getInt("UniqueSpectrumID"), rs.getInt("MassPeakID"), rs.getInt("LastScan"), rs.getInt("FirstScan"), rs.getInt("ScanNumbers"), rs.getInt("Charge"), rs.getDouble("RetentionTime"), rs.getDouble("Mass"), rs.getInt("ScanEventID")));
                             lPeptide.getParentSpectrum().setFileId(rs.getInt("file"));
-                            //lPeptide.getParentSpectrum().setZippedBytes(rs.getBytes("Spectrum"));
+                            //lPeptide.getParentSpectrum().setZippedSpectrumXML(rs.getBytes("Spectrum"));
                             protIdToProt.get(rs.getInt("pp.ProteinID")).addPeptide(lPeptide);
                         }
                     } finally {
@@ -306,7 +311,7 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
                             lPeptide.setUniquePeptideSequenceId(rs.getInt("UniquePeptideSequenceID"));
                             lPeptide.setParentSpectrum(new SpectrumLowMem(rs.getInt("SpectrumID"), rs.getInt("UniqueSpectrumID"), rs.getInt("MassPeakID"), rs.getInt("LastScan"), rs.getInt("FirstScan"), rs.getInt("ScanNumbers"), rs.getInt("Charge"), rs.getDouble("RetentionTime"), rs.getDouble("Mass"), rs.getInt("ScanEventID")));
                             lPeptide.getParentSpectrum().setFileId(rs.getInt("file"));
-                            //lPeptide.getParentSpectrum().setZippedBytes(rs.getBytes("Spectrum"));
+                            //lPeptide.getParentSpectrum().setZippedSpectrumXML(rs.getBytes("Spectrum"));
                             protIdToProt.get(rs.getInt("pp.ProteinID")).addPeptide(lPeptide);
                         }
                     } finally {

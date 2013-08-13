@@ -7,13 +7,11 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: Davy
- * Date: 4/23/12
- * Time: 3:53 PM
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: Davy Date: 4/23/12 Time: 3:53 PM To change
+ * this template use File | Settings | File Templates.
  */
 public class SpectrumLowMem {
+
     /**
      * The spectrum id
      */
@@ -75,7 +73,8 @@ public class SpectrumLowMem {
      */
     private ScanEvent iScanEvent;
     /**
-     * HashMap with the custom data field values. The key is the id of the custom data field
+     * HashMap with the custom data field values. The key is the id of the
+     * custom data field
      */
     private final HashMap<Integer, String> iCustomDataFieldValues = new HashMap<Integer, String>();
     /**
@@ -90,16 +89,13 @@ public class SpectrumLowMem {
      * The decoy peptides linked to this spectrum
      */
     private final List<PeptideLowMem> iPeptidesDecoy = new ArrayList<PeptideLowMem>();
-
     /**
      * The quan result linked to this spectrum
      */
     private QuanResultLowMem iQuanResult;
-    
     private String spectrumXML;
 
     //TODo add check if file is unzipped already
-
     public SpectrumLowMem(int iSpectrumId, int iUniqueSpectrumId, int iMassPeakId, int iLastScan, int iFirstScan, int iScan, int iCharge, double iRetentionTime, double iMass, int iScanEventId) {
         this.iSpectrumId = iSpectrumId;
         this.iUniqueSpectrumId = iUniqueSpectrumId;
@@ -153,7 +149,6 @@ public class SpectrumLowMem {
         return (iSinglyChargedMass + ((double) (iCharge - 1)) * 1.007825) / (double) iCharge;
     }
 
-
     public int getScanEventId() {
         return iScanEventId;
     }
@@ -191,26 +186,30 @@ public class SpectrumLowMem {
         return iQuanResult;
     }
 
-    public byte[] getZippedSpectrumXml(){
-        return iZippedSpectrumXml.clone();
+    public byte[] getZippedSpectrumXml() {
+        byte[] zippedXMLToReturn = null;
+        if (iZippedSpectrumXml != null) {
+            zippedXMLToReturn = iZippedSpectrumXml.clone();
+        }
+        return zippedXMLToReturn;
     }
-    
+
     public void setFileId(int iFileId) {
         this.iFileId = iFileId;
     }
 
-    public void setZippedBytes(byte[] lZipped) {
+    public void setZippedSpectrumXML(byte[] lZipped) {
         this.iZippedSpectrumXml = lZipped;
     }
 
     public void setScanEvent(ScanEvent iScanEvent) {
         this.iScanEvent = iScanEvent;
     }
-    
+
     /**
      * This will add score and a processing node number
      *
-     * @param lScore                The score
+     * @param lScore The score
      * @param lProcessingNodeNumber The processing node number
      */
     public void addSpectrumScore(double lScore, int lProcessingNodeNumber) {
@@ -219,9 +218,10 @@ public class SpectrumLowMem {
     }
 
     /**
-     * This method will add a value in the custom data field map by the id off the custom data field
+     * This method will add a value in the custom data field map by the id off
+     * the custom data field
      *
-     * @param lId    The custom data field id
+     * @param lId The custom data field id
      * @param lValue The value to add
      */
     public void addCustomDataField(int lId, String lValue) {
@@ -258,17 +258,17 @@ public class SpectrumLowMem {
     //TODO this looks wrong
     public boolean isHighestScoring(PeptideLowMem iSelectedPeptide, List<ScoreTypeLowMem> scoreTypes) {
         Boolean lIsHighestScore = null;
-        for(int l = 0; l<scoreTypes.size(); l++){
+        for (int l = 0; l < scoreTypes.size(); l++) {
             if (iSelectedPeptide.getScoreByScoreType(scoreTypes.get(l)) != null) {
                 Double lScore = iSelectedPeptide.getScoreByScoreType(scoreTypes.get(l));
-                if(lIsHighestScore == null){
+                if (lIsHighestScore == null) {
                     lIsHighestScore = true;
                 }
-                if(lScore != null){
+                if (lScore != null) {
                     for (int i = 0; i < iPeptides.size(); i++) {
-                        if (!iSelectedPeptide.getModifiedPeptide().equalsIgnoreCase(iPeptides.get(i).getModifiedPeptide())) {
+                        if (!iSelectedPeptide.getModifiedPeptideSequence().equalsIgnoreCase(iPeptides.get(i).getModifiedPeptideSequence())) {
                             Double lCompareScore = iPeptides.get(i).getScoreByScoreType(scoreTypes.get(l));
-                            if(lCompareScore != null){
+                            if (lCompareScore != null) {
                                 if (lScore < lCompareScore) {
                                     lIsHighestScore = false;
                                 }
@@ -279,7 +279,7 @@ public class SpectrumLowMem {
             }
         }
 
-        if(lIsHighestScore == null){
+        if (lIsHighestScore == null) {
             lIsHighestScore = false;
         }
         return lIsHighestScore;
@@ -287,17 +287,17 @@ public class SpectrumLowMem {
 
     public boolean isLowestScoring(PeptideLowMem iSelectedPeptide, List<ScoreTypeLowMem> scoreTypes) {
         Boolean lIsLowestScore = null;
-        for(int i = 0; i<scoreTypes.size(); i ++){
+        for (int i = 0; i < scoreTypes.size(); i++) {
             if (iSelectedPeptide.getScoreByScoreType(scoreTypes.get(i)) != null) {
                 Double lScore = iSelectedPeptide.getScoreByScoreType(scoreTypes.get(i));
-                if(lIsLowestScore == null){
+                if (lIsLowestScore == null) {
                     lIsLowestScore = true;
                 }
-                if(lScore != null){
+                if (lScore != null) {
                     for (int j = 0; j < iPeptides.size(); j++) {
-                        if (!iSelectedPeptide.getModifiedPeptide().equalsIgnoreCase(iPeptides.get(j).getModifiedPeptide())) {
+                        if (!iSelectedPeptide.getModifiedPeptideSequence().equalsIgnoreCase(iPeptides.get(j).getModifiedPeptideSequence())) {
                             Double lCompareScore = iPeptides.get(j).getScoreByScoreType(scoreTypes.get(j));
-                            if(lCompareScore != null){
+                            if (lCompareScore != null) {
                                 if (lScore > lCompareScore) {
                                     lIsLowestScore = false;
                                 }
@@ -307,21 +307,21 @@ public class SpectrumLowMem {
                 }
             }
         }
-        if(lIsLowestScore == null){
+        if (lIsLowestScore == null) {
             lIsLowestScore = false;
         }
         return lIsLowestScore;
     }
 
-    public String getSpectrumXML(){
+    public String getSpectrumXML() {
         return spectrumXML;
     }
-    
+
     public void addSpectrumXML(String aSpectrumXML) {
         spectrumXML = aSpectrumXML;
     }
-    
-        public List<PeptideLowMem> getiPeptidesDecoy() {
+
+    public List<PeptideLowMem> getiPeptidesDecoy() {
         return Collections.unmodifiableList(iPeptidesDecoy);
     }
 }

@@ -5,7 +5,13 @@ import com.compomics.thermo_msf_parser_API.lowmeminstance.controllers.SpectrumLo
 import com.compomics.thermo_msf_parser_API.lowmeminstance.model.MsfFile;
 import com.compomics.thermo_msf_parser_API.lowmeminstance.model.PeptideLowMem;
 import com.compomics.thermo_msf_parser_API.lowmeminstance.model.SpectrumLowMem;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.RandomAccessFile;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +19,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
+import org.apache.commons.io.FileUtils;
 
 /**
  *
@@ -21,14 +28,28 @@ import static org.hamcrest.CoreMatchers.*;
 public class SpectrumLowMemControllerTest {
 
     static MsfFile msfFile;
+    private static String unzippedSpectrumXml;
+    private static SpectrumLowMem lSpectrum;
+    private static byte[] zippedSpectrumXML = new byte[7342];
 
     public SpectrumLowMemControllerTest() throws ClassNotFoundException, SQLException {
     }
 
     @BeforeClass
-    public static void setUpClass() throws ClassNotFoundException, SQLException {
+    public static void setUpClass() throws ClassNotFoundException, SQLException, FileNotFoundException, IOException {
         msfFile = new MsfFile(new File(SpectrumLowMemControllerTest.class.getClassLoader().getResource("test-msf-v-1.2.msf").getPath()));
-
+        FileInputStream fin = new FileInputStream(new File(SpectrumLowMemControllerTest.class.getClassLoader().getResource("first-spectrum-test-1.2.xml").getPath()));
+        BufferedReader myInput = new BufferedReader(new InputStreamReader(fin));
+        StringBuilder sb = new StringBuilder();
+        String thisLine;
+        while ((thisLine = myInput.readLine()) != null) {
+            sb.append(thisLine).append("\r\n");
+        }
+        sb.replace(sb.length() - 2, sb.length(), "");
+        unzippedSpectrumXml = sb.toString();
+        RandomAccessFile f = new RandomAccessFile(new File(SpectrumLowMemControllerTest.class.getClassLoader().getResource("first-spectrum-test-1.2.zip").getPath()), "r");
+        f.readFully(zippedSpectrumXML);
+        lSpectrum = new SpectrumLowMem(1,499,1,5,5,5,3,0.04635833333,2300.15530757984,2); 
     }
 
     /**
@@ -40,11 +61,10 @@ public class SpectrumLowMemControllerTest {
         System.out.println("createSpectrumXMLForPeptide");
         SpectrumLowMemController instance = new SpectrumLowMemController();
         String expResult = "";
+        fail("add peptide to get spectrum xml for");
         PeptideLowMem peptide = null;
         String result = instance.createSpectrumXMLForPeptide(peptide, msfFile);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertEquals(unzippedSpectrumXml, result);
     }
 
     /**
@@ -54,11 +74,9 @@ public class SpectrumLowMemControllerTest {
     @Test
     public void testCreateSpectrumXMLForSpectrum() throws Exception {
         System.out.println("createSpectrumXMLForSpectrum");
-        SpectrumLowMem lSpectrum = null;
         SpectrumLowMemController instance = new SpectrumLowMemController();
         instance.createSpectrumXMLForSpectrum(lSpectrum, msfFile);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        FileUtils.writeStringToFile(new File("C:\\Users\\Davy\\spectrumoutput"), lSpectrum.getSpectrumXML());
     }
 
     /**
@@ -67,13 +85,9 @@ public class SpectrumLowMemControllerTest {
     @Test
     public void testGetMSMSPeaks() {
         System.out.println("getMSMSPeaks");
-        String lXml = "";
         SpectrumLowMemController instance = new SpectrumLowMemController();
-        List expResult = null;
-        List result = instance.getMSMSPeaks(lXml);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        List result = instance.getMSMSPeaks(unzippedSpectrumXml);
+        assertThat(result.size(),is(not(0)));
     }
 
     /**
@@ -82,13 +96,9 @@ public class SpectrumLowMemControllerTest {
     @Test
     public void testGetMSPeaks() {
         System.out.println("getMSPeaks");
-        String lXml = "";
         SpectrumLowMemController instance = new SpectrumLowMemController();
-        List expResult = null;
-        List result = instance.getMSPeaks(lXml);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        List result = instance.getMSPeaks(unzippedSpectrumXml);
+        assertThat(result.size(),is(not(0)));
     }
 
     /**
@@ -97,13 +107,13 @@ public class SpectrumLowMemControllerTest {
     @Test
     public void testGetFragmentedMsPeak() {
         System.out.println("getFragmentedMsPeak");
-        String lXml = "";
         SpectrumLowMemController instance = new SpectrumLowMemController();
-        Peak expResult = null;
-        Peak result = instance.getFragmentedMsPeak(lXml);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        Peak expResult = new Peak(767.38995,925.5309,3,23005,7.1);
+        Peak result = instance.getFragmentedMsPeak(unzippedSpectrumXml);
+        assertThat(result.getX(),is(expResult.getX()));
+        assertThat(result.getY(),is(expResult.getY()));
+        assertThat(result.getR(),is(expResult.getR()));
+        assertThat(result.getSN(),is(expResult.getSN()));
     }
 
     /**
@@ -136,6 +146,7 @@ public class SpectrumLowMemControllerTest {
     public void testGetSpectrumForPeptideID_PeptideLowMem_MsfFile() {
         System.out.println("getSpectrumForPeptideID");
         PeptideLowMem peptideOfInterest = null;
+        fail("add a peptide to check against");
         SpectrumLowMemController instance = new SpectrumLowMemController();
         SpectrumLowMem expResult = null;
         SpectrumLowMem result = instance.getSpectrumForPeptide(peptideOfInterest, msfFile);
@@ -187,14 +198,11 @@ public class SpectrumLowMemControllerTest {
     @Test
     public void testGetSpectrumTitle() {
         System.out.println("getSpectrumTitle");
-        String rawFileName = "";
-        SpectrumLowMem lspectrum = null;
+        String rawFileName = "test.afterdot";
         SpectrumLowMemController instance = new SpectrumLowMemController();
-        String expResult = "";
-        String result = instance.getSpectrumTitle(rawFileName, lspectrum);
+        String expResult = "test_1_5_3";
+        String result = instance.getSpectrumTitle(rawFileName, lSpectrum);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
 
     /**
@@ -203,11 +211,11 @@ public class SpectrumLowMemControllerTest {
     @Test
     public void testUnzipXMLforSpectrum() {
         System.out.println("unzipXMLforSpectrum");
-        SpectrumLowMem spectrum = null;
+        SpectrumLowMem spectrum = lSpectrum;
         SpectrumLowMemController instance = new SpectrumLowMemController();
+        spectrum.setZippedSpectrumXML(zippedSpectrumXML);
         instance.unzipXMLforSpectrum(spectrum);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertThat(spectrum.getSpectrumXML().compareTo(unzippedSpectrumXml),is(0));
     }
 
     /**

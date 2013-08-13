@@ -1,6 +1,5 @@
 package com.compomics.thermo_msf_parser_API.lowmeminstance.controllers.version_1_2;
 
-import com.compomics.thermo_msf_parser_API.highmeminstance.Modification;
 import com.compomics.thermo_msf_parser_API.lowmeminstance.controllers.ModificationLowMemController;
 import com.compomics.thermo_msf_parser_API.lowmeminstance.model.MsfFile;
 import com.compomics.thermo_msf_parser_API.lowmeminstance.model.PeptideLowMem;
@@ -8,10 +7,10 @@ import java.io.File;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.*;
 
 /**
  *
@@ -30,19 +29,18 @@ public class ModificationLowMemControllerTest {
     }
 
     /**
-     * Test of addModificationsToPeptideSequence method, of class
+     * Test of getModifiedSequenceForPeptide method, of class
      * ModificationLowMemController.
      */
     @Test
     public void testAddModificationsToPeptideSequence() {
         System.out.println("addModificationsToPeptideSequence");
+        fail("add an actual peptide to add to");
         PeptideLowMem peptide = null;
         ModificationLowMemController instance = new ModificationLowMemController();
         String expResult = "";
-        String result = instance.addModificationsToPeptideSequence(peptide, msfFile);
+        String result = instance.getModifiedSequenceForPeptide(peptide, msfFile);
         assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
     }
 
     /**
@@ -53,11 +51,10 @@ public class ModificationLowMemControllerTest {
     public void testCreateModificationMap() {
         System.out.println("createModificationMap");
         ModificationLowMemController instance = new ModificationLowMemController();
-        HashMap expResult = null;
-        HashMap result = instance.createModificationMap(msfFile);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        HashMap<Integer, String> result = instance.createModificationMap(msfFile);
+        assertThat(result.isEmpty(), is(false));
+        assertThat(result.containsKey(709), is(true));
+        assertThat(result.get(5), is("Amidated"));
     }
 
     /**
@@ -67,13 +64,12 @@ public class ModificationLowMemControllerTest {
     @Test
     public void testGetAllModificationNames() {
         System.out.println("getAllModificationNames");
-        MsfFile msfFile = null;
         ModificationLowMemController instance = new ModificationLowMemController();
-        List expResult = null;
-        List result = instance.getAllModificationNames(msfFile);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        List<String> result = instance.getAllModificationNames(msfFile);
+        assertThat(result.isEmpty(), is(false));
+        assertThat(result.size(), is(709));
+        assertThat(result.get(1), is("15dB-biotin"));
+        assertThat(result.get(708), allOf(is("ZGB"), is(result.get(707))));
     }
 
     /**
@@ -83,15 +79,17 @@ public class ModificationLowMemControllerTest {
     @Test
     public void testGetPeptidesWithModification() {
         System.out.println("getPeptidesWithModification");
-        String modification = "";
-        MsfFile msfFile = null;
+        String modification = "Oxidation";
         ModificationLowMemController instance = new ModificationLowMemController();
-        List expResult = null;
-        List result = instance.getPeptidesWithModification(modification, msfFile);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+        List<PeptideLowMem> result = instance.getPeptidesWithModification(modification, msfFile,false);
+        assertThat(result.isEmpty(), is(false));
+        assertThat(result.size(),is(33));
+        assertThat(result.get(5).getModifiedPeptideSequence(),is("NH2-KDLMSSK-COOH"));
+        assertThat(result.get(5).getSequence(),is("KDLMSSK"));
+        List<PeptideLowMem> resultWithModificationsAdded = instance.getPeptidesWithModification(modification, msfFile, true);
+        assertThat(resultWithModificationsAdded.get(5).getSequence(),is("KDLMSSK"));
+        assertThat(resultWithModificationsAdded.get(5).getModifiedPeptideSequence(),is("NH2-KDLMSSK-COOH"));
+        }
 
     /**
      * Test of getAllModifications method, of class
@@ -100,13 +98,9 @@ public class ModificationLowMemControllerTest {
     @Test
     public void testGetAllModifications() {
         System.out.println("getAllModifications");
-        MsfFile msfFile = null;
         ModificationLowMemController instance = new ModificationLowMemController();
-        List expResult = null;
         List result = instance.getAllModifications(msfFile);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertThat(result.size(),is(0));
     }
 
     /**
@@ -116,13 +110,9 @@ public class ModificationLowMemControllerTest {
     @Test
     public void testGetListOfFixedModificationNumbers() {
         System.out.println("getListOfFixedModificationNumbers");
-        MsfFile msfFile = null;
         ModificationLowMemController instance = new ModificationLowMemController();
-        List expResult = null;
         List result = instance.getListOfFixedModificationNumbers(msfFile);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertThat(result.size(),is(0));
     }
 
     /**
@@ -133,10 +123,7 @@ public class ModificationLowMemControllerTest {
     public void testGetListOfVariableModidifcationNumbers() {
         System.out.println("getListOfVariableModidifcationNumbers");
         ModificationLowMemController instance = new ModificationLowMemController();
-        List expResult = null;
         List result = instance.getListOfVariableModidifcationNumbers(msfFile);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertThat(result.size(),is(0));
     }
 }

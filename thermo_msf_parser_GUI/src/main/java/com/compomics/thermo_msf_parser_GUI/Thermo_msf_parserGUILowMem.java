@@ -2034,7 +2034,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
         SpectrumLowMem spectrumOfPeptide = lPeptide.getParentSpectrum();
         lPeptideObject.add(spectrumLowMemInstance.getSpectrumTitle(rawFileLowMemInstance.getRawFileNameForFileID(spectrumOfPeptide.getFileId(), iParsedMsf), spectrumOfPeptide));
         lPeptideObject.add(lPeptide);
-        lPeptideObject.add(lPeptide.getModifiedPeptide());
+        lPeptideObject.add(lPeptide.getModifiedPeptideSequence());
         for (ScoreTypeLowMem iMergedPeptidesScore : iMergedPeptidesScores) {
             if (!peptideInformationChb.isSelected()) {
                 if (iMergedPeptidesScore.getIsMainScore() == 1) {
