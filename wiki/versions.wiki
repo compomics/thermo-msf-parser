@@ -2,9 +2,8 @@
 #Starting from thermo-msf-parser version 1.0, all subsequent versions of the library are listed here.
 
 ===2.0.5 (6 August 2013)===
-
-* FEATURE: added support for proteome discoverer 1.4
-* FEATURE: support for files larger than 1 gigabyte has been finalized
+ * added support for proteome discoverer 1.4
+ * support for files larger than 1 gigabyte has been finalized
 
 ===1.0.8 (30 January 2013)===
  * BUGFIX for reading protein headers
