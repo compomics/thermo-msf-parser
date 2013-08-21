@@ -4,9 +4,9 @@ import com.compomics.thermo_msf_parser_API.lowmeminstance.model.MsfFile;
 import com.compomics.thermo_msf_parser_API.highmeminstance.EventAnnotation;
 import com.compomics.thermo_msf_parser_API.highmeminstance.IsotopePattern;
 import com.compomics.thermo_msf_parser_API.highmeminstance.QuanResult;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.log4j.Logger;
@@ -28,10 +28,10 @@ public class QuanResultLowMemController {
     public Map<Integer, IsotopePattern> getIsotopePatternMap(MsfFile msfFile) {
         Map<Integer, IsotopePattern> iIsotopePatternMap = new HashMap<Integer, IsotopePattern>();
         try {
-            PreparedStatement stat = null;
+            Statement stat = null;
             try {
-                stat = msfFile.getConnection().prepareStatement("select * from EventAnnotations");
-                ResultSet rs = stat.executeQuery();
+                stat = msfFile.getConnection().createStatement();
+                ResultSet rs = stat.executeQuery("select * from EventAnnotations");
                 try {
                     while (rs.next()) {
                         int lIsotopePatternId = rs.getInt("IsotopePatternID");
@@ -80,10 +80,10 @@ public class QuanResultLowMemController {
     public HashMap getQuanResults(MsfFile msfFile) {
         HashMap<Integer, QuanResult> iQuanResultsMap = new HashMap<Integer, QuanResult>();
         try {
-            PreparedStatement stat = null;
+            Statement stat = null;
             try {
-                stat = msfFile.getConnection().prepareStatement("select * from PrecursorIonQuanResults");
-                ResultSet rs = stat.executeQuery();
+                stat = msfFile.getConnection().createStatement();
+                ResultSet rs = stat.executeQuery("select * from PrecursorIonQuanResults");
                 try {
                     while (rs.next()) {
                         int lQuantId = rs.getInt("QuanResultID");
