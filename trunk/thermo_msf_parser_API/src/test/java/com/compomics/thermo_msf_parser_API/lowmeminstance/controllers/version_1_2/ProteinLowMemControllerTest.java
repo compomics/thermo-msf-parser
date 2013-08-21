@@ -1,5 +1,6 @@
 package com.compomics.thermo_msf_parser_API.lowmeminstance.controllers.version_1_2;
 
+import com.compomics.thermo_msf_parser_API.highmeminstance.AminoAcid;
 import com.compomics.thermo_msf_parser_API.lowmeminstance.controllers.ProteinLowMemController;
 import com.compomics.thermo_msf_parser_API.lowmeminstance.model.MsfFile;
 import com.compomics.thermo_msf_parser_API.lowmeminstance.model.PeptideLowMem;
@@ -77,10 +78,10 @@ public class ProteinLowMemControllerTest {
         int aProteinId = 0;
         ProteinLowMemController instance = new ProteinLowMemController();
         ProteinLowMem expResult = null;
-        ProteinLowMem result = instance.getProteinForProteinId(aProteinId,msfFile);
+        ProteinLowMem result = instance.getProteinForProteinId(aProteinId, msfFile);
         assertEquals(expResult, result);
         aProteinId = 16242;
-        result = instance.getProteinForProteinId(aProteinId,msfFile);
+        result = instance.getProteinForProteinId(aProteinId, msfFile);
         assertThat(result.getAccession(), is("P22194"));
         assertThat(result.getSequence(), is("MSNVSSEDGIAPETQLIIDDPDVQQIDADEDLLDDVPDDVDCVELIQSRIQSMASLGLERFKNLQSLCLRQNQIKKIESVPETLTELDLYDNLIVRIENLDNVKNLTYLDLSFNNIKTIRNINHLKGLENLFFVQNRIRRIENLEGLDRLTNLELGGNKIRVIENLDTLVNLEKLWVGKNKITKFENFEKLQKLSLLSIQSNRITQFENLACLSHCLRELYVSHNGLTSFSGIEVLENLEILDVSNNMIKHLSYLAGLKNLVELWASNNELSSFQEIEDELSGLKKLETVYFEGNPLQKTNPAVYRNKVRLCLPQLRQIDATIIPKTSKQFP"));
         assertThat(result.getProteinID(), is(16242));
@@ -231,10 +232,10 @@ public class ProteinLowMemControllerTest {
     public void testGetProteinsForPeptideList() {
         System.out.println("getProteinsForPeptideList");
         List<PeptideLowMem> peptideList = new ArrayList<PeptideLowMem>();
+        peptideList.add(new PeptideLowMem(59, 1354, 1, "KAAEANGGSK", 108, 4, "", 3, msfFile.getAminoAcids()));
         ProteinLowMemController instance = new ProteinLowMemController();
         List result = instance.getProteinsForPeptideList(peptideList, msfFile);
-        assertThat(result.isEmpty(), is(true));
-        fail("add an actual list of peptides to get for");
+        assertThat(result.isEmpty(), is(false));
     }
 
     /**
@@ -250,7 +251,7 @@ public class ProteinLowMemControllerTest {
         assertThat(result.isEmpty(), is(true));
         peptideID = 9;
         result = instance.getAllProteinAccessionsForPeptide(peptideID, msfFile);
-        assertThat(result.size(),is(1));
+        assertThat(result.size(), is(1));
     }
 
     /**

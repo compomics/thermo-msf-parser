@@ -510,8 +510,8 @@ public class ProteinLowMemController extends Observable implements ProteinContro
             stringBuilder.replace(0, 1, "");
             PreparedStatement stat = null;
             try {
-                stat = msfFile.getConnection().prepareStatement("select Proteins.ProteinID,Sequence from Proteins,(select PeptidesProteins.ProteinID from PeptidesProteins where PeptideID in (?)) as protid where protid.ProteinID = Proteins.ProteinID");
-                stat.setString(1, stringBuilder.toString());
+                stat = msfFile.getConnection().prepareStatement("select Proteins.ProteinID,Sequence from Proteins, PeptidesProteins where PeptidesProteins.ProteinID = Proteins.ProteinID and PeptideID in ?");
+                stat.setString(1, String.format("('%s')", stringBuilder.toString()));
                 ResultSet rs = null;
                 try {
                     rs = stat.executeQuery();

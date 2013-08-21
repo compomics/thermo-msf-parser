@@ -25,9 +25,6 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
  * logger instance
  */
     private static final Logger logger = Logger.getLogger(PeptideLowMemController.class);
-/**
- * 
- */
     private final ScoreTypeLowMemController scoreTypeInstance = new ScoreTypeLowMemController();
     private int counter = 0;
 
