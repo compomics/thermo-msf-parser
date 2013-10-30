@@ -1,5 +1,6 @@
 package com.compomics.thermo_msf_parser_API.lowmeminstance.controllers;
 
+import com.compomics.thermo_msf_parser_API.enums.MsfVersion;
 import com.compomics.thermo_msf_parser_API.lowmeminstance.model.MsfFile;
 import com.compomics.thermo_msf_parser_API.interfaces.ProteinControllerInterface;
 import com.compomics.thermo_msf_parser_API.lowmeminstance.model.PeptideLowMem;
@@ -626,28 +627,30 @@ public class ProteinLowMemController extends Observable implements ProteinContro
      */
     public boolean isMasterProtein(int proteinID, MsfFile msfFile) {
         boolean isMasterProtein = false;
-        try {
-            PreparedStatement stat = null;
+        if (msfFile.getVersion() != MsfVersion.VERSION1_2) {
             try {
-                stat = msfFile.getConnection().prepareStatement("select IsMasterProtein from Proteins where ProteinID = ?");
-                stat.setInt(1, proteinID);
-                ResultSet rs = null;
+                PreparedStatement stat = null;
                 try {
-                    rs = stat.executeQuery();
-                    rs.next();
-                    isMasterProtein = rs.getBoolean("IsMasterProtein");
+                    stat = msfFile.getConnection().prepareStatement("select IsMasterProtein from Proteins where ProteinID = ?");
+                    stat.setInt(1, proteinID);
+                    ResultSet rs = null;
+                    try {
+                        rs = stat.executeQuery();
+                        rs.next();
+                        isMasterProtein = rs.getBoolean("IsMasterProtein");
+                    } finally {
+                        if (rs != null) {
+                            rs.close();
+                        }
+                    }
                 } finally {
-                    if (rs != null) {
-                        rs.close();
+                    if (stat != null) {
+                        stat.close();
                     }
                 }
-            } finally {
-                if (stat != null) {
-                    stat.close();
-                }
+            } catch (SQLException sqle) {
+                logger.error(sqle);
             }
-        } catch (SQLException sqle) {
-            logger.error(sqle);
         }
         return isMasterProtein;
     }

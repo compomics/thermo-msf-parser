@@ -207,7 +207,7 @@ public class ModificationLowMemController implements ModificationInterface {
      * @return
      */
     private List<Modification> getModList(MsfFile msfFile, boolean getFixedModifications, boolean getVariableModifications) {
-        StringBuilder modNumbersToFetch = new StringBuilder();
+        StringBuilder modNumbersToFetch = new StringBuilder("(");
         List<Modification> modsToReturn = new ArrayList<Modification>();
         List<ProcessingNode> allNodes = processingNodes.getAllProcessingNodes(msfFile);
         List<Integer> fixedMods = new ArrayList<Integer>();
@@ -239,13 +239,13 @@ public class ModificationLowMemController implements ModificationInterface {
                 }
             }
         }
-        if (modNumbersToFetch.length() > 0) {
+        if (modNumbersToFetch.length() > 1) {
             try {
                 modNumbersToFetch.deleteCharAt(modNumbersToFetch.length() - 1);
+                modNumbersToFetch.append(")");
                 PreparedStatement stat = null;
                 try {
-                    stat = msfFile.getConnection().prepareStatement("select * from AminoAcidModifications where AminoAcidModificationID in (?)");
-                    stat.setString(1, modNumbersToFetch.toString());
+                    stat = msfFile.getConnection().prepareStatement("select * from AminoAcidModifications where AminoAcidModificationID in " + modNumbersToFetch.toString());
                     ResultSet rs = null;
                     try {
                         rs = stat.executeQuery();
