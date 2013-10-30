@@ -1,6 +1,5 @@
 package com.compomics.thermo_msf_parser_API.lowmeminstance.controllers.version_1_2;
 
-import com.compomics.thermo_msf_parser_API.highmeminstance.AminoAcid;
 import com.compomics.thermo_msf_parser_API.lowmeminstance.controllers.ProteinLowMemController;
 import com.compomics.thermo_msf_parser_API.lowmeminstance.model.MsfFile;
 import com.compomics.thermo_msf_parser_API.lowmeminstance.model.PeptideLowMem;
@@ -24,7 +23,8 @@ public class ProteinLowMemControllerTest {
 
     static MsfFile msfFile;
 
-    public ProteinLowMemControllerTest() {
+    public ProteinLowMemControllerTest(MsfFile msfFile) {
+        this.msfFile = msfFile;
     }
 
     @BeforeClass

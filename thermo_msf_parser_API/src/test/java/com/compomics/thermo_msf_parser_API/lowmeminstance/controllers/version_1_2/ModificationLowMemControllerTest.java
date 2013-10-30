@@ -100,7 +100,7 @@ public class ModificationLowMemControllerTest {
         System.out.println("getAllModifications");
         ModificationLowMemController instance = new ModificationLowMemController();
         List result = instance.getAllModifications(msfFile);
-        assertThat(result.size(),is(0));
+        assertThat(result.size(),is(1));
     }
 
     /**

@@ -147,10 +147,10 @@ public class ProteinLowMem implements ProteinModel {
     }    
     
     @Override
-    public boolean equals(Object proteinLowMem){
+    public boolean equals(Object aLowMemProtein){
         boolean equal = false;
-        if(proteinLowMem != null && proteinLowMem instanceof ProteinLowMem){
-            equal = (((ProteinLowMem)proteinLowMem).getProteinID() == this.getProteinID() && ((ProteinLowMem)proteinLowMem).getAccession().equalsIgnoreCase(this.getAccession()));
+        if(aLowMemProtein != null && aLowMemProtein instanceof ProteinLowMem){
+            equal = (((ProteinLowMem)aLowMemProtein).getProteinID() == this.getProteinID() && ((ProteinLowMem)aLowMemProtein).getAccession().equalsIgnoreCase(this.getAccession()));
         }
         return equal;
     }
