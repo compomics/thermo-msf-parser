@@ -50,7 +50,7 @@ The *Thermo MSF Parser* project is grateful for the support by:
 |:--:|:--:|:--:|
 | [![compomics](http://genesis.ugent.be/public_data/image/compomics.png)](http://www.compomics.com) | [![vib](http://genesis.ugent.be/public_data/image/vib.png)](http://www.vib.be) | [![ugent](http://genesis.ugent.be/public_data/image/ugent.png)](http://www.ugent.be/en) |
 
-[Go to top of page](#jtraml)
+[Go to top of page](#thermo-msf-parser)
 
 ----
 
