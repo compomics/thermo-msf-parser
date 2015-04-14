@@ -4,6 +4,7 @@
  * [Project Description](#project-description)
  * [Downloads](#downloads)
  * [Usage](#usage)
+ * [Related Projects](#related-projects)
  * [Project Support](#project-support)
 
 ----
@@ -37,6 +38,23 @@ Note that we only support MSF files from ProteomeDiscoverer version 1.2, 1.3 and
 
 ## Usage
 See the [wiki](https://github.com/compomics/thermo-msf-parser/wiki) for additional information on how to use *Thermo MSF Parser*.
+
+[Go to top of page](#thermo-msf-parser)
+
+----
+
+## Related Projects
+
+The Thermo MSF viewer makes use of [http://code.google.com/p/compomics-utilities compomics-utilities] and [http://code.google.com/p/jsparklines JSparklines] to visualize every bit of information found in the msf files.
+
+Similar parsers for OMSSA and X!Tandem results files are also available, see [http://code.google.com/p/omssa-parser OMSSA Parser] and [http://code.google.com/p/xtandem-parser XTandem Parser].
+
+You might also find some of the following projects interesting: [http://code.google.com/p/peptizer Peptizer],
+[http://code.google.com/p/dbtoolkit dbtoolkit],
+[http://code.google.com/p/ms-lims ms-lims],
+[http://code.google.com/p/compomics-rover Rover] and
+[http://code.google.com/p/peptide-shaker PeptideShaker]
+
 
 [Go to top of page](#thermo-msf-parser)
 
