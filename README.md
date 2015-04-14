@@ -47,14 +47,13 @@ See the [wiki](https://github.com/compomics/thermo-msf-parser/wiki) for addition
 
 The Thermo MSF viewer makes use of [http://code.google.com/p/compomics-utilities compomics-utilities] and [http://code.google.com/p/jsparklines JSparklines] to visualize every bit of information found in the msf files.
 
-Similar parsers for OMSSA and X!Tandem results files are also available, see [http://code.google.com/p/omssa-parser OMSSA Parser] and [http://code.google.com/p/xtandem-parser XTandem Parser].
+Similar parsers for OMSSA and X!Tandem results files are also available, see [OMSSA Parser](http://code.google.com/p/omssa-parser) and [XTandem Parser](http://code.google.com/p/xtandem-parser).
 
-You might also find some of the following projects interesting: [http://code.google.com/p/peptizer Peptizer],
-[http://code.google.com/p/dbtoolkit dbtoolkit],
-[http://code.google.com/p/ms-lims ms-lims],
-[http://code.google.com/p/compomics-rover Rover] and
-[http://code.google.com/p/peptide-shaker PeptideShaker]
-
+You might also find some of the following projects interesting: [Peptizer](http://code.google.com/p/peptizer),
+[dbtoolkit](https://github.com/compomics/dbtoolkit),
+[ms-lims](http://code.google.com/p/ms-lims),
+[Rover](http://code.google.com/p/compomics-rover) and
+[PeptideShaker](http://code.google.com/p/peptide-shaker)
 
 [Go to top of page](#thermo-msf-parser)
 
