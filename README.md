@@ -24,10 +24,12 @@ Note that we only support MSF files from ProteomeDiscoverer version 1.2, 1.3 and
 ----
 
 ## Downloads
-## Download
 | Download | Version | Release info |
 | :------------: |:---------------:| :-----:|
 | [![download](https://github.com/compomics/thermo-msf-parser/wiki/images/download_button.png)](http://genesis.ugent.be/downloadredirect.php?toolname=thermo-msf-parser) | *3.4.29 - All platforms* |    [Release notes](https://github.com/compomics/thermo-msf-parser/wiki/ReleaseNotes) |
+
+### Example Dataset
+[Example Dataset 1](http://thermo-msf-parser.googlecode.com/svn/trunk/thermo_msf_parser_API/src/test/resources/test-msf-v-1.2.msf)
 
 [Go to top of page](#thermo-msf-parser)
 
