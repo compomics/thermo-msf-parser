@@ -15,6 +15,10 @@ Thermo ProteomeDiscoverer integrates both the peptide identification and quantif
 *Supported MSF Versions:*
 Note that we only support MSF files from ProteomeDiscoverer version 1.2, 1.3 and 1.4. We are not planning to invest development time in supporting older versions, but will however, try to ensure forward compatibility as new versions of ProteomeDiscoverer become available.
 
+### Citation
+ * [Colaert et al: J Proteome Res. 2011 Aug 5;10(8):3840-3.](http://pubs.acs.org/doi/abs/10.1021/pr2005154).
+ * If you use *Thermo MSF Parser* as part of a paper, please include the reference above.
+
 [Go to top of page](#thermo-msf-parser)
 
 ----
@@ -23,14 +27,14 @@ Note that we only support MSF files from ProteomeDiscoverer version 1.2, 1.3 and
 ## Download
 | Download | Version | Release info |
 | :------------: |:---------------:| :-----:|
-| [![download](https://github.com/compomics/mascotdatfile/wiki/images/download_button.png)](http://genesis.ugent.be/maven2/com/compomics/mascotdatfile/3.4.29/mascotdatfile-3.4.29.zip) | *3.4.29 - All platforms* |    [Release notes](https://github.com/compomics/mascotdatfile/wiki/ReleaseNotes) |
+| [![download](https://github.com/compomics/thermo-msf-parser/wiki/images/download_button.png)](http://genesis.ugent.be/downloadredirect.php?toolname=thermo-msf-parser) | *3.4.29 - All platforms* |    [Release notes](https://github.com/compomics/thermo-msf-parser/wiki/ReleaseNotes) |
 
 [Go to top of page](#thermo-msf-parser)
 
 ----
 
 ## Usage
-See the [wiki](https://github.com/compomics/jtraml/wiki) for additional information on how to setup, run and configure jTraML.
+See the [wiki](https://github.com/compomics/thermo-msf-parser/wiki) for additional information on how to use *Thermo MSF Parser*.
 
 [Go to top of page](#thermo-msf-parser)
 
@@ -38,7 +42,7 @@ See the [wiki](https://github.com/compomics/jtraml/wiki) for additional informat
 
 ## Project Support
 
-The thermo-msf-parser project is grateful for the support by:
+The *Thermo MSF Parser* project is grateful for the support by:
 
 | Compomics | VIB | Ghent University|
 |:--:|:--:|:--:|
