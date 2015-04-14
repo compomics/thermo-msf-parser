@@ -45,7 +45,7 @@ See the [wiki](https://github.com/compomics/thermo-msf-parser/wiki) for addition
 
 ## Related Projects
 
-The Thermo MSF viewer makes use of [http://code.google.com/p/compomics-utilities compomics-utilities] and [http://code.google.com/p/jsparklines JSparklines] to visualize every bit of information found in the msf files.
+The Thermo MSF viewer makes use of [compomics-utilities](http://code.google.com/p/compomics-utilities) and [JSparklines](http://code.google.com/p/jsparklines) to visualize every bit of information found in the msf files.
 
 Similar parsers for OMSSA and X!Tandem results files are also available, see [OMSSA Parser](http://code.google.com/p/omssa-parser) and [XTandem Parser](http://code.google.com/p/xtandem-parser).
 
