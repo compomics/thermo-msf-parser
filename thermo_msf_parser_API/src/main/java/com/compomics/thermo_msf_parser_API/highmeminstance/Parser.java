@@ -16,6 +16,9 @@ import java.util.regex.Pattern;
 
 /**
  * Created by IntelliJ IDEA. User: Niklaas Date: 18-Feb-2011 Time: 09:12:53
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class Parser {
 
@@ -233,8 +236,8 @@ public class Parser {
      * This will parse the thermo msf file
      *
      * @param iMsfFileLocation A String with the location of the msf file
-     * @param iLowMemory
-     * @throws ClassNotFoundException This is thrown when the sqlite library
+     * @param iLowMemory a boolean.
+     * @throws java.lang.ClassNotFoundException This is thrown when the sqlite library
      * cannot be found
      * @throws java.sql.SQLException This is thrown when there is a problem
      * extracting the data from the thermo msf file
@@ -909,9 +912,8 @@ public class Parser {
 
     /**
      * Retrieve the modifications of a peptide
-     *
-     * @param stat statement object for the database
-     * @throws SQLException
+     *@param conn the connection to the proteome discoverer file
+     * @throws SQLException if any
      */
     private void populateModifications(Connection conn) throws SQLException {
 
@@ -1112,6 +1114,8 @@ public class Parser {
 
     /**
      * Close the database connection
+     *
+     * @throws java.sql.SQLException if any.
      */
     public void close() throws SQLException {
         iConnection.close();
@@ -1356,7 +1360,7 @@ public class Parser {
 
     /**
      * This getter gives a vector with the channel ids of the different
-     * components (ex. Light => <b>1</b>, Heavy => <b>2</b>, ...) found in the
+     * components (ex. Light <b>1</b>, Heavy <b>2</b>, ...) found in the
      * msf file
      *
      * @return List with the channel ids of the different components (ex. 1,2,
@@ -1558,23 +1562,50 @@ public class Parser {
         return iProcessingNodesMap.get(lId);
     }
 
+    /**
+     * <p>getProcessingNodes.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     public List<ProcessingNode> getProcessingNodes() {
         return iProcessingNodes;
     }
 
+    /**
+     * <p>getFilePath.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getFilePath() {
         return iFilePath;
     }
 
+    /**
+     * <p>getFileName.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getFileName() {
         String lSub = iFilePath.substring(iFilePath.lastIndexOf(System.getProperties().getProperty("file.separator")) + 1);
         return lSub;
     }
 
+    /**
+     * <p>getQuantificationMethodName.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getQuantificationMethodName() {
         return iQuantificationMethodName;
     }
 
+    /**
+     * <p>getAminoAcidsFromDb.</p>
+     *
+     * @param iConnection a {@link java.sql.Connection} object.
+     * @return a {@link java.util.List} object.
+     * @throws java.sql.SQLException if any.
+     */
     public List getAminoAcidsFromDb(Connection iConnection) throws SQLException {
         PreparedStatement stat = iConnection.prepareStatement("select * from AminoAcids");
         ResultSet rs = stat.executeQuery();
@@ -1588,10 +1619,24 @@ public class Parser {
         return iAminoAcids;
     }
 
+    /**
+     * <p>addModificationsToPeptideSequence.</p>
+     *
+     * @param peptide a {@link com.compomics.thermo_msf_parser_API.highmeminstance.Peptide} object.
+     * @param modificationMap a {@link java.util.HashMap} object.
+     * @param iConnection a {@link java.sql.Connection} object.
+     * @return a {@link java.lang.String} object.
+     */
     public String addModificationsToPeptideSequence(Peptide peptide, HashMap modificationMap, Connection iConnection) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    /**
+     * <p>createModificationMap.</p>
+     *
+     * @param iConnection a {@link java.sql.Connection} object.
+     * @return a {@link java.util.Map} object.
+     */
     public Map createModificationMap(Connection iConnection) {
         try {
             PreparedStatement stat = iConnection.prepareStatement("select * from AminoAcidModifications");
@@ -1649,6 +1694,13 @@ public class Parser {
         return iModificationsMap;
     }
 
+    /**
+     * <p>createEnzymeMap.</p>
+     *
+     * @param iConnection a {@link java.sql.Connection} object.
+     * @return a {@link java.util.Map} object.
+     * @throws java.sql.SQLException if any.
+     */
     public Map createEnzymeMap(Connection iConnection) throws SQLException {
         PreparedStatement stat = iConnection.prepareStatement("select * from Enzymes");
         ResultSet rs = stat.executeQuery();
@@ -1677,6 +1729,13 @@ public class Parser {
         return iEnzymesMap;
     }
 
+    /**
+     * <p>getPeptides.</p>
+     *
+     * @param iConnection a {@link java.sql.Connection} object.
+     * @param iMsfVersion a {@link com.compomics.thermo_msf_parser_API.enums.MsfVersion} object.
+     * @throws java.sql.SQLException if any.
+     */
     public void getPeptides(Connection iConnection, MsfVersion iMsfVersion) throws SQLException {
         PreparedStatement stat = iConnection.prepareStatement("");
         ResultSet rs = stat.executeQuery("select * from Peptides as p");
@@ -1717,34 +1776,102 @@ public class Parser {
         }
     }
 
+    /**
+     * <p>getPeptidesForProtein.</p>
+     *
+     * @param protein a {@link com.compomics.thermo_msf_parser_API.lowmeminstance.model.ProteinLowMem} object.
+     * @param iConnection a {@link java.sql.Connection} object.
+     * @param iMsfVersion a {@link com.compomics.thermo_msf_parser_API.enums.MsfVersion} object.
+     * @param iAminoAcids a {@link java.util.List} object.
+     * @return a {@link java.util.List} object.
+     * @throws java.sql.SQLException if any.
+     */
     public List<Peptide> getPeptidesForProtein(ProteinLowMem protein, Connection iConnection, MsfVersion iMsfVersion, List<AminoAcid> iAminoAcids) throws SQLException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    /**
+     * <p>getPeptidesForProtein.</p>
+     *
+     * @param protein a {@link com.compomics.thermo_msf_parser_API.lowmeminstance.model.ProteinLowMem} object.
+     * @param iMsfVersion a {@link com.compomics.thermo_msf_parser_API.enums.MsfVersion} object.
+     * @param iAminoAcids a {@link java.util.List} object.
+     * @return a {@link java.util.List} object.
+     * @throws java.sql.SQLException if any.
+     */
     public List<Peptide> getPeptidesForProtein(ProteinLowMem protein, MsfVersion iMsfVersion, List<AminoAcid> iAminoAcids) throws SQLException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    /**
+     * <p>getPeptidesForAccession.</p>
+     *
+     * @param lProteinAccession a {@link java.lang.String} object.
+     * @param iMsfVersion a {@link com.compomics.thermo_msf_parser_API.enums.MsfVersion} object.
+     * @param iConnection a {@link java.sql.Connection} object.
+     * @param iAminoAcids a {@link java.util.List} object.
+     * @return a {@link java.util.List} object.
+     */
     public List<Peptide> getPeptidesForAccession(String lProteinAccession, MsfVersion iMsfVersion, Connection iConnection, List<AminoAcid> iAminoAcids) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    /**
+     * <p>getInformationForPeptide.</p>
+     *
+     * @param peptideID a int.
+     * @param iConnection a {@link java.sql.Connection} object.
+     * @param fullInfo a boolean.
+     * @return a {@link java.util.List} object.
+     */
     public List getInformationForPeptide(int peptideID, Connection iConnection, boolean fullInfo) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    /**
+     * <p>getSpectrumXMLForPeptide.</p>
+     *
+     * @param peptideOfInterest a {@link com.compomics.thermo_msf_parser_API.highmeminstance.Peptide} object.
+     * @return a {@link java.lang.String} object.
+     * @throws java.io.IOException if any.
+     * @throws java.sql.SQLException if any.
+     */
     public String getSpectrumXMLForPeptide(Peptide peptideOfInterest) throws IOException, SQLException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    /**
+     * <p>getSpectrumForPeptide.</p>
+     *
+     * @param peptideOfInterest a {@link com.compomics.thermo_msf_parser_API.highmeminstance.Peptide} object.
+     * @return a {@link com.compomics.thermo_msf_parser_API.highmeminstance.Spectrum} object.
+     * @throws java.sql.SQLException if any.
+     */
     public Spectrum getSpectrumForPeptide(Peptide peptideOfInterest) throws SQLException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    /**
+     * <p>getSpectrumXMLForPeptide.</p>
+     *
+     * @param peptideOfInterest a {@link com.compomics.thermo_msf_parser_API.highmeminstance.Peptide} object.
+     * @param iConnection a {@link java.sql.Connection} object.
+     * @return a {@link java.lang.String} object.
+     * @throws java.io.IOException if any.
+     * @throws java.sql.SQLException if any.
+     */
     public String getSpectrumXMLForPeptide(Peptide peptideOfInterest, Connection iConnection) throws IOException, SQLException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    /**
+     * <p>getSpectrumForPeptide.</p>
+     *
+     * @param peptideOfInterest a {@link com.compomics.thermo_msf_parser_API.highmeminstance.Peptide} object.
+     * @param iConnection a {@link java.sql.Connection} object.
+     * @return a {@link com.compomics.thermo_msf_parser_API.highmeminstance.Spectrum} object.
+     * @throws java.sql.SQLException if any.
+     */
     public Spectrum getSpectrumForPeptide(Peptide peptideOfInterest, Connection iConnection) throws SQLException {
         PreparedStatement stat = iConnection.prepareStatement("select s.*, m.FileID from spectrumheaders as s, masspeaks as m where m.masspeakid = s.masspeakid");
         ResultSet rs = stat.executeQuery();
@@ -1790,6 +1917,13 @@ public class Parser {
         return null;
     }
 
+    /**
+     * <p>getAllProteins.</p>
+     *
+     * @param iConnection a {@link java.sql.Connection} object.
+     * @return a {@link java.util.Iterator} object.
+     * @throws java.sql.SQLException if any.
+     */
     public Iterator getAllProteins(Connection iConnection) throws SQLException {
         PreparedStatement stat = iConnection.prepareStatement("select * from Proteins");
         ResultSet rs = stat.executeQuery();
@@ -1857,62 +1991,165 @@ public class Parser {
         return iProteins.iterator();
     }
 
+    /**
+     * <p>getProteinFromAccession.</p>
+     *
+     * @param proteinAccession a {@link java.lang.String} object.
+     * @param iConnection a {@link java.sql.Connection} object.
+     * @return a {@link com.compomics.thermo_msf_parser_API.lowmeminstance.model.ProteinLowMem} object.
+     * @throws java.sql.SQLException if any.
+     */
     public ProteinLowMem getProteinFromAccession(String proteinAccession, Connection iConnection) throws SQLException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    /**
+     * <p>getAccessionFromProteinID.</p>
+     *
+     * @param proteinID a int.
+     * @param iConnection a {@link java.sql.Connection} object.
+     * @return a {@link java.lang.String} object.
+     * @throws java.sql.SQLException if any.
+     */
     public String getAccessionFromProteinID(int proteinID, Connection iConnection) throws SQLException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    /**
+     * <p>getSequenceForProteinID.</p>
+     *
+     * @param proteinID a int.
+     * @param iConnection a {@link java.sql.Connection} object.
+     * @return a {@link java.lang.String} object.
+     * @throws java.sql.SQLException if any.
+     */
     public String getSequenceForProteinID(int proteinID, Connection iConnection) throws SQLException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    /**
+     * <p>getProteinsForPeptide.</p>
+     *
+     * @param PeptideID a int.
+     * @param iConnection a {@link java.sql.Connection} object.
+     * @return a {@link java.util.List} object.
+     * @throws java.sql.SQLException if any.
+     */
     public List<ProteinLowMem> getProteinsForPeptide(int PeptideID, Connection iConnection) throws SQLException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    /**
+     * <p>parseRatioTypes.</p>
+     *
+     * @param iConnection a {@link java.sql.Connection} object.
+     * @return a {@link java.util.List} object.
+     */
     public List<RatioTypeLowMem> parseRatioTypes(Connection iConnection) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    /**
+     * <p>getRawFileNameForFileID.</p>
+     *
+     * @param fileID a int.
+     * @return a {@link java.lang.String} object.
+     */
     public String getRawFileNameForFileID(int fileID) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    /**
+     * <p>createSpectrumXMLForPeptide.</p>
+     *
+     * @param peptideID a int.
+     * @param iConnection a {@link java.sql.Connection} object.
+     * @return a {@link java.lang.String} object.
+     * @throws java.sql.SQLException if any.
+     * @throws java.io.IOException if any.
+     */
     public String createSpectrumXMLForPeptide(int peptideID, Connection iConnection) throws SQLException, IOException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    /**
+     * <p>getMSMSPeaks.</p>
+     *
+     * @param lXml a {@link java.lang.String} object.
+     * @return a {@link java.util.List} object.
+     * @throws java.lang.Exception if any.
+     */
     public List<Peak> getMSMSPeaks(String lXml) throws Exception {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    /**
+     * <p>getMSPeaks.</p>
+     *
+     * @param lXml a {@link java.lang.String} object.
+     * @return a {@link java.util.List} object.
+     * @throws java.lang.Exception if any.
+     */
     public List<Peak> getMSPeaks(String lXml) throws Exception {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    /**
+     * <p>getFragmentedMsPeak.</p>
+     *
+     * @param lXml a {@link java.lang.String} object.
+     * @return a {@link com.compomics.thermo_msf_parser_API.highmeminstance.Peak} object.
+     * @throws java.lang.Exception if any.
+     */
     public Peak getFragmentedMsPeak(String lXml) throws Exception {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    /**
+     * <p>getRawFileForFileID.</p>
+     *
+     * @param fileID a int.
+     * @param iconn a {@link java.sql.Connection} object.
+     * @return a {@link java.util.HashMap} object.
+     */
     public HashMap<Integer, String> getRawFileForFileID(int fileID, Connection iconn) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    /**
+     * <p>getRawFileNameForFileID.</p>
+     *
+     * @param FileID a int.
+     * @param iConn a {@link java.sql.Connection} object.
+     * @return a {@link java.lang.String} object.
+     */
     public String getRawFileNameForFileID(int FileID, Connection iConn) {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 
+    /**
+     * <p>hasPhosphoRS.</p>
+     *
+     * @return a boolean.
+     */
     public boolean hasPhosphoRS() {
         return hasPhosphoRS;
     }
 
+    /**
+     * <p>getFastaFiles.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     public List<String> getFastaFiles() {
         return iFastaFiles;
     }
 
+    /**
+     * <p>getMajorScoreTypes.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     public List<ScoreType> getMajorScoreTypes() {
         return iMajorScoreTypes;
     }

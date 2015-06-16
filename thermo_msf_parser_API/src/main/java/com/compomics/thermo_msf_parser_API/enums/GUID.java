@@ -8,8 +8,10 @@ import java.util.HashMap;
 import java.util.Map;
 import org.apache.log4j.Logger;
 /**
+ * <p>GUID class.</p>
  *
  * @author toorn101
+ * @version $Id: $Id
  */
 public enum GUID {
 
@@ -115,8 +117,8 @@ public enum GUID {
     /**
      * Convert a string representing a GUID to a GUID member
      *
-     * @param iNodeGUID
-     * @return
+     * @param iNodeGUID a {@link java.lang.String} object.
+     * @return a {@link com.compomics.thermo_msf_parser_API.enums.GUID} object.
      */
     public static GUID fromGUIDString(String iNodeGUID) {
         if (guidStringToGUID == null) {
@@ -140,11 +142,17 @@ public enum GUID {
         this.description = description;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString() {
         return guid;
     }
 
+    /**
+     * <p>Getter for the field <code>description</code>.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getDescription() {
         return description;
     }

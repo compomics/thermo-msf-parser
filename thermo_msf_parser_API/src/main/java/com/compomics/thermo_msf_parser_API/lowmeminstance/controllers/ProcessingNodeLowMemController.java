@@ -11,11 +11,15 @@ import java.util.*;
 /**
  * Created by IntelliJ IDEA. User: Davy Date: 4/26/12 Time: 9:53 AM To change
  * this template use File | Settings | File Templates.
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class ProcessingNodeLowMemController implements ProcessingNodeInterface {
 
     private static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(ProcessingNodeLowMemController.class);
 
+    /** {@inheritDoc} */
     @Override
     public List<ProcessingNode> getAllProcessingNodes(MsfFile msfFile) {
         HashMap<Integer, ProcessingNode> allNodesMap = new HashMap<Integer, ProcessingNode>();
@@ -59,6 +63,7 @@ public class ProcessingNodeLowMemController implements ProcessingNodeInterface {
         return new ArrayList<ProcessingNode>(allNodesMap.values());
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getQuantitationMethod(MsfFile msfFile) {
         String iQuantitationMethod = "";
@@ -85,6 +90,7 @@ public class ProcessingNodeLowMemController implements ProcessingNodeInterface {
         return iQuantitationMethod;
     }
 
+    /** {@inheritDoc} */
     @Override
     public ProcessingNode getProcessingNodeByNumber(int processingNodeId, MsfFile msfFile) {
 
@@ -127,6 +133,7 @@ public class ProcessingNodeLowMemController implements ProcessingNodeInterface {
         return processingNodeToReturn;
     }
 
+    /** {@inheritDoc} */
     @Override
     public ProcessingNode getProcessingNodeByName(String processingNodeName, MsfFile msfFile) {
         PreparedStatement stat = null;

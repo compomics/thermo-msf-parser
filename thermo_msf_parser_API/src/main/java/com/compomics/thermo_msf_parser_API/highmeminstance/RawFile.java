@@ -8,7 +8,10 @@ package com.compomics.thermo_msf_parser_API.highmeminstance;
  */
 
 /**
- * This class represents the raw file 
+ * This class represents the raw file
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class RawFile {
 
@@ -24,6 +27,7 @@ public class RawFile {
 
     /**
      * The constructor for the raw file
+     *
      * @param aFileId The file id
      * @param aFileName The file name
      */
@@ -35,6 +39,7 @@ public class RawFile {
 
     /**
      * Getter for the file id
+     *
      * @return int with the file id
      */
     public int getFileId() {
@@ -43,6 +48,7 @@ public class RawFile {
 
     /**
      * Getter for the file name
+     *
      * @return String with the file name
      */
     public String getFileName() {

@@ -3,10 +3,11 @@ package com.compomics.thermo_msf_parser_API.highmeminstance;
 import com.compomics.util.experiment.personalization.UrParameter;
 
 /**
- * A class needed to be able to add charge to PeptideFragmentIon objects, as 
+ * A class needed to be able to add charge to PeptideFragmentIon objects, as
  * this is not supported in the standard PeptideFragmentIon objects.
  *
  * @author Harald Barsnes
+ * @version $Id: $Id
  */
 public class Charge implements UrParameter {
     static final long serialVersionUID = 6808590175195298797L;
@@ -41,11 +42,13 @@ public class Charge implements UrParameter {
         return charge;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getFamilyName() {
         return "Charge";
     }
 
+    /** {@inheritDoc} */
     @Override
     public int getIndex() {
         return 0;

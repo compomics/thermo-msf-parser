@@ -69,6 +69,9 @@ import java.util.logging.Level;
 
 /**
  * Created by IntelliJ IDEA. User: Davy Date: 4/25/12 Time: 1:45 PM
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
 
@@ -226,7 +229,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
     /**
      * The constructor
      *
-     * @param lStandAlone
+     * @param lStandAlone a boolean.
      */
     public Thermo_msf_parserGUILowMem(boolean lStandAlone) {
 
@@ -661,6 +664,9 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
         });
     }
 
+    /**
+     * <p>closeMethod.</p>
+     */
     public void closeMethod() {
         try {
             //try to delete the zip file
@@ -908,6 +914,11 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
         lParser.start();
     }
 
+    /**
+     * <p>setGuiElementsResponsive.</p>
+     *
+     * @param lResponsive a boolean.
+     */
     public void setGuiElementsResponsive(boolean lResponsive) {
         aIonsJCheckBox.setEnabled(lResponsive);
         bIonsJCheckBox.setEnabled(lResponsive);
@@ -1313,7 +1324,6 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
      *
      *
      *
-     * @noinspection ALL
      */
     private void $$$setupUI$$$() {
         createUIComponents();
@@ -1814,12 +1824,15 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
     }
 
     /**
-     * @noinspection ALL
+     * <p>$$$getRootComponent$$$.</p>
+     *
+     * @return a {@link javax.swing.JComponent} object.
      */
     public JComponent $$$getRootComponent$$$() {
         return contentPane;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void update(Observable o, Object arg) {
         progressBar.setValue(progressBarIntFiller.progressBarReturn());
@@ -2024,9 +2037,9 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
     /**
      * This method will create a peptide line vector for the peptide table
      *
-     *
      * @param lPeptide The peptide to create the peptide line for
      * @return ArrayList with the objects of the peptide line
+     * @param iParsedMsf a {@link com.compomics.thermo_msf_parser_API.lowmeminstance.model.MsfFile} object.
      */
     public Object[] createPeptideLine(PeptideLowMem lPeptide, MsfFile iParsedMsf) {
         ArrayList<Object> lPeptideObject = new ArrayList<Object>();
@@ -2153,7 +2166,7 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
      * This method will set the msms spectrum annotation for a peptide
      *
      * @param lPeptide The peptide to set the annotation for
-     * @throws java.sql.SQLException
+     * @throws java.sql.SQLException if any.
      */
     public void setSpectrumMSMSAnnotations(PeptideLowMem lPeptide) throws SQLException {
         Vector lAnnotations = new Vector();
@@ -3050,6 +3063,12 @@ public class Thermo_msf_parserGUILowMem extends JFrame implements Observer {
 
     }
 
+    /**
+     * <p>getQuanChannelNameById.</p>
+     *
+     * @param lChannelId a int.
+     * @return a {@link java.lang.String} object.
+     */
     public String getQuanChannelNameById(int lChannelId) {
         /*for (int i = 0; i < iQuanChannelIds.size(); i++) {
          if (iQuanChannelIds.get(i) == lChannelId) {

@@ -18,14 +18,17 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 /**
+ * <p>ScoreTypeLowMemController class.</p>
  *
  * @author Davy
+ * @version $Id: $Id
  */
 public class ScoreTypeLowMemController implements ScoreTypeInterface {
 
     private static final Logger logger = Logger.getLogger(ScoreTypeLowMemController.class);
     private List<ScoreTypeLowMem> iScoreTypes = new ArrayList<ScoreTypeLowMem>();
 
+    /** {@inheritDoc} */
     @Override
     public List<ScoreTypeLowMem> getScoreTypesOfMsfFileList(List<MsfFile> MsfFiles) {
         for (MsfFile msfFile : MsfFiles) {
@@ -57,6 +60,7 @@ public class ScoreTypeLowMemController implements ScoreTypeInterface {
         return iScoreTypes;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Map<Integer, Double> getScoresForPeptide(PeptideLowMem peptide, MsfFile msfFile) {
         Map<Integer, Double> peptideScores = new HashMap<Integer, Double>();
@@ -88,6 +92,7 @@ public class ScoreTypeLowMemController implements ScoreTypeInterface {
         return peptideScores;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void addScoresToPeptide(PeptideLowMem peptide, MsfFile msfFile) {
         try {
@@ -118,6 +123,7 @@ public class ScoreTypeLowMemController implements ScoreTypeInterface {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void getScoresForPeptideList(List<PeptideLowMem> peptideLowMemList, MsfFile msfFile) {
         String listOfPeptideids = "";
@@ -151,6 +157,7 @@ public class ScoreTypeLowMemController implements ScoreTypeInterface {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<ScoreTypeLowMem> getScoreTypes(MsfFile msfFile) {
         //get the score types
@@ -180,10 +187,21 @@ public class ScoreTypeLowMemController implements ScoreTypeInterface {
         return iScoreTypes;
     }
 
+    /**
+     * <p>setScoreTypes.</p>
+     *
+     * @param scoreTypes a {@link java.util.List} object.
+     */
     public void setScoreTypes(List<ScoreTypeLowMem> scoreTypes) {
         this.iScoreTypes = scoreTypes;
     }
 
+    /**
+     * <p>getMajorScoreTypes.</p>
+     *
+     * @param msfFile a {@link com.compomics.thermo_msf_parser_API.lowmeminstance.model.MsfFile} object.
+     * @return a {@link java.util.List} object.
+     */
     public List<ScoreTypeLowMem> getMajorScoreTypes(MsfFile msfFile) {
         List<ScoreTypeLowMem> scoreTypes = getScoreTypes(msfFile);
         List<ScoreTypeLowMem> majorScoreTypes = new ArrayList<ScoreTypeLowMem>();

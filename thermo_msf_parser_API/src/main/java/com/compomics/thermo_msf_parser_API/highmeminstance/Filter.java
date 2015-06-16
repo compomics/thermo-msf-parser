@@ -9,6 +9,9 @@ import java.util.List;
  * User: Niklaas
  * Date: 21-Feb-2011
  * Time: 09:32:57
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class Filter {
 
@@ -67,6 +70,7 @@ public class Filter {
 
     /**
      * The filter constructor
+     *
      * @param iFilterSetName The filter set name
      * @param iFilterXmlLines The filter xml
      */
@@ -95,6 +99,7 @@ public class Filter {
 
     /**
      * Getter for the filter name
+     *
      * @return String with the filter name
      */
     public String getFilterName() {
@@ -103,6 +108,7 @@ public class Filter {
 
     /**
      * Getter with the filter description
+     *
      * @return String with the filter description
      */
     public String getFilterDescription() {
@@ -111,6 +117,7 @@ public class Filter {
 
     /**
      * Getter for the kind
+     *
      * @return String with the kind
      */
     public String getKind() {
@@ -119,6 +126,7 @@ public class Filter {
 
     /**
      * Getter for the applyable nodes
+     *
      * @return String with the applyable nodes
      */
     public String getApplyableNodes() {
@@ -127,6 +135,7 @@ public class Filter {
 
     /**
      * Getter for a boolean that indicates that the filter is active
+     *
      * @return boolean that indicates that the filter is active
      */
     public boolean isActive() {
@@ -135,6 +144,7 @@ public class Filter {
 
     /**
      * Getter for a boolean that indicates that the filter is applied
+     *
      * @return boolean that indicates that the filter is applied
      */
     public boolean isApplied() {
@@ -143,6 +153,7 @@ public class Filter {
 
     /**
      * Getter for a boolean that indicates that the filter is a confidence filter
+     *
      * @return boolean that indicates that the filter is confidence filter
      */
     public boolean isConfidenceFilter() {
@@ -151,6 +162,7 @@ public class Filter {
 
     /**
      * Getter for the confidence level
+     *
      * @return String with the confidence level
      */
     public String getConfidenceLevel() {
@@ -159,6 +171,7 @@ public class Filter {
 
     /**
      * Getter for the processing node number
+     *
      * @return int with the processing node number
      */
     public int getProcessingNodeNumber() {
@@ -167,6 +180,7 @@ public class Filter {
 
     /**
      * Getter for the version
+     *
      * @return int with the version
      */
     public int getVersion() {
@@ -175,6 +189,7 @@ public class Filter {
 
     /**
      * Getter for a vector with the different parameter names
+     *
      * @return vector with the different parameter names
      */
     public List<String> getParameterName() {
@@ -183,6 +198,7 @@ public class Filter {
 
     /**
      * Getter for a vector with the different parameter values
+     *
      * @return vector with the different parameter values
      */
     public List<String> getParameterValue() {
@@ -191,6 +207,7 @@ public class Filter {
 
     /**
      * Getter for the filter name
+     *
      * @return String with the filter name
      */
     public String getFilterSetName() {

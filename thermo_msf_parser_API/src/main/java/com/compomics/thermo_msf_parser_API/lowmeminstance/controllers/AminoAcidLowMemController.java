@@ -12,15 +12,13 @@ import java.util.List;
 /**
  * Created by IntelliJ IDEA. User: Davy Date: 4/24/12 Time: 11:09 AM To change
  * this template use File | Settings | File Templates.
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class AminoAcidLowMemController implements AminoAcidInterface {
 
-    /**
-     *
-     * @param msfFile the proteome discoverer file to retrieve the amino acids from
-     * @return a vector containing all the amino acids in the database
-     * @throws SQLException
-     */
+    /** {@inheritDoc} */
     @Override
     public List<AminoAcid> getAminoAcidsFromDb(MsfFile msfFile) throws SQLException {
         List<AminoAcid> iAminoAcids = new ArrayList<AminoAcid>();

@@ -10,14 +10,17 @@ import java.util.Map;
  * Date: 5/25/12
  * Time: 2:58 PM
  * To change this template use File | Settings | File Templates.
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public interface EnzymeInterface {
     /**
      * creates a hashmap containing the enzymes
-     * @param iConnection
-     * @return
-     * @throws SQLException 
-     */    
+     *
+     * @param iConnection a {@link java.sql.Connection} object.
+     * @return a {@link java.util.Map} object.
+     */
     public Map createEnzymeMap (Connection iConnection);
 
 }

@@ -14,12 +14,16 @@ import org.apache.log4j.Logger;
 /**
  * Created by IntelliJ IDEA. User: Davy Date: 10/1/12 Time: 11:03 AM To change
  * this template use File | Settings | File Templates.
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class QuanResultLowMemController {
 
     private static final Logger logger = Logger.getLogger(QuanResultLowMemController.class);
 
     /**
+     * <p>getIsotopePatternMap.</p>
      *
      * @param msfFile      * @param msfFile the proteome discoverer file to retrieve the isotope patterns from
      * @return a hashmap with key: the isotope pattern id and value: the
@@ -72,10 +76,11 @@ public class QuanResultLowMemController {
     }
 
     /**
+     * <p>getQuanResults.</p>
      *
-     * @param aConnection connection to the msf file
      * @return hashmap containing the quan results key:quanresultid value:quan
      * object
+     * @param msfFile a {@link com.compomics.thermo_msf_parser_API.lowmeminstance.model.MsfFile} object.
      */
     public HashMap getQuanResults(MsfFile msfFile) {
         HashMap<Integer, QuanResult> iQuanResultsMap = new HashMap<Integer, QuanResult>();

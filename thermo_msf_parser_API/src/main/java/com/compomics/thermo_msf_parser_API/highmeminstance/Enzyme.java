@@ -10,6 +10,9 @@ package com.compomics.thermo_msf_parser_API.highmeminstance;
 
 /**
  * This class represent the enzyme
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class Enzyme {
 
@@ -44,6 +47,7 @@ public class Enzyme {
 
     /**
      * The constructor for the enzyme
+     *
      * @param iEnzymeId The enzyme id
      * @param iName The name
      * @param iAbbreviation The abbreviation
@@ -62,6 +66,7 @@ public class Enzyme {
 
     /**
      * Getter for the enzyme id
+     *
      * @return int with the enzyme id
      */
     public int getEnzymeId() {
@@ -70,6 +75,7 @@ public class Enzyme {
 
     /**
      * Getter for the name
+     *
      * @return String with the name
      */
     public String getName() {
@@ -78,6 +84,7 @@ public class Enzyme {
 
     /**
      * Getter for the abbreviation
+     *
      * @return String with the abbreviation
      */
     public String getAbbreviation() {
@@ -86,6 +93,7 @@ public class Enzyme {
 
     /**
      * Getter for the seperator
+     *
      * @return String with the seperator
      */
     public String getSeperator() {
@@ -94,6 +102,7 @@ public class Enzyme {
 
     /**
      * Getter for the non seperator
+     *
      * @return String with the non seperator
      */
     public String getNonSeperator() {
@@ -102,6 +111,7 @@ public class Enzyme {
 
     /**
      * Getter for the offset
+     *
      * @return int with the offset
      */
     public int getOffset() {
@@ -110,6 +120,7 @@ public class Enzyme {
 
     /**
      * Getter for the specificity
+     *
      * @return int with the specificity
      */
     public int getSpecificity() {
@@ -118,6 +129,7 @@ public class Enzyme {
 
     /**
      * Setter for the specificity
+     *
      * @param iSpecificity int with the specificity
      */
     public void setSpecificity(int iSpecificity) {

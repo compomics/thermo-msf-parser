@@ -13,6 +13,9 @@ import java.util.zip.ZipInputStream;
  */
 /**
  * This class represents a chromatogram
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class Chromatogram implements ChromatogramInterface {
     // Class specific log4j logger for Thermo_msf_parserGUI instances.
@@ -40,17 +43,25 @@ public class Chromatogram implements ChromatogramInterface {
     private String iUnzippedChromatogramXml;
     private List points;
 
+    /**
+     * <p>getPointsVector.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     public List getPointsVector() {
         return points;
     }
 
+    /**
+     * <p>Setter for the field <code>points</code>.</p>
+     */
     public void setPoints() {
         String lXml = getUnzippedChromatogramXml();
         String[] lLines = lXml.split("\n");
         List<Point> lPoints = new ArrayList<Point>();
-        for (int i = 0; i < lLines.length; i++) {
-            if (lLines[i].trim().startsWith("<Pt ")) {
-                lPoints.add(new Point(lLines[i]));
+        for (String lLine : lLines) {
+            if (lLine.trim().startsWith("<Pt ")) {
+                lPoints.add(new Point(lLine));
             }
         }
         this.points = lPoints;
@@ -115,8 +126,6 @@ public class Chromatogram implements ChromatogramInterface {
      * Getter for the unzipped chromatogram xml
      *
      * @return String with the unzipped chromatogram xml
-     * @throws IOException An error is thrown when the zipped byte[] can not be
-     * unzipped
      */
     public String getUnzippedChromatogramXml() {
         if (iUnzippedChromatogramXml == null) {
@@ -170,8 +179,6 @@ public class Chromatogram implements ChromatogramInterface {
      * Getter for the different points in the chromatogram
      *
      * @return Vector with the different points
-     * @throws IOException An error is thrown when the zipped byte[] can not be
-     * unzipped
      */
     public List<Point> getPoints() {
         String lXml = getUnzippedChromatogramXml();
@@ -185,21 +192,25 @@ public class Chromatogram implements ChromatogramInterface {
         return lPoints;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int getChromatogramFileNumber() {
         return iFileId;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setChromatogramFileNumber(int newFileId) {
         this.iFileId = newFileId;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int getTraceTypeID() {
         return iTraceTypeId;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setTraceTypeID(int newTraceTypeID) {
         this.iTraceTypeId = newTraceTypeID;
@@ -230,8 +241,7 @@ public class Chromatogram implements ChromatogramInterface {
          */
         public Point(String lLine) {
             String[] lElements = lLine.split(" ");
-            for (int i = 0; i < lElements.length; i++) {
-                String lElement = lElements[i];
+            for (String lElement : lElements) {
                 if (lElement.startsWith("T=\"")) {
                     iT = Double.valueOf(lElement.substring(3, lElement.lastIndexOf("\"")));
                 }

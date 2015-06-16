@@ -15,6 +15,9 @@ import java.util.Map;
  * Date: 18-Feb-2011
  * Time: 09:21:21
  * To change this template use File | Settings | File Templates.
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class Protein {
     /**
@@ -83,20 +86,43 @@ public class Protein {
     private List<ProteinScore> scores = new ArrayList<ProteinScore>();
     private List<ProteinScore> decoyScores = new ArrayList<ProteinScore>();
 
+    /**
+     * <p>Constructor for Protein.</p>
+     *
+     * @param iProteinId a int.
+     * @param iSequence a {@link java.lang.String} object.
+     */
     public Protein(int iProteinId, String iSequence) {
         this.iProteinId = iProteinId;
         this.iSequence = iSequence;
     }
 
+    /**
+     * <p>Constructor for Protein.</p>
+     *
+     * @param anInt a int.
+     * @param lParser a {@link com.compomics.thermo_msf_parser_API.highmeminstance.Parser} object.
+     */
     public Protein(int anInt, Parser lParser) {
         this.iProteinId = anInt;
         this.iParser = lParser;
     }
 
+    /**
+     * <p>getProteinId.</p>
+     *
+     * @return a int.
+     */
     public int getProteinId() {
         return iProteinId;
     }
 
+    /**
+     * <p>getSequence.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     * @throws java.sql.SQLException if any.
+     */
     public String getSequence() throws SQLException {
         if(iSequence ==  null){
             ResultSet rs;
@@ -114,10 +140,20 @@ public class Protein {
         return iSequence;
     }
 
+    /**
+     * <p>getDescription.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getDescription() {
         return iDescription;
     }
 
+    /**
+     * <p>setDescription.</p>
+     *
+     * @param iDescription a {@link java.lang.String} object.
+     */
     public void setDescription(String iDescription) {
         this.iDescription = iDescription;
         if ( iDescription.contains(">GENSCAN")){
@@ -141,6 +177,7 @@ public class Protein {
 
     /**
      * This method will add a value in the custom data field map by the id off the custom data field
+     *
      * @param lId The custom data field id
      * @param lValue The value to add
      */
@@ -150,6 +187,7 @@ public class Protein {
 
     /**
      * This method will add a value in the decoy custom data field map by the id off the custom data field
+     *
      * @param lId The custom data field id
      * @param lValue The value to add
      */
@@ -157,82 +195,177 @@ public class Protein {
         iDecoyCustomDataFieldValues.put(lId, lValue);
     }
 
+    /**
+     * <p>addPeptide.</p>
+     *
+     * @param lPeptide a {@link com.compomics.thermo_msf_parser_API.highmeminstance.Peptide} object.
+     */
     public void addPeptide(Peptide lPeptide) {
         this.iPeptides.add(lPeptide);
     }
 
 
+    /**
+     * <p>getCustomDataFieldValues.</p>
+     *
+     * @return a {@link java.util.Map} object.
+     */
     public Map<Integer, String> getCustomDataFieldValues() {
         return iCustomDataFieldValues;
     }
 
 
+    /**
+     * <p>getDecoyCustomDataFieldValues.</p>
+     *
+     * @return a {@link java.util.HashMap} object.
+     */
     public HashMap<Integer, String> getDecoyCustomDataFieldValues() {
         return iDecoyCustomDataFieldValues;
     }
 
+    /**
+     * <p>getUtilProtein.</p>
+     *
+     * @return a {@link com.compomics.util.protein.Protein} object.
+     */
     public com.compomics.util.protein.Protein getUtilProtein() {
         return iUtilProtein;
     }
 
+    /**
+     * <p>getUtilAccession.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getUtilAccession() {
         return iUtilAccession;
     }
 
+    /**
+     * <p>getUtilDescription.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getUtilDescription() {
         return iUtilDescription;
     }
 
+    /**
+     * <p>getPeptides.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     public List<Peptide> getPeptides() {
         return iPeptides;
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public String toString(){
         return iUtilAccession;
     }
 
+    /**
+     * <p>getParser.</p>
+     *
+     * @return a {@link com.compomics.thermo_msf_parser_API.highmeminstance.Parser} object.
+     */
     public Parser getParser() {
         return iParser;
     }
 
+    /**
+     * <p>setMasterProtein.</p>
+     *
+     * @param aMasterProtein a int.
+     */
     public void setMasterProtein(int aMasterProtein) {
         this.iMasterProtein = aMasterProtein;
     }
 
+    /**
+     * <p>getMasterProtein.</p>
+     *
+     * @return a int.
+     */
     public int getMasterProtein() {
         return iMasterProtein;
     }
 
+    /**
+     * <p>setProteinGroupId.</p>
+     *
+     * @param aProteinGroupId a int.
+     */
     public void setProteinGroupId(int aProteinGroupId){
         this.iProteinGroupId = aProteinGroupId;
     }
 
+    /**
+     * <p>getProteinGroupId.</p>
+     *
+     * @return a int.
+     */
     public int getProteinGroupId() {
         return iProteinGroupId;
     }
 
+    /**
+     * <p>addPtmAnnotation.</p>
+     *
+     * @param aPtmAnnotation a {@link com.compomics.thermo_msf_parser_API.highmeminstance.Protein.PtmAnnotation} object.
+     */
     public void addPtmAnnotation(PtmAnnotation aPtmAnnotation) {
         this.iPtmAnnotation.add(aPtmAnnotation);
     }
 
+    /**
+     * <p>addDecoyPeptide.</p>
+     *
+     * @param aPeptide a {@link com.compomics.thermo_msf_parser_API.highmeminstance.Peptide} object.
+     */
     public void addDecoyPeptide(Peptide aPeptide) {
         this.iDecoyPeptides.add(aPeptide);
     }
 
+    /**
+     * <p>addScore.</p>
+     *
+     * @param aProteinScore a double.
+     * @param aProcessingNodeNumber a int.
+     * @param aCoverage a double.
+     */
     public void addScore(double aProteinScore, int aProcessingNodeNumber, double aCoverage) {
         this.scores.add(new ProteinScore(aProteinScore,aProcessingNodeNumber,aCoverage));
     }
 
+    /**
+     * <p>Getter for the field <code>scores</code>.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     public List<ProteinScore> getScores() {
         return scores;
     }
 
+    /**
+     * <p>addDecoyScore.</p>
+     *
+     * @param aProteinScore a double.
+     * @param aProcessingNodeNumber a int.
+     * @param aCoverage a double.
+     */
     public void addDecoyScore(double aProteinScore, int aProcessingNodeNumber, double aCoverage) {
         this.decoyScores.add(new ProteinScore(aProteinScore,aProcessingNodeNumber,aCoverage));
     }
     
+    /**
+     * <p>Getter for the field <code>decoyScores</code>.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     public List<ProteinScore> getDecoyScores() {
         return decoyScores;
     }

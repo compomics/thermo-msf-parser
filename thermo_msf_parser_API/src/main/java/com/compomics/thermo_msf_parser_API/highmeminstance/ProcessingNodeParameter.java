@@ -6,6 +6,9 @@ package com.compomics.thermo_msf_parser_API.highmeminstance;
  * Date: 25-Feb-2011
  * Time: 11:48:50
  * To change this template use File | Settings | File Templates.
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class ProcessingNodeParameter {
     /**
@@ -85,46 +88,101 @@ public class ProcessingNodeParameter {
     }
 
 
+    /**
+     * <p>getProcessingNodeNumber.</p>
+     *
+     * @return a int.
+     */
     public int getProcessingNodeNumber() {
         return iProcessingNodeNumber;
     }
 
+    /**
+     * <p>getProcessingNodeId.</p>
+     *
+     * @return a int.
+     */
     public int getProcessingNodeId() {
         return iProcessingNodeId;
     }
 
+    /**
+     * <p>getParameterName.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getParameterName() {
         return iParameterName;
     }
 
+    /**
+     * <p>getFriendlyName.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getFriendlyName() {
         return iFriendlyName;
     }
 
+    /**
+     * <p>getIntendedPurpose.</p>
+     *
+     * @return a int.
+     */
     public int getIntendedPurpose() {
         return iIntendedPurpose;
     }
 
+    /**
+     * <p>getPurposeDetails.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getPurposeDetails() {
         return iPurposeDetails;
     }
 
+    /**
+     * <p>getAdvanced.</p>
+     *
+     * @return a int.
+     */
     public int getAdvanced() {
         return iAdvanced;
     }
 
+    /**
+     * <p>getCategory.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getCategory() {
         return iCategory;
     }
 
+    /**
+     * <p>getPosition.</p>
+     *
+     * @return a int.
+     */
     public int getPosition() {
         return iPosition;
     }
 
+    /**
+     * <p>getParameterValue.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getParameterValue() {
         return iParameterValue;
     }
 
+    /**
+     * <p>getValueDisplayString.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getValueDisplayString() {
         return iValueDisplayString;
     }

@@ -5,8 +5,10 @@ import com.compomics.thermo_msf_parser_API.lowmeminstance.model.MsfFile;
 import com.compomics.thermo_msf_parser_API.lowmeminstance.model.PeptideLowMem;
 
 /**
+ * <p>GUIPeptideLowMem class.</p>
  *
  * @author Davy
+ * @version $Id: $Id
  */
 public class GUIPeptideLowMem extends PeptideLowMem {
 

@@ -12,6 +12,9 @@ import org.apache.log4j.Logger;
 /**
  * Created by IntelliJ IDEA. User: Davy Date: 7/31/12 Time: 2:05 PM To change
  * this template use File | Settings | File Templates.
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class QuantitationXMLLowMem {
 
@@ -20,6 +23,11 @@ public class QuantitationXMLLowMem {
     private List<Integer> iChannelIds = new ArrayList<Integer>();
     private List<RatioType> iRatioTypes = new ArrayList<RatioType>();
 
+    /**
+     * <p>parseQuantitationXML.</p>
+     *
+     * @param aQuantitationXML a {@link java.lang.String} object.
+     */
     public void parseQuantitationXML(String aQuantitationXML) {
         //String iQuantitationMethodName;
         boolean lRatioReporting;
@@ -60,6 +68,13 @@ public class QuantitationXMLLowMem {
 
     }
 
+    /**
+     * <p>getQuantitationXML.</p>
+     *
+     * @param iConnection a {@link java.sql.Connection} object.
+     * @return a {@link java.lang.String} object.
+     * @throws java.sql.SQLException if any.
+     */
     public String getQuantitationXML(Connection iConnection) throws SQLException {
         String iQuantitationMethod = null;
         try {
@@ -85,26 +100,56 @@ public class QuantitationXMLLowMem {
         return iQuantitationMethod;
     }
 
+    /**
+     * <p>getComponents.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     public List<String> getComponents() {
         return iComponents;
     }
 
+    /**
+     * <p>setComponents.</p>
+     *
+     * @param aComponentsList a {@link java.util.List} object.
+     */
     public void setComponents(List aComponentsList) {
         this.iComponents = aComponentsList;
     }
 
+    /**
+     * <p>getChannelIds.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     public List<Integer> getChannelIds() {
         return iChannelIds;
     }
 
+    /**
+     * <p>setChannelIds.</p>
+     *
+     * @param aChannelIdsList a {@link java.util.List} object.
+     */
     public void setChannelIds(List<Integer> aChannelIdsList) {
         this.iChannelIds = aChannelIdsList;
     }
 
+    /**
+     * <p>getRatioTypes.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     public List<RatioType> getRatioTypes() {
         return iRatioTypes;
     }
 
+    /**
+     * <p>setRatioTypes.</p>
+     *
+     * @param aRatioTypeList a {@link java.util.List} object.
+     */
     public void setRatioTypes(List aRatioTypeList) {
         this.iRatioTypes = aRatioTypeList;
     }

@@ -13,6 +13,9 @@ import org.apache.commons.lang3.EnumUtils;
  * Date: 18-Feb-2011
  * Time: 13:26:06
  * To change this template use File | Settings | File Templates.
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class ScanEvent {
     /**
@@ -46,6 +49,7 @@ public class ScanEvent {
 
     /**
      * The scanevent constructor
+     *
      * @param iScanEventId The scanevent id
      * @param iMSLevel The ms level
      * @param iPolarity The polarity
@@ -67,14 +71,29 @@ public class ScanEvent {
     
     //getters
 
+    /**
+     * <p>getScanEventId.</p>
+     *
+     * @return a int.
+     */
     public int getScanEventId() {
         return iScanEventId;
     }
 
+    /**
+     * <p>getMSLevel.</p>
+     *
+     * @return a int.
+     */
     public int getMSLevel() {
         return iMSLevel;
     }
 
+    /**
+     * <p>getPolarity.</p>
+     *
+     * @return a int.
+     */
     public int getPolarity() {
         return iPolarity;
     }
@@ -83,30 +102,65 @@ public class ScanEvent {
 //        return iScanType;
 //    }
     
+    /**
+     * <p>getScanType.</p>
+     *
+     * @return a {@link com.compomics.thermo_msf_parser_API.enums.ScanType} object.
+     */
     public ScanType getScanType() {
         return ScanType.values()[iScanType];
     }
 
+    /**
+     * <p>getIonization.</p>
+     *
+     * @return a int.
+     */
     public int getIonization() {
         return iIonization;
     }
     
+    /**
+     * <p>getIonizationTypes.</p>
+     *
+     * @return a {@link com.compomics.thermo_msf_parser_API.enums.IonizationType} object.
+     */
     public IonizationType getIonizationTypes() {
         return IonizationType.values()[iIonization];
     }
 
+    /**
+     * <p>getMassAnalyzer.</p>
+     *
+     * @return a int.
+     */
     public int getMassAnalyzer() {
         return iMassAnalyzer;
     }
     
+    /**
+     * <p>getMassAnalyzerType.</p>
+     *
+     * @return a {@link com.compomics.thermo_msf_parser_API.enums.DetectorType} object.
+     */
     public DetectorType getMassAnalyzerType() {
         return DetectorType.values()[iMassAnalyzer];
     }
 
+    /**
+     * <p>getActivationType.</p>
+     *
+     * @return a int.
+     */
     public int getActivationType() {
         return iActivationType;
     }
     
+    /**
+     * <p>getActivationTypeSet.</p>
+     *
+     * @return a {@link java.util.EnumSet} object.
+     */
     public EnumSet<ActivationType> getActivationTypeSet() {
         return EnumUtils.processBitVector(ActivationType.class, (long)iActivationType);
     }

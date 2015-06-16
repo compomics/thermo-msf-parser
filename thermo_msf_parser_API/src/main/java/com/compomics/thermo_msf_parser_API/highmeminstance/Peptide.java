@@ -9,6 +9,9 @@ import java.util.List;
 
 /**
  * Created by IntelliJ IDEA. User: Niklaas Date: 18-Feb-2011 Time: 09:17:23
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class Peptide {
     // Class specific log4j logger for Thermo_msf_parserGUI instances.
@@ -137,7 +140,7 @@ public class Peptide {
      * @param iTotalIonsCount The total ion count
      * @param iMatchedIonsCount The matched ion count
      * @param iAnnotation The annotation
-     * @param iProcessingNodeNumber
+     * @param iProcessingNodeNumber a int.
      * @param iAminoAcids The amino acids found in the msf file
      */
     public Peptide(int iPeptideId, int iSpectrumId, int iConfidenceLevel, String iSequence, int iTotalIonsCount, int iMatchedIonsCount, String iAnnotation, int iProcessingNodeNumber, Map<Character, AminoAcid> iAminoAcids) {
@@ -408,6 +411,7 @@ public class Peptide {
      *
      * @param iScore double with the score
      * @param iScoreTypeid the score type id the added score
+     * @param iScoreTypeid the score type id the added score
      * @param lScoreTypes The different score types found in the msf file
      */
     public void setScore(double iScore, int iScoreTypeid, List<ScoreType> lScoreTypes) {
@@ -440,6 +444,8 @@ public class Peptide {
      *
      * @param lMod The modification
      * @param lModPos The modification position
+     * @param lModPos The modification position
+     * @param pRSSiteMod a {@link java.lang.Float} object.
      */
     public void addModification(Modification lMod, ModificationPosition lModPos, Float pRSSiteMod) {
         iPeptideModifications.add(lMod);
@@ -665,56 +671,111 @@ public class Peptide {
     }
 
     /**
-     * To string method
+     * {@inheritDoc}
      *
-     * @return String with the peptide sequence
+     * To string method
      */
     @Override
     public String toString() {
         return iSequence;
     }
 
+    /**
+     * <p>setMissedCleavage.</p>
+     *
+     * @param aMissedCleavage a int.
+     */
     public void setMissedCleavage(int aMissedCleavage) {
         this.iMissedCleavage = aMissedCleavage;
     }
 
+    /**
+     * <p>setUniquePeptideSequenceId.</p>
+     *
+     * @param aUniquePeptideSequenceId a int.
+     */
     public void setUniquePeptideSequenceId(int aUniquePeptideSequenceId) {
         this.iUniquePeptideSequenceId = aUniquePeptideSequenceId;
     }
 
+    /**
+     * <p>getMissedCleavage.</p>
+     *
+     * @return a int.
+     */
     public int getMissedCleavage() {
         return iMissedCleavage;
     }
 
+    /**
+     * <p>getUniquePeptideSequenceId.</p>
+     *
+     * @return a int.
+     */
     public int getUniquePeptideSequenceId() {
         return iUniquePeptideSequenceId;
     }
 
+    /**
+     * <p>addDecoyProtein.</p>
+     *
+     * @param aProtein a {@link com.compomics.thermo_msf_parser_API.highmeminstance.Protein} object.
+     */
     public void addDecoyProtein(Protein aProtein) {
         iPeptideProteins.add(aProtein);
         aProtein.addDecoyPeptide(this);
     }
 
+    /**
+     * <p>setAnnotation.</p>
+     *
+     * @param aAnnotation a {@link java.lang.String} object.
+     */
     public void setAnnotation(String aAnnotation) {
         this.iAnnotation = aAnnotation;
     }
 
+    /**
+     * <p>Setter for the field <code>phosphoRSScore</code>.</p>
+     *
+     * @param pRSScore a {@link java.lang.Float} object.
+     */
     public void setPhosphoRSScore(Float pRSScore) {
         this.phosphoRSScore = pRSScore;
     }
 
+    /**
+     * <p>Getter for the field <code>phosphoRSScore</code>.</p>
+     *
+     * @return a {@link java.lang.Float} object.
+     */
     public Float getPhosphoRSScore() {
         return phosphoRSScore;
     }
 
+    /**
+     * <p>Getter for the field <code>phoshpoRSSequenceProbability</code>.</p>
+     *
+     * @return a {@link java.lang.Float} object.
+     */
     public Float getPhoshpoRSSequenceProbability() {
         return phoshpoRSSequenceProbability;
     }
 
+    /**
+     * <p>Setter for the field <code>phoshpoRSSequenceProbability</code>.</p>
+     *
+     * @param phoshpoRSSequenceProbability a {@link java.lang.Float} object.
+     */
     public void setPhoshpoRSSequenceProbability(Float phoshpoRSSequenceProbability) {
         this.phoshpoRSSequenceProbability = phoshpoRSSequenceProbability;
     }
 
+    /**
+     * <p>getPhosphoRSSiteProbabilities.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     public List<Float> getPhosphoRSSiteProbabilities() {
         return iPhosphoRSSiteProbabilities;
     }

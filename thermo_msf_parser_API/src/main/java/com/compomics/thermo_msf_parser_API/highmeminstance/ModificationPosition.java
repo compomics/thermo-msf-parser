@@ -6,6 +6,9 @@ package com.compomics.thermo_msf_parser_API.highmeminstance;
  * Date: 18-Feb-2011
  * Time: 10:48:27
  * To change this template use File | Settings | File Templates.
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class ModificationPosition {
     /**
@@ -23,6 +26,7 @@ public class ModificationPosition {
 
     /**
      * The modificationposition constructor
+     *
      * @param iPosition The position
      * @param iIsNterm Boolean that indicates if it is a N term
      * @param iIsCterm Boolean that indicates if it is a C term
@@ -36,6 +40,7 @@ public class ModificationPosition {
 
     /**
      * Getter for the position
+     *
      * @return int with the position
      */
     public int getPosition() {
@@ -44,6 +49,7 @@ public class ModificationPosition {
 
     /**
      * Getter for a boolean that indicates if this is a N-terminal modification
+     *
      * @return boolean that indicates if this is a N-terminal modification
      */
     public boolean isNterm() {
@@ -52,6 +58,7 @@ public class ModificationPosition {
 
     /**
      * Getter for a boolean that indicates if this is a C-terminal modification
+     *
      * @return boolean that indicates if this is a C-terminal modification
      */
     public boolean isCterm() {

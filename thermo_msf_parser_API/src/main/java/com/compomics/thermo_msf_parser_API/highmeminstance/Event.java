@@ -16,6 +16,9 @@ import java.util.List;
 
 /**
  * This class represent an event
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class Event {
     /**
@@ -65,8 +68,9 @@ public class Event {
 
     /**
      * The constructor for the event
+     *
      * @param lRs A resultset from the sql lite msf file
-     * @throws SQLException Throws an exception when there is a problem with the sql library
+     * @throws java.sql.SQLException Throws an exception when there is a problem with the sql library
      */
     public Event(ResultSet lRs) throws SQLException {
         this.iEventId = lRs.getInt("EventID");
@@ -85,6 +89,7 @@ public class Event {
 
     /**
      * Getter for the event id
+     *
      * @return int with the event id
      */
     public int getEventId() {
@@ -93,6 +98,7 @@ public class Event {
 
     /**
      * Getter for the mass
+     *
      * @return double with the mass
      */
     public double getMass() {
@@ -101,6 +107,7 @@ public class Event {
 
     /**
      * Getter for the average mass
+     *
      * @return double with the average
      */
     public double getAverageMass() {
@@ -109,6 +116,7 @@ public class Event {
 
     /**
      * Getter for the area
+     *
      * @return double with the area
      */
     public double getArea() {
@@ -117,6 +125,7 @@ public class Event {
 
     /**
      * Getter for the intensity
+     *
      * @return double with the intensity
      */
     public double getIntensity() {
@@ -125,6 +134,7 @@ public class Event {
 
     /**
      * Getter for the peak width
+     *
      * @return double with the peak width
      */
     public double getPeakWidth() {
@@ -133,6 +143,7 @@ public class Event {
 
     /**
      * Getter for the retention time
+     *
      * @return double with the retention time
      */
     public double getRetentionTime() {
@@ -141,6 +152,7 @@ public class Event {
 
     /**
      * Getter for the left retention time
+     *
      * @return double with the left retention time
      */
     public double getLeftRetentionTime() {
@@ -149,6 +161,7 @@ public class Event {
 
     /**
      * Getter for the right retention time
+     *
      * @return double with the right retention time
      */
     public double getRightRetentionTime() {
@@ -157,6 +170,7 @@ public class Event {
 
     /**
      * Getter for the SN
+     *
      * @return double with the sn
      */
     public double getSN() {
@@ -165,6 +179,7 @@ public class Event {
 
     /**
      * Getter for the file id
+     *
      * @return int with the file id
      */
     public int getFileId() {
@@ -173,17 +188,18 @@ public class Event {
 
     /**
      * This method gives events by the given event ids
+     *
      * @param lIds The ids of the wanted events
      * @param lConn The connection to the msf file
-     * @return List<Event> The events
-     * @throws SQLException An exception is thrown when there is a problem with the connection to the msf file
+     * @return List The events
+     * @throws java.sql.SQLException An exception is thrown when there is a problem with the connection to the msf file
      */
     public static List<Event> getEventByIds(List<Integer> lIds, Connection lConn) throws SQLException {
         List<Event> lEvents = new ArrayList<Event>(); 
 
         String lIdsString =  "";
-        for(int i = 0; i<lIds.size(); i ++){
-            lIdsString = new StringBuilder().append(lIdsString).append(lIds.get(i)).append(",").toString();
+        for (Integer lId : lIds) {
+            lIdsString = lIdsString + lId + ",";
         }
         if(lIds.size() > 0){
 
@@ -193,7 +209,7 @@ public class Event {
             ResultSet rs;
 
             //get all the events
-            rs = stat.executeQuery(new StringBuilder().append("select * from Events where EventID in (").append(lIdsString).append(")").toString());
+            rs = stat.executeQuery("select * from Events where EventID in (" + lIdsString + ")");
 
             while(rs.next()){
                 lEvents.add(new Event(rs));
@@ -206,12 +222,13 @@ public class Event {
 
     /**
      * This method gives the events by a range of the retention time
+     *
      * @param lLowerRT The lower retention time
      * @param lUpperRT The upper retention time
      * @param lFileId The file id
      * @param lConn The connection to the msf file
-     * @return List<Event> The events
-     * @throws SQLException An exception is thrown when there is a problem with the connection to the msf file
+     * @return List The events
+     * @throws java.sql.SQLException An exception is thrown when there is a problem with the connection to the msf file
      */
     public static List<Event> getEventByRetentionTimeLimitAndFileId(double lLowerRT, double lUpperRT, int lFileId, Connection lConn) throws SQLException {
         List<Event> lEvents = new ArrayList<Event>();
@@ -231,14 +248,15 @@ public class Event {
 
     /**
      * This method gives the events by a range of the retention time and mass
+     *
      * @param lLowerRT The lower retention time
      * @param lUpperRT The upper retention time
      * @param lLowerMass The lower mass
      * @param lUpperMass The upper mass
      * @param lFileId The file id
      * @param lConn The connection to the msf file
-     * @return List<Event> The events
-     * @throws SQLException An exception is thrown when there is a problem with the connection to the msf file
+     * @return List The events
+     * @throws java.sql.SQLException An exception is thrown when there is a problem with the connection to the msf file
      */
     public static List<Event> getEventByRetentionTimeLimitMassLimitAndFileId(double lLowerRT, double lUpperRT, double lLowerMass, double lUpperMass, int lFileId, Connection lConn) throws SQLException {
         List<Event> lEvents = new ArrayList<Event>();
@@ -258,6 +276,7 @@ public class Event {
 
     /**
      * This method gives the events by a range of the retention time and mass and excluding some events by id
+     *
      * @param lLowerRT The lower retention time
      * @param lUpperRT The upper retention time
      * @param lLowerMass The lower mass
@@ -265,16 +284,16 @@ public class Event {
      * @param lIds A vector with the excluded ids (Integer)
      * @param lFileId The file id
      * @param lConn The connection to the msf file
-     * @return List<Event> The events
-     * @throws SQLException An exception is thrown when there is a problem with the connection to the msf file
+     * @return List The events
+     * @throws java.sql.SQLException An exception is thrown when there is a problem with the connection to the msf file
      */
     public static List<Event> getEventByRetentionTimeLimitMassLimitAndFileIdExcludingIds(double lLowerRT, double lUpperRT, double lLowerMass, double lUpperMass, List<Integer> lIds, int lFileId, Connection lConn) throws SQLException {
         List<Event> lEvents = new ArrayList<Event>();
         String lIdsString =  "";
-        for(int i = 0; i<lIds.size(); i ++){
-            lIdsString = new StringBuilder().append(lIdsString).append(lIds.get(i)).append(",").toString();
+        for (Integer lId : lIds) {
+            lIdsString = new StringBuilder().append(lIdsString).append(lId).append(",").toString();
         }
-        if(lIdsString.indexOf(",") >= 0){
+        if(lIdsString.contains(",")){
             lIdsString = lIdsString.substring(0, lIdsString.lastIndexOf(","));
         }
 
@@ -282,7 +301,7 @@ public class Event {
         ResultSet rs;
 
         //get all the events
-        rs = stat.executeQuery(new StringBuilder().append("select * from Events where RT > ").append(lLowerRT).append(" and RT < ").append(lUpperRT).append(" and Mass > ").append(lLowerMass).append(" and Mass < ").append(lUpperMass).append(" and EventID not in (").append(lIdsString).append(")and FileID = ").append(lFileId).toString());
+        rs = stat.executeQuery("select * from Events where RT > " + lLowerRT + " and RT < " + lUpperRT + " and Mass > " + lLowerMass + " and Mass < " + lUpperMass + " and EventID not in (" + lIdsString + ")and FileID = " + lFileId);
 
         while(rs.next()){
             lEvents.add(new Event(rs));

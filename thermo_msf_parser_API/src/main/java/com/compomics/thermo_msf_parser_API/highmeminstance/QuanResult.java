@@ -9,6 +9,9 @@ import java.util.List;
  * Date: 21-Feb-2011
  * Time: 11:45:06
  * To change this template use File | Settings | File Templates.
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class QuanResult {
     /**
@@ -83,6 +86,7 @@ public class QuanResult {
 
     /**
      * The quan result constructor
+     *
      * @param iQuanResultId The quan result id
      */
     public QuanResult(int iQuanResultId) {
@@ -93,68 +97,144 @@ public class QuanResult {
 
     //getters
 
+    /**
+     * <p>getQuanResultId.</p>
+     *
+     * @return a int.
+     */
     public int getQuanResultId() {
         return iQuanResultId;
     }
 
+    /**
+     * <p>getQuanChannelIds.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     public List<Integer> getQuanChannelIds() {
         return iQuanChannelIds;
     }
 
+    /**
+     * <p>getMasses.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     public List<Double> getMasses() {
         return iMasses;
     }
 
+    /**
+     * <p>getCharges.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     public List<Integer> getCharges() {
         return iCharges;
     }
 
+    /**
+     * <p>getIntensities.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     public List<Double> getIntensities() {
         return iIntensities;
     }
 
+    /**
+     * <p>getRetentionTimes.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     public List<Double> getRetentionTimes() {
         return iRetentionTimes;
     }
 
+    /**
+     * <p>getIsotopePatterns.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     public List<IsotopePattern> getIsotopePatterns() {
         return iIsotopePatterns;
     }
 
+    /**
+     * <p>getHeight.</p>
+     *
+     * @return a double.
+     */
     public double getHeight() {
         return iHeight;
     }
 
+    /**
+     * <p>getArea.</p>
+     *
+     * @return a double.
+     */
     public double getArea() {
         return iArea;
     }
 
+    /**
+     * <p>getStartTime.</p>
+     *
+     * @return a double.
+     */
     public double getStartTime() {
         return iStartTime;
     }
 
+    /**
+     * <p>getEndTime.</p>
+     *
+     * @return a double.
+     */
     public double getEndTime() {
         return iEndTime;
     }
 
+    /**
+     * <p>getStartPeakTime.</p>
+     *
+     * @return a double.
+     */
     public double getStartPeakTime() {
         return iStartPeakTime;
     }
 
+    /**
+     * <p>getStartPeakIntensity.</p>
+     *
+     * @return a double.
+     */
     public double getStartPeakIntensity() {
         return iStartPeakIntensity;
     }
 
+    /**
+     * <p>getEndPeakTime.</p>
+     *
+     * @return a double.
+     */
     public double getEndPeakTime() {
         return iEndPeakTime;
     }
 
+    /**
+     * <p>getEndPeakIntensity.</p>
+     *
+     * @return a double.
+     */
     public double getEndPeakIntensity() {
         return iEndPeakIntensity;
     }
 
     /**
      * This method will calculate a ratio (double) based on the given ratio type
+     *
      * @param lType The ratio type
      * @return double with the ratio
      */
@@ -178,6 +258,7 @@ public class QuanResult {
 
     /**
      * This method will give a numerator based on the given ratio type
+     *
      * @param lType The ratio type
      * @return double with the numerator
      */
@@ -197,6 +278,7 @@ public class QuanResult {
 
     /**
      * This method will give a denominator based on the given ratio type
+     *
      * @param lType The ratio type
      * @return double with the denominator
      */
@@ -216,34 +298,74 @@ public class QuanResult {
 
     //setters
 
+    /**
+     * <p>setHeight.</p>
+     *
+     * @param iHeight a double.
+     */
     public void setHeight(double iHeight) {
         this.iHeight = iHeight;
     }
 
+    /**
+     * <p>setArea.</p>
+     *
+     * @param iArea a double.
+     */
     public void setArea(double iArea) {
         this.iArea = iArea;
     }
 
+    /**
+     * <p>setStartTime.</p>
+     *
+     * @param iStartTime a double.
+     */
     public void setStartTime(double iStartTime) {
         this.iStartTime = iStartTime;
     }
 
+    /**
+     * <p>setEndTime.</p>
+     *
+     * @param iEndTime a double.
+     */
     public void setEndTime(double iEndTime) {
         this.iEndTime = iEndTime;
     }
 
+    /**
+     * <p>setStartPeakTime.</p>
+     *
+     * @param iStartPeakTime a double.
+     */
     public void setStartPeakTime(double iStartPeakTime) {
         this.iStartPeakTime = iStartPeakTime;
     }
 
+    /**
+     * <p>setStartPeakIntensity.</p>
+     *
+     * @param iStartPeakIntensity a double.
+     */
     public void setStartPeakIntensity(double iStartPeakIntensity) {
         this.iStartPeakIntensity = iStartPeakIntensity;
     }
 
+    /**
+     * <p>setEndPeakTime.</p>
+     *
+     * @param iEndPeakTime a double.
+     */
     public void setEndPeakTime(double iEndPeakTime) {
         this.iEndPeakTime = iEndPeakTime;
     }
 
+    /**
+     * <p>setEndPeakIntensity.</p>
+     *
+     * @param iEndPeakIntensity a double.
+     */
     public void setEndPeakIntensity(double iEndPeakIntensity) {
         this.iEndPeakIntensity = iEndPeakIntensity;
     }
@@ -251,6 +373,7 @@ public class QuanResult {
 
     /**
      * This method will add an isotope pattern to this quan result
+     *
      * @param lIso The isotope pattern to add
      */
     public void addIsotopePattern(IsotopePattern lIso){
@@ -259,6 +382,7 @@ public class QuanResult {
 
     /**
      * This method will add some quan values
+     *
      * @param iQuanChannelId The quan channel id
      * @param iMass The mass
      * @param iCharge The charge
@@ -273,18 +397,38 @@ public class QuanResult {
         this.iRetentionTimes.add(iRetentionTime);
     }
 
+    /**
+     * <p>addSpectrumId.</p>
+     *
+     * @param anInt a int.
+     */
     public void addSpectrumId(int anInt) {
         this.iSpectrumIds.add(anInt);
     }
 
+    /**
+     * <p>addProcessingNodeNumber.</p>
+     *
+     * @param anInt a int.
+     */
     public void addProcessingNodeNumber(int anInt) {
         this.iProcessingNodeNumbers.add(anInt);
     }
 
+    /**
+     * <p>getSpectrumIds.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     public List<Integer> getSpectrumIds() {
         return iSpectrumIds;
     }
 
+    /**
+     * <p>getProcessingNodeNumbers.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     public List<Integer> getProcessingNodeNumbers() {
         return iProcessingNodeNumbers;
     }

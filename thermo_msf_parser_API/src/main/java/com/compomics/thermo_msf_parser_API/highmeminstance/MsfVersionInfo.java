@@ -5,6 +5,9 @@ package com.compomics.thermo_msf_parser_API.highmeminstance;
  * User: Niklaas
  * Date: 21-Feb-2011
  * Time: 09:18:47
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class MsfVersionInfo {
     /**
@@ -18,6 +21,7 @@ public class MsfVersionInfo {
 
     /**
      * The MsfVersionInfo constructor
+     *
      * @param iSchemaVersion The schema version
      * @param iSoftwareVersion The software version
      */
@@ -29,6 +33,7 @@ public class MsfVersionInfo {
 
     /**
      * Getter for the schema version
+     *
      * @return int with the schema version
      */
     public int getSchemaVersion() {
@@ -37,6 +42,7 @@ public class MsfVersionInfo {
 
     /**
      * Getter for the software version
+     *
      * @return String with software version
      */
     public String getSoftwareVersion() {

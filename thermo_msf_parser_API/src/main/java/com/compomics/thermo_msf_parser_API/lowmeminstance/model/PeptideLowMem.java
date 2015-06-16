@@ -16,6 +16,9 @@ import java.util.List;
 /**
  * Created by IntelliJ IDEA. User: Davy Date: 4/24/12 Time: 9:37 AM To change
  * this template use File | Settings | File Templates.
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class PeptideLowMem {
 
@@ -167,6 +170,12 @@ public class PeptideLowMem {
      * @param rs
      */
 
+    /**
+     * <p>Constructor for PeptideLowMem.</p>
+     *
+     * @param rs a {@link java.sql.ResultSet} object.
+     * @param iAminoAcids a {@link java.util.List} object.
+     */
     public PeptideLowMem(ResultSet rs, List<AminoAcid> iAminoAcids) {
         try {
             this.iPeptideId = rs.getInt("PeptideID");
@@ -416,6 +425,7 @@ public class PeptideLowMem {
      *
      * @param iScore double with the score
      * @param iScoreTypeid the score type id the added score
+     * @param iScoreTypeid the score type id the added score
      * @param lScoreTypes The different score types found in the msf file
      */
     public void setScore(double iScore, int iScoreTypeid, List<ScoreTypeLowMem> lScoreTypes) {
@@ -444,9 +454,10 @@ public class PeptideLowMem {
     }
 
     /**
-     * This method will add an amino acid modification and the chance it is a phospho site to this peptide 
+     * This method will add an amino acid modification and the chance it is a phospho site to this peptide
      *
      * @param lMod The modification
+     * @param lModPos The modification position
      * @param lModPos The modification position
      * @param pRSSiteMod chance that the modification is a phospho site
      */
@@ -461,8 +472,9 @@ public class PeptideLowMem {
 
     /**
      * adds an amino acid modification to the peptide
-     * 
+     *
      * @param lMod the modification to add
+     * @param lModPos the location of the modification on the peptide
      * @param lModPos the location of the modification on the peptide
      */
     public void addModification(Modification lMod, ModificationPosition lModPos) {
@@ -685,9 +697,9 @@ public class PeptideLowMem {
     }
 
     /**
-     * To string method
+     * {@inheritDoc}
      *
-     * @return String with the peptide sequence
+     * To string method
      */
     @Override
     public String toString() {
@@ -695,40 +707,45 @@ public class PeptideLowMem {
     }
 
     /**
+     * <p>setMissedCleavage.</p>
      *
-     * @param aMissedCleavage
+     * @param aMissedCleavage a int.
      */
     public void setMissedCleavage(int aMissedCleavage) {
         this.iMissedCleavage = aMissedCleavage;
     }
 
     /**
+     * <p>setUniquePeptideSequenceId.</p>
      *
-     * @param aUniquePeptideSequenceId
+     * @param aUniquePeptideSequenceId a int.
      */
     public void setUniquePeptideSequenceId(int aUniquePeptideSequenceId) {
         this.iUniquePeptideSequenceId = aUniquePeptideSequenceId;
     }
 
     /**
+     * <p>getMissedCleavage.</p>
      *
-     * @return
+     * @return a int.
      */
     public int getMissedCleavage() {
         return iMissedCleavage;
     }
 
     /**
+     * <p>getUniquePeptideSequenceId.</p>
      *
-     * @return
+     * @return a int.
      */
     public int getUniquePeptideSequenceId() {
         return iUniquePeptideSequenceId;
     }
 
     /**
+     * <p>addDecoyProtein.</p>
      *
-     * @param aProtein
+     * @param aProtein a {@link com.compomics.thermo_msf_parser_API.lowmeminstance.model.ProteinLowMem} object.
      */
     public void addDecoyProtein(ProteinLowMem aProtein) {
         iPeptideProteins.add(aProtein);
@@ -736,57 +753,64 @@ public class PeptideLowMem {
     }
 
     /**
+     * <p>setAnnotation.</p>
      *
-     * @param aAnnotation
+     * @param aAnnotation a {@link java.lang.String} object.
      */
     public void setAnnotation(String aAnnotation) {
         this.iAnnotation = aAnnotation;
     }
 
     /**
+     * <p>Setter for the field <code>phosphoRSScore</code>.</p>
      *
-     * @param pRSScore
+     * @param pRSScore a {@link java.lang.Float} object.
      */
     public void setPhosphoRSScore(Float pRSScore) {
         this.phosphoRSScore = pRSScore;
     }
 
     /**
+     * <p>Getter for the field <code>phosphoRSScore</code>.</p>
      *
-     * @return
+     * @return a {@link java.lang.Float} object.
      */
     public Float getPhosphoRSScore() {
         return phosphoRSScore;
     }
 
     /**
+     * <p>Getter for the field <code>phoshpoRSSequenceProbability</code>.</p>
      *
-     * @return
+     * @return a {@link java.lang.Float} object.
      */
     public Float getPhoshpoRSSequenceProbability() {
         return phoshpoRSSequenceProbability;
     }
 
     /**
+     * <p>Setter for the field <code>phoshpoRSSequenceProbability</code>.</p>
      *
-     * @param phoshpoRSSequenceProbability
+     * @param phoshpoRSSequenceProbability a {@link java.lang.Float} object.
      */
     public void setPhoshpoRSSequenceProbability(Float phoshpoRSSequenceProbability) {
         this.phoshpoRSSequenceProbability = phoshpoRSSequenceProbability;
     }
 
     /**
+     * <p>getPhosphoRSSiteProbabilities.</p>
      *
-     * @return
+     * @return a {@link java.util.List} object.
      */
     public List<Float> getPhosphoRSSiteProbabilities() {
         return iPhosphoRSSiteProbabilities;
     }
 
     /**
+     * <p>getPeptideMassForCharge.</p>
      *
-     * @param lCharge
-     * @return
+     * @param lCharge a int.
+     * @return a double.
      */
     public double getPeptideMassForCharge(int lCharge) {
         double lCalculatedMass = 0.0;
@@ -806,6 +830,8 @@ public class PeptideLowMem {
     }
 
     /**
+     * <p>Getter for the field <code>counter</code>.</p>
+     *
      * @return the counter
      */
     public int getCounter() {
@@ -813,16 +839,24 @@ public class PeptideLowMem {
     }
 
     /**
+     * <p>Setter for the field <code>counter</code>.</p>
+     *
      * @param counter the counter to set
      */
     public void setCounter(int counter) {
         this.counter = counter;
     }
 
+    /**
+     * <p>setSequence.</p>
+     *
+     * @param iSequence a {@link java.lang.String} object.
+     */
     public void setSequence(String iSequence) {
         this.iSequence = iSequence;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean equals(Object peptideLowMemToCompare) {
         boolean equals = false;
@@ -832,6 +866,7 @@ public class PeptideLowMem {
         return equals;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         int hash = 7;

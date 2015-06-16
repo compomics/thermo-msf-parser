@@ -18,12 +18,16 @@ import java.util.zip.ZipInputStream;
 /**
  * Created by IntelliJ IDEA. User: Davy Date: 10/1/12 Time: 11:08 AM To change
  * this template use File | Settings | File Templates.
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class SpectrumLowMemController implements SpectrumInterface {
 
     private static final Logger logger = Logger.getLogger(SpectrumLowMemController.class);
 
     /**
+     * <p>createSpectrumXMLForPeptide.</p>
      *
      * @param peptide the {@code PeptideLowMem} peptide to fetch the spectrum
      * XML file
@@ -76,13 +80,7 @@ public class SpectrumLowMemController implements SpectrumInterface {
 
     }
 
-    /**
-     *
-     * @param lXml the spectrum xml to return the msms peaks from
-     * @return a vector containing all the MSMS peak objects retrieved from the
-     * xml
-     * @throws Exception
-     */
+    /** {@inheritDoc} */
     @Override
     public List<Peak> getMSMSPeaks(String lXml) {
         List<Peak> lPeaks = new ArrayList<Peak>();
@@ -97,12 +95,9 @@ public class SpectrumLowMemController implements SpectrumInterface {
     }
 
     /**
-     * gets the MS peaks from a spectrum XML file
+     * {@inheritDoc}
      *
-     * @param lXml the spectrum xml we want the MS peak from
-     * @return a vector containing all the MS peak objects retrieved from the
-     * xml
-     * @throws Exception
+     * gets the MS peaks from a spectrum XML file
      */
     @Override
     public List<Peak> getMSPeaks(String lXml) {
@@ -118,10 +113,9 @@ public class SpectrumLowMemController implements SpectrumInterface {
     }
 
     /**
-     * gets the fragmented MS peaks from a spectrum XML file
+     * {@inheritDoc}
      *
-     * @param lXml the spectrum xml we want the fragmented peak from
-     * @return a peak object containing the fragmented MS peak
+     * gets the fragmented MS peaks from a spectrum XML file
      */
     @Override
     public Peak getFragmentedMsPeak(String lXml) {
@@ -307,6 +301,7 @@ public class SpectrumLowMemController implements SpectrumInterface {
         return returnSpectrum;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getSpectrumTitle(String rawFileName, SpectrumLowMem lspectrum) {
         String spectrumTitle = rawFileName.substring(0, rawFileName.toLowerCase().lastIndexOf("."));
@@ -315,6 +310,7 @@ public class SpectrumLowMemController implements SpectrumInterface {
 
     //TODO redo this part properly
 
+    /** {@inheritDoc} */
     @Override
     public void createSpectrumXMLForSpectrum(SpectrumLowMem lSpectrum, MsfFile msfFile) throws IOException {
         //TODO make own spectrumfile object to return to avoid constantly going through this
@@ -375,6 +371,7 @@ public class SpectrumLowMemController implements SpectrumInterface {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean unzipXMLforSpectrum(SpectrumLowMem spectrum) {
         boolean returnvalue = false;

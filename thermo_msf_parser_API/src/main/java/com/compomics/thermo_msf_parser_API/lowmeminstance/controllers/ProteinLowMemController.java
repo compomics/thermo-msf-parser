@@ -13,6 +13,9 @@ import java.util.*;
 /**
  * Created by IntelliJ IDEA. User: Davy Date: 10/1/12 Time: 10:36 AM To change
  * this template use File | Settings | File Templates.
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class ProteinLowMemController extends Observable implements ProteinControllerInterface {
 
@@ -20,12 +23,7 @@ public class ProteinLowMemController extends Observable implements ProteinContro
     private int proteinCounter;
     private int internalcounter = 0;
 
-    /**
-     *
-     * @param msfFile the msf File to fetch from
-     * @return an {@code Iterator} containing all the {@code ProteinLowMem}
-     * representations of all the proteins from the msf file
-     */
+    /** {@inheritDoc} */
     @Override
     public List<ProteinLowMem> getAllProteins(MsfFile msfFile) {
         proteinCounter = 0;
@@ -66,6 +64,7 @@ public class ProteinLowMemController extends Observable implements ProteinContro
     }
 
     /**
+     * <p>getNumberOfProteinsWithAPeptideAtConfidenceLevel.</p>
      *
      * @param confidenceLevel the confidence level to fetch for
      * @param msfFile the msf file to look in
@@ -140,12 +139,7 @@ public class ProteinLowMemController extends Observable implements ProteinContro
         return protein;
     }
 
-    /**
-     *
-     * @param proteinAccession a protein accession
-     * @param msfFile the msf file to fetch from
-     * @return a {@code ProteinLowMem} representation of the protein
-     */
+    /** {@inheritDoc} */
     @Override
     public ProteinLowMem getProteinFromAccession(String proteinAccession, MsfFile msfFile) {
         int lProteinID = 0;
@@ -182,12 +176,7 @@ public class ProteinLowMemController extends Observable implements ProteinContro
         return new ProteinLowMem(proteinAccession, lProteinID, sequence);
     }
 
-    /**
-     *
-     * @param proteinID a protein id in the db
-     * @param msfFile the msfFile to fetch from
-     * @return a {@code String} containing the accession of the protein
-     */
+    /** {@inheritDoc} */
     @Override
     //TODO, perhaps look at this code, if this cannot be made simpler by using Header or utilprotein for all cases
     public String getAccessionFromProteinID(int proteinID, MsfFile msfFile) {
@@ -280,6 +269,7 @@ public class ProteinLowMemController extends Observable implements ProteinContro
     }
 
     /**
+     * <p>getAllProteinAccessions.</p>
      *
      * @param msfFile the file to get from
      * @return a {@code Map} with key: the {@code String} accession value: a
@@ -417,12 +407,7 @@ public class ProteinLowMemController extends Observable implements ProteinContro
         return changedAccessions;
     }
 
-    /**
-     *
-     * @param proteinID the ID of the protein in the SQLite DB
-     * @param msfFile the file to check in
-     * @return the sequence for the protein id
-     */
+    /** {@inheritDoc} */
     @Override
     public String getSequenceForProteinID(int proteinID, MsfFile msfFile) {
         String lSequence = "";
@@ -450,12 +435,9 @@ public class ProteinLowMemController extends Observable implements ProteinContro
     }
 
     /**
-     * get all the proteins associated with a peptide
+     * {@inheritDoc}
      *
-     * @param peptideID peptideID stored in the SQLite DB
-     * @param msfFile the file to get from
-     * @return a {@code List} containing all the {@code ProteinLowMem}
-     * representations of the proteins connected to the peptide
+     * get all the proteins associated with a peptide
      */
     @Override
     public List<ProteinLowMem> getProteinsForPeptide(int peptideID, MsfFile msfFile) {
@@ -610,6 +592,7 @@ public class ProteinLowMemController extends Observable implements ProteinContro
     }
 
     /**
+     * <p>getNumberOfProteinsProcessed.</p>
      *
      * @return getter for the observers to know how many proteins are processed
      */

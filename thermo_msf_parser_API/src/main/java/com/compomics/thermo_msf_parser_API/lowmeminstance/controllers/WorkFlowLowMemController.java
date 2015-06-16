@@ -10,8 +10,10 @@ import java.sql.SQLException;
 import org.apache.log4j.Logger;
 
 /**
+ * <p>WorkFlowLowMemController class.</p>
  *
  * @author Davy
+ * @version $Id: $Id
  */
 public class WorkFlowLowMemController {
 

@@ -14,6 +14,9 @@ import java.util.List;
 
 /**
  * This class represents the isotope pattern with event annotations attached to it
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class IsotopePattern {
     /**
@@ -27,6 +30,7 @@ public class IsotopePattern {
 
     /**
      * The isotope pattern constructor
+     *
      * @param iIsotopePatternId The isotope pattern id
      */
     public IsotopePattern(int iIsotopePatternId) {
@@ -36,6 +40,7 @@ public class IsotopePattern {
 
     /**
      * Getter for the isotope pattern id
+     *
      * @return int with the isotope pattern id
      */
     public int getIsotopePatternId() {
@@ -44,6 +49,7 @@ public class IsotopePattern {
 
     /**
      * Getter for the attached event annotations
+     *
      * @return List with the attached event annotations
      */
     public List<EventAnnotation> getEventAnnotations() {
@@ -53,6 +59,7 @@ public class IsotopePattern {
     /**
      * Getter for the shared quan channel id
      * This will look into the event annotations and will find the channel id
+     *
      * @return int with the channel id
      */
     public int getSharedQuanChannelId(){
@@ -69,6 +76,7 @@ public class IsotopePattern {
     /**
      * Getter for the shared quan event id
      * This will look into the event annotations and will find the quan event id
+     *
      * @return int with the channel id
      */
     public int getSharedQuanResultId(){
@@ -84,9 +92,10 @@ public class IsotopePattern {
 
     /**
      * Getter for the events linked to the event annotations
+     *
      * @param lConn A connection to the msf file
      * @return List with the events linked to the attached
-     * @throws SQLException An exception is thrown whenever there is a problem with the connection to the msf file
+     * @throws java.sql.SQLException An exception is thrown whenever there is a problem with the connection to the msf file
      */
     public List<Event> getEvents(Connection lConn) throws SQLException {
         List<Integer> lIds = new ArrayList<Integer>();
@@ -98,9 +107,10 @@ public class IsotopePattern {
 
     /**
      * Getter for the events with a quan result linked to the event annotations
+     *
      * @param lConn A connection to the msf file
      * @return List with the events linked to the attached
-     * @throws SQLException An exception is thrown whenever there is a problem with the connection to the msf file
+     * @throws java.sql.SQLException An exception is thrown whenever there is a problem with the connection to the msf file
      */
     public List<Event> getEventsWithQuanResult(Connection lConn) throws SQLException {
         List<Integer> lIds = new ArrayList<Integer>();
@@ -114,9 +124,10 @@ public class IsotopePattern {
 
     /**
      * Getter for the events without a quan result linked to the event annotations
+     *
      * @param lConn A connection to the msf file
      * @return List with the events linked to the attached
-     * @throws SQLException An exception is thrown whenever there is a problem with the connection to the msf file
+     * @throws java.sql.SQLException An exception is thrown whenever there is a problem with the connection to the msf file
      */
     public List<Event> getEventsWithoutQuanResult(Connection lConn) throws SQLException {
         List<Integer> lIds = new ArrayList<Integer>();
@@ -131,6 +142,7 @@ public class IsotopePattern {
 
     /**
      * This method will add an event annotation to this class
+     *
      * @param lEventAnno An event annotation
      */
     public void addEventAnnotation(EventAnnotation lEventAnno){

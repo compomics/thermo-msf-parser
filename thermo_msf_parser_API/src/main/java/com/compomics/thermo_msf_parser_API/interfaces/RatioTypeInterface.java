@@ -11,15 +11,17 @@ import java.util.List;
  * Date: 4/23/12
  * Time: 3:23 PM
  * To change this template use File | Settings | File Templates.
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public interface RatioTypeInterface {
 
     /**
-     *
-     @param msfFile the proteome discoverer file to retrieve from
+     * <p>parseRatioTypes.</p>
+     * @param msfFile the proteome discoverer file to retrieve from
      * @return vector containing the ratio types
      */
-
     public List<RatioTypeLowMem> parseRatioTypes(MsfFile msfFile);
 
 }

@@ -9,6 +9,9 @@ import java.util.List;
  * Date: 18-Feb-2011
  * Time: 09:26:18
  * To change this template use File | Settings | File Templates.
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class Modification {
 
@@ -81,6 +84,7 @@ public class Modification {
 
     /**
      * The Modification constructor
+     *
      * @param iAminoAcidModificationId The modificationid
      * @param iModificationName The modification name
      * @param iDeltaMass The delta mass
@@ -110,74 +114,159 @@ public class Modification {
     }
 
 
+    /**
+     * <p>addAminoAcid.</p>
+     *
+     * @param lAa a {@link com.compomics.thermo_msf_parser_API.highmeminstance.AminoAcid} object.
+     */
     public void addAminoAcid(AminoAcid lAa){
         this.iAttachedAminoAcids.add(lAa);
     }
 
+    /**
+     * <p>addNeutralLoss.</p>
+     *
+     * @param aNeutralLoss a {@link com.compomics.thermo_msf_parser_API.highmeminstance.NeutralLoss} object.
+     */
     public void addNeutralLoss(NeutralLoss aNeutralLoss){
         this.iAttachedNeutralLosses.add(aNeutralLoss);
     }
     
     //getters
 
+    /**
+     * <p>getAminoAcidModificationId.</p>
+     *
+     * @return a int.
+     */
     public int getAminoAcidModificationId() {
         return iAminoAcidModificationId;
     }
 
+    /**
+     * <p>getModificationName.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getModificationName() {
         return iModificationName;
     }
 
+    /**
+     * <p>getDeltaMass.</p>
+     *
+     * @return a double.
+     */
     public double getDeltaMass() {
         return iDeltaMass;
     }
 
+    /**
+     * <p>getSubstitution.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getSubstitution() {
         return iSubstitution;
     }
 
+    /**
+     * <p>getLeavingGroup.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getLeavingGroup() {
         return iLeavingGroup;
     }
 
+    /**
+     * <p>getAbbreviation.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getAbbreviation() {
         return iAbbreviation;
     }
 
+    /**
+     * <p>getPositionType.</p>
+     *
+     * @return a int.
+     */
     public int getPositionType() {
         return iPositionType;
     }
 
+    /**
+     * <p>getIsActive.</p>
+     *
+     * @return a int.
+     */
     public int getIsActive() {
         return iIsActive;
     }
 
+    /**
+     * <p>getDeltaAverageMass.</p>
+     *
+     * @return a double.
+     */
     public double getDeltaAverageMass() {
         return iDeltaAverageMass;
     }
 
+    /**
+     * <p>getUnimodAccession.</p>
+     *
+     * @return a int.
+     */
     public int getUnimodAccession() {
         return iUnimodAccession;
     }
 
+    /**
+     * <p>getIsSubstitution.</p>
+     *
+     * @return a int.
+     */
     public int getIsSubstitution() {
         return iIsSubstitution;
     }
 
+    /**
+     * <p>getAttachedAminoAcids.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     public List<AminoAcid> getAttachedAminoAcids() {
         return iAttachedAminoAcids;
     }
 
+    /**
+     * <p>getSelectedAminoAcids.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     public List<AminoAcid> getSelectedAminoAcids() {
         return iSelectedAminoAcids;
     }
     
     
 
+    /**
+     * <p>addClassificationForAminoAcid.</p>
+     *
+     * @param aClassification a int.
+     */
     public void addClassificationForAminoAcid(int aClassification) {
         this.iAttachedClassifications.add(aClassification);
     }
 
+    /**
+     * <p>isFixedModification.</p>
+     *
+     * @return a boolean.
+     */
     public boolean isFixedModification() {
         return fixedModification;
     }

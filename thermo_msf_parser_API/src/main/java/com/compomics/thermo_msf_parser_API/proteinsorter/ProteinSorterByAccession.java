@@ -13,15 +13,24 @@ import java.util.Comparator;
  */
 
 /**
- * This will sort proteins alphabetically 
+ * This will sort proteins alphabetically
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class ProteinSorterByAccession implements Comparator<ProteinModel>, Serializable {
     private boolean iAtoZ;
 
+    /**
+     * <p>Constructor for ProteinSorterByAccession.</p>
+     *
+     * @param lAtoZ a boolean.
+     */
     public ProteinSorterByAccession(boolean lAtoZ){
         this.iAtoZ = lAtoZ;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int compare(ProteinModel o1, ProteinModel o2) {
         int comparator;

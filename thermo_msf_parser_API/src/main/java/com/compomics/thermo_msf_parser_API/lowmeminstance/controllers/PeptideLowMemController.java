@@ -18,6 +18,9 @@ import java.util.List;
 /**
  * Created by IntelliJ IDEA. User: Davy Date: 10/1/12 Time: 10:30 AM To change
  * this template use File | Settings | File Templates.
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class PeptideLowMemController extends Observable implements PeptideInterface {
 /**
@@ -28,17 +31,20 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
     private int counter = 0;
 
     //TODO: finish this only get peptides for a specific confidencelevel and implement this in such a way that getpeptideswithconfidencelevel can use this
+    /**
+     * <p>getPeptidesForProteinAtConfidenceLevel.</p>
+     *
+     * @param protein a {@link com.compomics.thermo_msf_parser_API.lowmeminstance.model.ProteinLowMem} object.
+     * @param msfFile a {@link com.compomics.thermo_msf_parser_API.lowmeminstance.model.MsfFile} object.
+     * @param confidenceLevel a int.
+     * @return a {@link java.util.List} object.
+     */
     public List<PeptideLowMem> getPeptidesForProteinAtConfidenceLevel(ProteinLowMem protein,MsfFile msfFile,int confidenceLevel){
         List<PeptideLowMem> foundPeptides = new ArrayList<PeptideLowMem>();
         throw new UnsupportedOperationException("not yet implemented");
     }
     
-    /**
-     *
-     * @param protein: a Protein object
-     * @param msfFile the proteome discoverer file to retrieve from
-     * @return a vector containing all the peptides connected to the protein
-     */
+    /** {@inheritDoc} */
     @Override
     public List<PeptideLowMem> getPeptidesForProtein(ProteinLowMem protein, MsfFile msfFile) {
         counter = 0;
@@ -100,6 +106,7 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
         return foundPeptides;
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<PeptideLowMem> getPeptidesForAccession(String lProteinAccession, MsfFile msfFile) {
         int lProteinID = 0;
@@ -131,6 +138,7 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
     }
 
     //TODO finish this
+    /** {@inheritDoc} */
     @Override
     public List getInformationForPeptide(int peptideID, MsfFile msfFile, boolean fullInfo) {
         List peptideInfo = new ArrayList();
@@ -164,6 +172,7 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
         return peptideInfo;
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<PeptideLowMem> getPeptidesWithConfidenceLevel(int confidenceLevel, MsfFile msfFile) {
         List<PeptideLowMem> confidenceLevelPeptides = new ArrayList<PeptideLowMem>();
@@ -230,6 +239,7 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
         return confidenceLevelPeptides;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int getNumberOfPeptidesForConfidenceLevel(int confidenceLevel, MsfFile msfFile) {
         int numberOfPeptides = 0;
@@ -259,10 +269,16 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
         return numberOfPeptides;
     }
 
+    /**
+     * <p>getNumberOfPeptidesProcessed.</p>
+     *
+     * @return a {@link java.lang.Integer} object.
+     */
     public Integer getNumberOfPeptidesProcessed() {
         return counter;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void getPeptidesForProteinList(List<ProteinLowMem> proteinLowMemList, MsfFile msfFile, int confidenceLevel) {
         try {
@@ -320,6 +336,7 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public int returnNumberOfPeptides(MsfFile msfFile) {
         int numberOfPeptides = 0;
@@ -348,6 +365,14 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
         return numberOfPeptides;
     }
 
+    /**
+     * <p>getPeptidesForProteinAndProcessingNode.</p>
+     *
+     * @param protein a {@link com.compomics.thermo_msf_parser_API.lowmeminstance.model.ProteinLowMem} object.
+     * @param msfFile a {@link com.compomics.thermo_msf_parser_API.lowmeminstance.model.MsfFile} object.
+     * @param processingNode a {@link com.compomics.thermo_msf_parser_API.highmeminstance.ProcessingNode} object.
+     * @return a {@link java.util.List} object.
+     */
     public List<PeptideLowMem> getPeptidesForProteinAndProcessingNode(ProteinLowMem protein, MsfFile msfFile, ProcessingNode processingNode) {
         processingNode.getProcessingNodeId();
         throw new UnsupportedOperationException("not yet implemented");

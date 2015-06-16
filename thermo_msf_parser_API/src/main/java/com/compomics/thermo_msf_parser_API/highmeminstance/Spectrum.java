@@ -13,6 +13,9 @@ import java.util.zip.ZipInputStream;
 
 /**
  * Created by IntelliJ IDEA. User: Niklaas Date: 18-Feb-2011 Time: 11:33:33
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class Spectrum implements Cloneable {
 
@@ -115,8 +118,10 @@ public class Spectrum implements Cloneable {
      * @param iLastScan The last scan
      * @param iFirstScan The first scan
      * @param iScan The scan
+     * @param iScanEventId The scan event id
      * @param iCharge The charge
      * @param iRetentionTime The retention time
+     * @param iMassPeakId The mass peak id
      * @param iMass The mass
      * @param iScanEventId The scan event id
      * @param iConnection The connection to the msf file
@@ -137,6 +142,7 @@ public class Spectrum implements Cloneable {
         this.iParser = iParser;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Spectrum clone() throws CloneNotSupportedException {
         //todo check if this works
@@ -144,75 +150,166 @@ public class Spectrum implements Cloneable {
     }
 
     //getters
+    /**
+     * <p>getSpectrumId.</p>
+     *
+     * @return a int.
+     */
     public int getSpectrumId() {
         return iSpectrumId;
     }
 
+    /**
+     * <p>getUniqueSpectrumId.</p>
+     *
+     * @return a int.
+     */
     public int getUniqueSpectrumId() {
         return iUniqueSpectrumId;
     }
 
+    /**
+     * <p>getMassPeakId.</p>
+     *
+     * @return a int.
+     */
     public int getMassPeakId() {
         return iMassPeakId;
     }
 
+    /**
+     * <p>getLastScan.</p>
+     *
+     * @return a int.
+     */
     public int getLastScan() {
         return iLastScan;
     }
 
+    /**
+     * <p>getFirstScan.</p>
+     *
+     * @return a int.
+     */
     public int getFirstScan() {
         return iFirstScan;
     }
 
+    /**
+     * <p>getScan.</p>
+     *
+     * @return a int.
+     */
     public int getScan() {
         return iScan;
     }
 
+    /**
+     * <p>getCharge.</p>
+     *
+     * @return a int.
+     */
     public int getCharge() {
         return iCharge;
     }
 
+    /**
+     * <p>getRetentionTime.</p>
+     *
+     * @return a double.
+     */
     public double getRetentionTime() {
         return iRetentionTime;
     }
 
+    /**
+     * <p>getSinglyChargedMass.</p>
+     *
+     * @return a double.
+     */
     public double getSinglyChargedMass() {
         return iSinglyChargedMass;
     }
 
+    /**
+     * <p>getMz.</p>
+     *
+     * @return a double.
+     */
     public double getMz() {
         return (iSinglyChargedMass + ((double) (iCharge - 1)) * 1.007825) / (double) iCharge;
     }
 
+    /**
+     * <p>getScanEventId.</p>
+     *
+     * @return a int.
+     */
     public int getScanEventId() {
         return iScanEventId;
     }
 
+    /**
+     * <p>getFileId.</p>
+     *
+     * @return a int.
+     */
     public int getFileId() {
         return iFileId;
     }
 
+    /**
+     * <p>getSpectrumScores.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     public List<Double> getSpectrumScores() {
         return iSpectrumScores;
     }
 
+    /**
+     * <p>getSpectrumScoresProcessingNodeNumber.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     public List<Integer> getSpectrumScoresProcessingNodeNumber() {
         return iSpectrumScoresProcessingNodeNumber;
     }
 
+    /**
+     * <p>getSpectrumPeptides.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     public List<Peptide> getSpectrumPeptides() {
         return iSpectrumPeptides;
     }
 
+    /**
+     * <p>getScanEvent.</p>
+     *
+     * @return a {@link com.compomics.thermo_msf_parser_API.highmeminstance.ScanEvent} object.
+     */
     public ScanEvent getScanEvent() {
         return iScanEvent;
     }
 
+    /**
+     * <p>getCustomDataFieldValues.</p>
+     *
+     * @return a {@link java.util.HashMap} object.
+     */
     public HashMap<Integer, String> getCustomDataFieldValues() {
 
         return iCustomDataFieldValues;
     }
 
+    /**
+     * <p>getZippedSpectrumXml.</p>
+     *
+     * @return an array of byte.
+     * @throws java.sql.SQLException if any.
+     */
     public byte[] getZippedSpectrumXml() throws SQLException {
         byte[] zippedSpectrumXML;
         if (iZippedSpectrumXml == null) {
@@ -232,10 +329,20 @@ public class Spectrum implements Cloneable {
         return zippedSpectrumXML;
     }
 
+    /**
+     * <p>getPeptides.</p>
+     *
+     * @return a {@link java.util.List} object.
+     */
     public List<Peptide> getPeptides() {
         return iPeptides;
     }
 
+    /**
+     * <p>getQuanResult.</p>
+     *
+     * @return a {@link com.compomics.thermo_msf_parser_API.highmeminstance.QuanResult} object.
+     */
     public QuanResult getQuanResult() {
         return iQuanResult;
     }
@@ -244,7 +351,7 @@ public class Spectrum implements Cloneable {
      * This method will unzip the zipped xml byte array
      *
      * @return A string with the spectrum xml
-     * @throws Exception An exception is thrown when there is a problem with the
+     * @throws java.lang.Exception An exception is thrown when there is a problem with the
      * connection to the msf file
      */
     public String getUnzippedSpectrumXml() throws Exception {
@@ -271,7 +378,7 @@ public class Spectrum implements Cloneable {
      * xml
      *
      * @return vector with the MS/MS peaks found in the spectrum xml
-     * @throws Exception An exception is thrown when there is a problem with the
+     * @throws java.lang.Exception An exception is thrown when there is a problem with the
      * connection to the msf file
      */
     public List<Peak> getMSMSPeaks() throws Exception {
@@ -296,7 +403,7 @@ public class Spectrum implements Cloneable {
      * xml
      *
      * @return vector with the MS peaks found in the spectrum xml
-     * @throws Exception An exception is thrown when there is a problem with the
+     * @throws java.lang.Exception An exception is thrown when there is a problem with the
      * connection to the msf file
      */
     public List<Peak> getMSPeaks() throws Exception {
@@ -316,7 +423,7 @@ public class Spectrum implements Cloneable {
      * This method will give the MS peak that is used for the fragmentation
      *
      * @return peak (MS) that is used for the fragmentation
-     * @throws Exception An exception is thrown when there is a problem with the
+     * @throws java.lang.Exception An exception is thrown when there is a problem with the
      * connection to the msf file
      */
     public Peak getFragmentedMsPeak() throws Exception {
@@ -336,7 +443,7 @@ public class Spectrum implements Cloneable {
      * This method will give the event linked to this
      *
      * @return Event
-     * @throws SQLException An exception is thrown when there is a problem with
+     * @throws java.sql.SQLException An exception is thrown when there is a problem with
      * the connection to the msf file
      */
     public Event getEvent() throws SQLException {
@@ -348,14 +455,29 @@ public class Spectrum implements Cloneable {
     }
 
     //setters
+    /**
+     * <p>setFileId.</p>
+     *
+     * @param iFileId a int.
+     */
     public void setFileId(int iFileId) {
         this.iFileId = iFileId;
     }
 
+    /**
+     * <p>setZippedBytes.</p>
+     *
+     * @param lZipped an array of byte.
+     */
     public void setZippedBytes(byte[] lZipped) {
         this.iZippedSpectrumXml = lZipped.clone();
     }
 
+    /**
+     * <p>setScanEvent.</p>
+     *
+     * @param iScanEvent a {@link com.compomics.thermo_msf_parser_API.highmeminstance.ScanEvent} object.
+     */
     public void setScanEvent(ScanEvent iScanEvent) {
         this.iScanEvent = iScanEvent;
     }
@@ -385,7 +507,7 @@ public class Spectrum implements Cloneable {
     /**
      * This will add a peptide to this spectrum
      *
-     * @param lPeptide
+     * @param lPeptide a {@link com.compomics.thermo_msf_parser_API.highmeminstance.Peptide} object.
      */
     public void addPeptide(Peptide lPeptide) {
         this.iPeptides.add(lPeptide);
@@ -395,13 +517,18 @@ public class Spectrum implements Cloneable {
     /**
      * This will add a peptide to this spectrum
      *
-     * @param lPeptide
+     * @param lPeptide a {@link com.compomics.thermo_msf_parser_API.highmeminstance.Peptide} object.
      */
     public void addDecoyPeptide(Peptide lPeptide) {
         this.iPeptidesDecoy.add(lPeptide);
         lPeptide.setParentSpectrum(this);
     }
 
+    /**
+     * <p>setQuanResult.</p>
+     *
+     * @param lQuanResult a {@link com.compomics.thermo_msf_parser_API.highmeminstance.QuanResult} object.
+     */
     public void setQuanResult(QuanResult lQuanResult) {
         if (iQuanResult != null) {
             System.out.println("Double quanresult added to the spectrum");
@@ -409,14 +536,29 @@ public class Spectrum implements Cloneable {
         this.iQuanResult = lQuanResult;
     }
 
+    /**
+     * <p>getConnection.</p>
+     *
+     * @return a {@link java.sql.Connection} object.
+     */
     public Connection getConnection() {
         return iConnection;
     }
 
+    /**
+     * <p>getParser.</p>
+     *
+     * @return a {@link com.compomics.thermo_msf_parser_API.highmeminstance.Parser} object.
+     */
     public Parser getParser() {
         return iParser;
     }
 
+    /**
+     * <p>getSpectrumTitle.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getSpectrumTitle() {
         String lRawFile = iParser.getRawfileNameByFileId(iFileId);
         if (lRawFile == null) {
@@ -428,6 +570,11 @@ public class Spectrum implements Cloneable {
         return lRawFile + "_" + iSpectrumId + "_" + iFirstScan + "_" + iCharge;
     }
 
+    /**
+     * <p>getUniqueSpectrumTitle.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getUniqueSpectrumTitle() {
         String lRawFile = iParser.getRawfileNameByFileId(iFileId);
         if (lRawFile == null) {
@@ -441,6 +588,13 @@ public class Spectrum implements Cloneable {
     }
 
     //TODO this looks wrong
+    /**
+     * <p>isHighestScoring.</p>
+     *
+     * @param iSelectedPeptide a {@link com.compomics.thermo_msf_parser_API.highmeminstance.Peptide} object.
+     * @param scoreTypes a {@link java.util.List} object.
+     * @return a boolean.
+     */
     public boolean isHighestScoring(Peptide iSelectedPeptide, List<ScoreType> scoreTypes) {
         Boolean lIsHighestScore = null;
         for (int l = 0; l < scoreTypes.size(); l++) {
@@ -469,6 +623,13 @@ public class Spectrum implements Cloneable {
         return lIsHighestScore;
     }
 
+    /**
+     * <p>isLowestScoring.</p>
+     *
+     * @param iSelectedPeptide a {@link com.compomics.thermo_msf_parser_API.highmeminstance.Peptide} object.
+     * @param scoreTypes a {@link java.util.List} object.
+     * @return a boolean.
+     */
     public boolean isLowestScoring(Peptide iSelectedPeptide, List<ScoreType> scoreTypes) {
         Boolean lIsLowestScore = null;
         for (int i = 0; i < scoreTypes.size(); i++) {

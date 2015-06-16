@@ -8,8 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * <p>FastaLowMemController class.</p>
  *
  * @author Davy
+ * @version $Id: $Id
  */
 public class FastaLowMemController {
 
@@ -104,6 +106,7 @@ public class FastaLowMemController {
 
     /**
      * returns the number of amino acids recorded in the fasta file in the proteome discoverer file
+     *
      * @param msfFile the proteome discoverer file to fetch from
      * @param fastaFileName the file name to fetch for
      * @return the number of amino acids in the fasta file as stored in the proteome discoverer file

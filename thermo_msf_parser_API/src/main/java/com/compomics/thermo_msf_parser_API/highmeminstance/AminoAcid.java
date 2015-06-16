@@ -9,6 +9,9 @@ package com.compomics.thermo_msf_parser_API.highmeminstance;
 
 /**
  * This class represents an amino acid
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class AminoAcid {
 
@@ -43,6 +46,7 @@ public class AminoAcid {
 
     /**
      * The constructor for the aminoacid
+     *
      * @param iAminoAcidId The amino acid id
      * @param iAminoAcidName The amino acid name
      * @param iOneLetterCode The one letter code
@@ -64,6 +68,7 @@ public class AminoAcid {
 
     /**
      * Getter for the amino acid id
+     *
      * @return int with the amino acid id
      */
     public int getAminoAcidId() {
@@ -72,6 +77,7 @@ public class AminoAcid {
 
     /**
      * Getter for the amino acid name
+     *
      * @return String with the amino acid name
      */
     public String getAminoAcidName() {
@@ -80,6 +86,7 @@ public class AminoAcid {
 
     /**
      * Getter for the one letter code
+     *
      * @return String with the one letter code
      */
     public String getOneLetterCode() {
@@ -88,6 +95,7 @@ public class AminoAcid {
 
     /**
      * Getter for the three letter code
+     *
      * @return String with the three letter code
      */
     public String getThreeLetterCode() {
@@ -96,6 +104,7 @@ public class AminoAcid {
 
     /**
      * Getter for the monoisotopic mass
+     *
      * @return double with the monoisotopic mass
      */
     public double getMonoisotopicMass() {
@@ -104,6 +113,7 @@ public class AminoAcid {
 
     /**
      * Getter for the average mass
+     *
      * @return double with the average mass
      */
     public double getAverageMass() {
@@ -112,6 +122,7 @@ public class AminoAcid {
 
     /**
      * Getter for the sum formula
+     *
      * @return String with the chemical formula of the amino acid
      */
     public String getSumFormula() {

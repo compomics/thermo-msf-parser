@@ -5,8 +5,10 @@
 package com.compomics.thermo_msf_parser_API.util;
 
 /**
+ * <p>MsfFileFactory class.</p>
  *
  * @author Davy
+ * @version $Id: $Id
  */
 public class MsfFileFactory {
     

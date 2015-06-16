@@ -5,8 +5,10 @@
 package com.compomics.thermo_msf_parser_API.enums;
 
 /**
+ * <p>ScanType class.</p>
  *
  * @author toorn101
+ * @version $Id: $Id
  */
 public enum ScanType {
     

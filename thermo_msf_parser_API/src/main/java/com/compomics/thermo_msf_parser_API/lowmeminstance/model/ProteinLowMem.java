@@ -10,6 +10,9 @@ import java.util.Set;
  * User: Davy
  * Date: 4/24/12
  * Time: 9:48 AM
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class ProteinLowMem implements ProteinModel {
 
@@ -25,16 +28,22 @@ public class ProteinLowMem implements ProteinModel {
     
     /**
      * constructor for the ProteinLowMem object
-     * 
+     *
      * @param aAccession the protein accession
      * @param aProteinID the protein id in the SQLite database
      */
-    
     public ProteinLowMem(String aAccession,int aProteinID){
         this.accession = aAccession;
         this.proteinID = aProteinID;
     }
     
+    /**
+     * <p>Constructor for ProteinLowMem.</p>
+     *
+     * @param aAccession a {@link java.lang.String} object.
+     * @param aProteinID a int.
+     * @param aSequence a {@link java.lang.String} object.
+     */
     public ProteinLowMem(String aAccession,int aProteinID,String aSequence){
         this.accession =aAccession;
         this.proteinID = aProteinID;
@@ -42,84 +51,90 @@ public class ProteinLowMem implements ProteinModel {
     }
 
     /**
+     * {@inheritDoc}
+     *
      * getter for the protein accession
-     * @return the protein accession string
      */
-
     @Override
     public String getAccession() {
         return accession;
     }
 
     /**
+     * {@inheritDoc}
+     *
      * setter for the protein accession
-     * @param accession an accession string
      */
-    
     @Override
     public void setAccession(String accession) {
         this.accession = accession;
     }
 
-    /**
-     *
-     * @return returns the location of the msf file in the msf file vector otherwise returns -1
-     */
-    
+    /** {@inheritDoc} */
     @Override
     public int getLocationInList() {
         return locationInList;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setLocationInList(int locationInList) {
         this.locationInList = locationInList;
     }
     /**
-     * getter for the protein id 
-     * @return the protein id
+     * {@inheritDoc}
+     *
+     * getter for the protein id
      */
     @Override
     public int getProteinID(){
         return proteinID;
     }
     
+    /** {@inheritDoc} */
     @Override
     public void setProteinID(int aProteinID){
         this.proteinID = aProteinID;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString(){
     return accession;
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public void addCustomDataField(int lId, String lValue){
         iCustomDataFieldValues.put(lId, lValue);
     }
 
+    /** {@inheritDoc} */
     @Override
     public HashMap<Integer, String> getCustomDataFieldValues() {
         return iCustomDataFieldValues;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int getNumberOfPeptides(){
         return numberOfPeptides;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void setNumberOfPeptides(int newNumberOfPeptides) {
         numberOfPeptides = newNumberOfPeptides;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void addPeptide(PeptideLowMem peptideLowMemToAdd) {
         peptidesOfProtein.add(peptideLowMemToAdd);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Set<PeptideLowMem> getPeptidesForProtein(){
         return peptidesOfProtein;
@@ -130,21 +145,25 @@ public class ProteinLowMem implements ProteinModel {
         //not yet implemented
     //}
     
+    /** {@inheritDoc} */
     @Override
     public void setMasterProtein(boolean isMasterProtein){
         this.isMasterProtein = isMasterProtein;
     }
     
+    /** {@inheritDoc} */
     @Override
     public boolean isMasterProtein(){
         return isMasterProtein;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getSequence() {
         return sequence;
     }    
     
+    /** {@inheritDoc} */
     @Override
     public boolean equals(Object aLowMemProtein){
         boolean equal = false;
@@ -154,6 +173,7 @@ public class ProteinLowMem implements ProteinModel {
         return equal;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         int hash = 5;

@@ -16,13 +16,16 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 /**
+ * <p>RawFileLowMemController class.</p>
  *
  * @author Davy
+ * @version $Id: $Id
  */
 public class RawFileLowMemController implements RawFileInterface {
 
     private static final Logger logger = Logger.getLogger(RawFileLowMemController.class);
 
+    /** {@inheritDoc} */
     @Override
     public HashMap<Integer, String> getRawFileForFileID(int fileID, MsfFile msfFile) {
         HashMap<Integer, String> lResult = new HashMap<Integer, String>();
@@ -50,6 +53,7 @@ public class RawFileLowMemController implements RawFileInterface {
         return lResult;
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<RawFileLowMem> getRawFileNames(MsfFile msfFile) {
         List<RawFileLowMem> rawFiles = new ArrayList<RawFileLowMem>();
@@ -78,6 +82,7 @@ public class RawFileLowMemController implements RawFileInterface {
 
     }
 
+    /** {@inheritDoc} */
     @Override
     public String getRawFileNameForFileID(int fileID, MsfFile msfFile) {
         String lResult = "";

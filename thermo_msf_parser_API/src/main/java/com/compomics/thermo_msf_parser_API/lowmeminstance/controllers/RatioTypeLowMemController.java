@@ -13,8 +13,10 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 /**
+ * <p>RatioTypeLowMemController class.</p>
  *
  * @author Davy
+ * @version $Id: $Id
  */
 public class RatioTypeLowMemController implements RatioTypeInterface {
 
@@ -23,6 +25,7 @@ public class RatioTypeLowMemController implements RatioTypeInterface {
     private List iQuanChannelIds = new ArrayList<String>();
     private final Map<Integer, String> quanChannelID = new HashMap<Integer, String>();
 
+    /** {@inheritDoc} */
     @Override
     public List<RatioTypeLowMem> parseRatioTypes(MsfFile msfFile) {
         List<RatioTypeLowMem> lRatioTypes = new ArrayList<RatioTypeLowMem>();

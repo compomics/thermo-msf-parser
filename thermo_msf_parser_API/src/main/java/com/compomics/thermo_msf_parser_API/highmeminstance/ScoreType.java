@@ -5,6 +5,9 @@ package com.compomics.thermo_msf_parser_API.highmeminstance;
  * User: Niklaas
  * Date: 18-Feb-2011
  * Time: 13:46:17
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class ScoreType {
     /**
@@ -34,6 +37,7 @@ public class ScoreType {
 
     /**
      * The score type constructor
+     *
      * @param iScoreTypeId The score type id
      * @param iScoreName The score name
      * @param iFriendlyName The friendly score name
@@ -53,30 +57,61 @@ public class ScoreType {
     
     //getters
 
+    /**
+     * <p>getScoreTypeId.</p>
+     *
+     * @return a int.
+     */
     public int getScoreTypeId() {
         return iScoreTypeId;
     }
 
+    /**
+     * <p>getScoreName.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getScoreName() {
         return iScoreName;
     }
 
+    /**
+     * <p>getFriendlyName.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getFriendlyName() {
         return iFriendlyName;
     }
 
+    /**
+     * <p>getDescription.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getDescription() {
         return iDescription;
     }
 
+    /**
+     * <p>getScoreCategory.</p>
+     *
+     * @return a int.
+     */
     public int getScoreCategory() {
         return iScoreCategory;
     }
 
+    /**
+     * <p>getIsMainScore.</p>
+     *
+     * @return a int.
+     */
     public int getIsMainScore() {
         return iIsMainScore;
     }
 
+    /** {@inheritDoc} */
     @Override
     public String toString(){
         return iFriendlyName;

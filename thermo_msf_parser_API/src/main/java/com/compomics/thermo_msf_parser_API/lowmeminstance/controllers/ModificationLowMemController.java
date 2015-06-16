@@ -23,6 +23,9 @@ import org.apache.log4j.Logger;
 /**
  * Created by IntelliJ IDEA. User: Davy Date: 4/24/12 Time: 2:16 PM To change
  * this template use File | Settings | File Templates.
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class ModificationLowMemController implements ModificationInterface {
 
@@ -30,6 +33,7 @@ public class ModificationLowMemController implements ModificationInterface {
     private final ProcessingNodeLowMemController processingNodes = new ProcessingNodeLowMemController();
     private HashMap<Integer, Modification> modshashMap = new HashMap<Integer, Modification>();
 
+    /** {@inheritDoc} */
     @Override
     public String getModifiedSequenceForPeptide(PeptideLowMem peptide, MsfFile msfFile) {
         String modifiedSequence = peptide.getSequence();
@@ -82,6 +86,7 @@ public class ModificationLowMemController implements ModificationInterface {
         return modifiedSequence;
     }
 
+    /** {@inheritDoc} */
     @Override
     public HashMap<Integer, String> createModificationMap(MsfFile msfFile) {
         HashMap<Integer, String> modificationsMap = new HashMap<Integer, String>();
@@ -108,6 +113,7 @@ public class ModificationLowMemController implements ModificationInterface {
         return modificationsMap;
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<String> getAllModificationNames(MsfFile msfFile) {
         List<String> allModificationNames = new ArrayList<String>();
@@ -142,6 +148,7 @@ public class ModificationLowMemController implements ModificationInterface {
      * @param modification the modification to get the peptides for
      * @param msfFile the proteome discoverer file to fetch from
      * @return a list of peptides who have that specific modification
+     * @param addModificationToPeptide a boolean.
      */
     public List<PeptideLowMem> getPeptidesWithModification(String modification, MsfFile msfFile, boolean addModificationToPeptide) {
         List<PeptideLowMem> peptidesWithModList = new ArrayList<PeptideLowMem>();
@@ -173,15 +180,33 @@ public class ModificationLowMemController implements ModificationInterface {
         return peptidesWithModList;
     }
 
+    /**
+     * <p>getAllModifications.</p>
+     *
+     * @param msfFile a {@link com.compomics.thermo_msf_parser_API.lowmeminstance.model.MsfFile} object.
+     * @return a {@link java.util.List} object.
+     */
     public List<Modification> getAllModifications(MsfFile msfFile) {
         return getModList(msfFile, true, true);
     }
 
 
+    /**
+     * <p>getListOfFixedModificationNumbers.</p>
+     *
+     * @param msfFile a {@link com.compomics.thermo_msf_parser_API.lowmeminstance.model.MsfFile} object.
+     * @return a {@link java.util.List} object.
+     */
     public List<Modification> getListOfFixedModificationNumbers(MsfFile msfFile) {
         return getModList(msfFile, true, false);
     }
 
+    /**
+     * <p>getListOfVariableModidifcationNumbers.</p>
+     *
+     * @param msfFile a {@link com.compomics.thermo_msf_parser_API.lowmeminstance.model.MsfFile} object.
+     * @return a {@link java.util.List} object.
+     */
     public List<Modification> getListOfVariableModidifcationNumbers(MsfFile msfFile) {
         return getModList(msfFile, false, true);
     }
@@ -321,6 +346,7 @@ public class ModificationLowMemController implements ModificationInterface {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void addModificationsToPeptide(PeptideLowMem peptide, MsfFile msfFile) {
         try {

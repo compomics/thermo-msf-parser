@@ -13,8 +13,10 @@ import java.sql.SQLException;
 import org.apache.log4j.Logger;
 
 /**
+ * <p>ScanEventLowMemController class.</p>
  *
  * @author Davy
+ * @version $Id: $Id
  */
 public class ScanEventLowMemController {
 
@@ -47,10 +49,23 @@ public class ScanEventLowMemController {
         return scanEvent;
     }
 
+    /**
+     * <p>addScanEventToSpectrum.</p>
+     *
+     * @param spectrum a {@link com.compomics.thermo_msf_parser_API.lowmeminstance.model.SpectrumLowMem} object.
+     * @param msfFile a {@link com.compomics.thermo_msf_parser_API.lowmeminstance.model.MsfFile} object.
+     */
     public void addScanEventToSpectrum(SpectrumLowMem spectrum, MsfFile msfFile) {
         spectrum.setScanEvent(getScanEventForScanEventID(spectrum.getScanEventId(), msfFile));
     }
 
+    /**
+     * <p>getScanEventForSpectrum.</p>
+     *
+     * @param spectrum a {@link com.compomics.thermo_msf_parser_API.lowmeminstance.model.SpectrumLowMem} object.
+     * @param msfFile a {@link com.compomics.thermo_msf_parser_API.lowmeminstance.model.MsfFile} object.
+     * @return a {@link com.compomics.thermo_msf_parser_API.highmeminstance.ScanEvent} object.
+     */
     public ScanEvent getScanEventForSpectrum(SpectrumLowMem spectrum, MsfFile msfFile) {
         ScanEvent scanEvent = null;
         try {

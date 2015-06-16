@@ -4,8 +4,10 @@ import com.compomics.thermo_msf_parser_API.lowmeminstance.model.MsfFile;
 import com.compomics.thermo_msf_parser_API.lowmeminstance.model.ProteinLowMem;
 
 /**
+ * <p>GUIProteinLowMem class.</p>
  *
  * @author Davy
+ * @version $Id: $Id
  */
 public class GUIProteinLowMem extends ProteinLowMem {
 
@@ -38,10 +40,20 @@ public class GUIProteinLowMem extends ProteinLowMem {
         super(aAccession, aProteinID);
     }
 
+    /**
+     * <p>setMsfFile.</p>
+     *
+     * @param msfFile a {@link com.compomics.thermo_msf_parser_API.lowmeminstance.model.MsfFile} object.
+     */
     public void setMsfFile(MsfFile msfFile) {
         msfFileForProtein = msfFile;
     }
 
+    /**
+     * <p>getMsfFile.</p>
+     *
+     * @return a {@link com.compomics.thermo_msf_parser_API.lowmeminstance.model.MsfFile} object.
+     */
     public MsfFile getMsfFile() {
         return msfFileForProtein;
     }

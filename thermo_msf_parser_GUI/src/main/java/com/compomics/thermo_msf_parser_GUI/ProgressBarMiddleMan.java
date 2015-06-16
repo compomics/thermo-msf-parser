@@ -17,12 +17,23 @@ class ProgressBarMiddleMan {
     private final ProteinLowMemController proteinLowMemInstance;
 
 
+    /**
+     * <p>Constructor for ProgressBarMiddleMan.</p>
+     *
+     * @param peptideLowMemInstance a {@link com.compomics.thermo_msf_parser_API.lowmeminstance.controllers.PeptideLowMemController} object.
+     * @param proteinLowMemInstance a {@link com.compomics.thermo_msf_parser_API.lowmeminstance.controllers.ProteinLowMemController} object.
+     */
     public ProgressBarMiddleMan(PeptideLowMemController peptideLowMemInstance,ProteinLowMemController proteinLowMemInstance){
         this.peptideLowMemInstance = peptideLowMemInstance;
         this.proteinLowMemInstance = proteinLowMemInstance;
     }
 
 
+    /**
+     * <p>progressBarReturn.</p>
+     *
+     * @return a int.
+     */
     public int progressBarReturn(){
         if (peptidesOrProteins) {
             return peptideLowMemInstance.getNumberOfPeptidesProcessed();
@@ -31,6 +42,11 @@ class ProgressBarMiddleMan {
         }
     }
     
+    /**
+     * <p>Setter for the field <code>peptidesOrProteins</code>.</p>
+     *
+     * @param peptidesOrProteins a boolean.
+     */
     public void setPeptidesOrProteins(boolean peptidesOrProteins){
         this.peptidesOrProteins = peptidesOrProteins;
     }

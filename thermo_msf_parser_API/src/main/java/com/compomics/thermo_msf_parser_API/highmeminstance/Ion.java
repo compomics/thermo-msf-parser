@@ -9,6 +9,9 @@ import com.compomics.util.experiment.personalization.ExperimentObject;
  * User: Marc
  * Date: Jun 18, 2010
  * Time: 8:57:33 AM
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public abstract class Ion extends ExperimentObject {
 
@@ -39,6 +42,7 @@ public abstract class Ion extends ExperimentObject {
 
     /**
      * getter for the ion family name
+     *
      * @return the ion family name as indexed in static field
      */
     public int getIonFamilyType() {

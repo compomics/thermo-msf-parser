@@ -12,6 +12,9 @@ import com.compomics.thermo_msf_parser_API.lowmeminstance.model.ProteinLowMem;
 
 /**
  * This will sort proteins based on the number of peptides
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class ProteinSorter implements ProteinSorterInterface {
 
@@ -19,6 +22,7 @@ public class ProteinSorter implements ProteinSorterInterface {
     private Boolean iAtoZ;
 
 
+    /** {@inheritDoc} */
     @Override
     public int compare(ProteinLowMem protein1, ProteinLowMem protein2) {
         int comparison = 0;
@@ -49,12 +53,14 @@ public class ProteinSorter implements ProteinSorterInterface {
     return comparison;
 }
 
+    /** {@inheritDoc} */
     @Override
     public void compareProteinByAccession(Boolean lAtoZ) {
         this.iAtoZ = lAtoZ;
         this.i1to20 = null;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void compareProteinByNumberOfPeptides(Boolean l1to20) {
         this.i1to20 = l1to20;

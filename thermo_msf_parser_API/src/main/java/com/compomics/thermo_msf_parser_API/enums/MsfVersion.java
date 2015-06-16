@@ -3,6 +3,9 @@ package com.compomics.thermo_msf_parser_API.enums;
 /**
  * Created by IntelliJ IDEA. User: Niklaas Date: 08/04/11 Time: 11:59 To change
  * this template use File | Settings | File Templates.
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public enum MsfVersion {
 
@@ -14,6 +17,11 @@ public enum MsfVersion {
         version = aVersion;
     }
     
+    /**
+     * <p>Getter for the field <code>version</code>.</p>
+     *
+     * @return a {@link java.lang.String} object.
+     */
     public String getVersion(){
         return version;
     }

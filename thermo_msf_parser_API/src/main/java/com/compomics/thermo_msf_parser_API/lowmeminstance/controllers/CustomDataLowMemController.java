@@ -17,12 +17,16 @@ import java.util.Map;
 /**
  * Created by IntelliJ IDEA. User: Davy Date: 5/2/12 Time: 11:46 AM To change
  * this template use File | Settings | File Templates.
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class CustomDataLowMemController implements CustomDataInterface {
 
     private static final Logger logger = Logger.getLogger(CustomDataLowMemController.class);
     private final HashMap<Integer, CustomDataField> customDataFieldHashMap = new HashMap<Integer, CustomDataField>();
 
+    /** {@inheritDoc} */
     @Override
     public Map<Integer, CustomDataField> getCustomDataFields(MsfFile msfFile) {
         if (customDataFieldHashMap.isEmpty()) {
@@ -51,6 +55,7 @@ public class CustomDataLowMemController implements CustomDataInterface {
         return customDataFieldHashMap;
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<CustomDataField> getCustomPeptideData(Map<Integer, CustomDataField> customData, MsfFile msfFile) {
         List<CustomDataField> iPeptideUsedCustomDataFields = new ArrayList<CustomDataField>();
@@ -78,11 +83,9 @@ public class CustomDataLowMemController implements CustomDataInterface {
     }
 
     /**
-     * adds the custom data of a protein to that protein object
+     * {@inheritDoc}
      *
-     * @param protein the {@link ProteinLowMem} to add the custom data to
-     * @param msfFile msf File to get the protein data from
-     * @throws SQLException
+     * adds the custom data of a protein to that protein object
      */
     @Override
     public void addCustomProteinsData(ProteinLowMem protein, MsfFile msfFile) {
@@ -109,6 +112,7 @@ public class CustomDataLowMemController implements CustomDataInterface {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<CustomDataField> getCustomSpectraData(Map<Integer, CustomDataField> iCustomDataFieldsMap, MsfFile msfFile) {
         List<CustomDataField> iSpectrumUsedCustomDataFields = new ArrayList<CustomDataField>();

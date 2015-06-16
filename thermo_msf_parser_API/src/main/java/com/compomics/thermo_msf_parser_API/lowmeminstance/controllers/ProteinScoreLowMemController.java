@@ -11,8 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * <p>ProteinScoreLowMemController class.</p>
  *
  * @author Davy
+ * @version $Id: $Id
  */
 public class ProteinScoreLowMemController {
 

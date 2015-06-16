@@ -15,6 +15,9 @@ import org.apache.log4j.Logger;
 /**
  * Created by IntelliJ IDEA. User: Davy Date: 10/1/12 Time: 10:21 AM To change
  * this template use File | Settings | File Templates.
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class ChromatogramLowMemController {
 
@@ -52,10 +55,12 @@ public class ChromatogramLowMemController {
     }
 
     /**
+     * <p>getUnzippedChromatogramXml.</p>
      *
      * @param zippedChromatogramXML the zipped chromatogram xml file retrieved
      * by getChromatogramFileForPeptideID
      * @return the unzipped chromatogram file in a string
+     * @throws java.io.IOException if the chromatogram xml file could not be written to disk
      */
     public String getUnzippedChromatogramXml(byte[] zippedChromatogramXML) throws IOException {
         String iUnzippedChromatogramXml = "";
@@ -115,14 +120,20 @@ public class ChromatogramLowMemController {
     public List<Point> getPoints(String chromatogramXML) {
         String[] lLines = chromatogramXML.split("\n");
         List<Point> lPoints = new ArrayList<Point>();
-        for (int i = 0; i < lLines.length; i++) {
-            if (lLines[i].trim().startsWith("<Pt ")) {
-                lPoints.add(new Point(lLines[i]));
+        for (String lLine : lLines) {
+            if (lLine.trim().startsWith("<Pt ")) {
+                lPoints.add(new Point(lLine));
             }
         }
         return lPoints;
     }
 
+    /**
+     * <p>getChromatogramFilesForMsfFile.</p>
+     *
+     * @param msfFile the proteome discoverer file to retrieve from.
+     * @return a {@link java.util.Collection} containing the retrieved chromatograms.
+     */
     public Collection<? extends Chromatogram> getChromatogramFilesForMsfFile(MsfFile msfFile) {
         List<Chromatogram> chromatogramFiles = new ArrayList<Chromatogram>();
         try {

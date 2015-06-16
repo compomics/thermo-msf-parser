@@ -35,6 +35,7 @@ import java.io.PrintWriter;
  *
  * @author Lennart Martens
  * @see com.compomics.util.protein.AASequenceImpl
+ * @version $Id: $Id
  */
 public class UtilProtein {
 
@@ -327,6 +328,7 @@ public class UtilProtein {
      *
      * @param   aOut    PrintWriter to write the file to.
      * @exception   IOException when the writing failed.
+     * @throws java.io.IOException if any.
      */
     public void writeToFASTAFile(PrintWriter aOut) throws IOException {
         aOut.println(this.getHeader().getAbbreviatedFASTAHeaderWithAddenda());
@@ -372,6 +374,8 @@ public class UtilProtein {
     }
 
     /**
+     * {@inheritDoc}
+     *
      * This method will check equality between this object
      * and another Protein instance.
      */
@@ -388,6 +392,7 @@ public class UtilProtein {
         return result;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int hashCode() {
         int hash = 7;

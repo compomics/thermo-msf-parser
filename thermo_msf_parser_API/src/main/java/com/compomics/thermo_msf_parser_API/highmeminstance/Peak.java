@@ -6,6 +6,9 @@ package com.compomics.thermo_msf_parser_API.highmeminstance;
  * Date: 18-Feb-2011
  * Time: 11:27:21
  * To change this template use File | Settings | File Templates.
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class Peak {
 
@@ -32,6 +35,7 @@ public class Peak {
 
     /**
      * The constructor for the peak
+     *
      * @param iX The x value
      * @param iY The y value
      * @param iZ The z value
@@ -48,6 +52,7 @@ public class Peak {
 
     /**
      * Construct a peak object from a peakline found in the spectrum xml
+     *
      * @param lPeakLineFromXml The xml line that will be parsed
      */
     public Peak(String lPeakLineFromXml){
@@ -76,6 +81,7 @@ public class Peak {
 
     /**
      * Getter for X
+     *
      * @return double for the X value
      */
     public double getX() {
@@ -84,6 +90,7 @@ public class Peak {
 
     /**
      * Getter for Y
+     *
      * @return double for the Y value
      */
     public double getY() {
@@ -92,6 +99,7 @@ public class Peak {
 
     /**
      * Getter for Z
+     *
      * @return double for the Z value
      */
     public double getZ() {
@@ -101,6 +109,7 @@ public class Peak {
 
     /**
      * Getter for R
+     *
      * @return double for the R value
      */
     public double getR() {
@@ -110,6 +119,7 @@ public class Peak {
 
     /**
      * Getter for SN
+     *
      * @return double for the SN value
      */
     public double getSN() {

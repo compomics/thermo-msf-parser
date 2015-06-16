@@ -11,6 +11,9 @@ import java.util.List;
  * Date: 4/23/12
  * Time: 2:05 PM
  * To change this template use File | Settings | File Templates.
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public interface PeptideInterface {
 
@@ -19,7 +22,7 @@ public interface PeptideInterface {
      @param msfFile the proteome discoverer file to retrieve from
     @return a List containing all the peptides connected to the given Protein, empty if none are found
     */
-    
+
     public List getPeptidesForProtein(ProteinLowMem protein,MsfFile msfFile);
 
    /**
@@ -40,33 +43,38 @@ public interface PeptideInterface {
     public List getInformationForPeptide(int peptideID,MsfFile msfFile,boolean fullInfo);
 
     
-     /**
+    /**
+     * <p>getPeptidesWithConfidenceLevel.</p>
      *
      * @param confidenceLevel the confidence level of the peptides wanted
-      @param msfFile the proteome discoverer file to retrieve from
+     * @param msfFile the proteome discoverer file to retrieve from
      * @return a vector containing the peptides identified and the specified confidence level, empty if none are found
      */
     public List<PeptideLowMem> getPeptidesWithConfidenceLevel(int confidenceLevel,MsfFile msfFile);
         
 
     /**
+     * <p>getNumberOfPeptidesForConfidenceLevel.</p>
+     *
      * @param confidenceLevel the confidence level of the peptides wanted
-     @param msfFile the proteome discoverer file to retrieve from
+     * @param msfFile the proteome discoverer file to retrieve from
+     * @return the number of peptides at a given confidence level for a proteome discoverer file.
      */
-    
     public int getNumberOfPeptidesForConfidenceLevel(int confidenceLevel,MsfFile msfFile);
     
     /**
+     * <p>getPeptidesForProteinList.</p>
+     *
      * @param proteinLowMemList a vector containing the protein objects we want to retrieve the peptides for
-     @param msfFile the proteome discoverer file to retrieve from
+     * @param msfFile the proteome discoverer file to retrieve from
      * @param confidenceLevel the confidence level we want to retrieve the peptides at
      */
     public void getPeptidesForProteinList(List<ProteinLowMem> proteinLowMemList,MsfFile msfFile,int confidenceLevel);
     
     /**
-     *
-     @param msfFile the proteome discoverer file to retrieve from
+     * <p>returnNumberOfPeptides.</p>
+     *@param msfFile the proteome discoverer file to retrieve from
+     * @return the number of peptides in the proteome discoverer.
      */
-    
     public int returnNumberOfPeptides(MsfFile msfFile);
 }

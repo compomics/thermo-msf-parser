@@ -9,6 +9,9 @@ package com.compomics.thermo_msf_parser_API.highmeminstance;
 
 /**
  * This class represents the event annotation
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class EventAnnotation {
 
@@ -31,6 +34,7 @@ public class EventAnnotation {
 
     /**
      * The event annotation constructor
+     *
      * @param iEventId The event id
      * @param iIsotopePatternId The isotope pattern
      * @param iQuanResultId The quan result id
@@ -45,7 +49,8 @@ public class EventAnnotation {
 
     /**
      * Getter for the event id
-      * @return int with the event id
+     *
+     * @return int with the event id
      */
     public int getEventId() {
         return iEventId;
@@ -53,6 +58,7 @@ public class EventAnnotation {
 
     /**
      * Getter for the isotope pattern id
+     *
      * @return int with the isotope pattern
      */
     public int getIsotopePatternId() {
@@ -61,6 +67,7 @@ public class EventAnnotation {
 
     /**
      * Getter for the quan result id
+     *
      * @return int with the result id
      */
     public int getQuanResultId() {
@@ -69,6 +76,7 @@ public class EventAnnotation {
 
     /**
      * Getter for the quan channel id
+     *
      * @return int with the quan channel id
      */
     public int getQuanChannelId() {

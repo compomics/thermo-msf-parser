@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
  * are read from the JavaOptions file.
  *
  * @author Harald Barsnes
+ * @version $Id: $Id
  */
 public class ThermoMsfParserGuiWrapper extends CompomicsWrapper {
 
@@ -71,7 +72,7 @@ public class ThermoMsfParserGuiWrapper extends CompomicsWrapper {
      * Starts the launcher by calling the launch method. Use this as the main
      * class in the jar file.
      *
-     * @param args
+     * @param args an array of {@link java.lang.String} objects.
      */
     public static void main(String[] args) {
         new ThermoMsfParserGuiWrapper(args);

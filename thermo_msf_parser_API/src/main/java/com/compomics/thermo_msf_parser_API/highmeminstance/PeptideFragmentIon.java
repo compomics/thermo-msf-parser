@@ -7,6 +7,9 @@ package com.compomics.thermo_msf_parser_API.highmeminstance;
  * User: Marc
  * Date: Jun 18, 2010
  * Time: 8:58:02 AM
+ *
+ * @author Davy Maddelein
+ * @version $Id: $Id
  */
 public class PeptideFragmentIon extends Ion {
 
@@ -129,6 +132,7 @@ public class PeptideFragmentIon extends Ion {
 
     /**
      * Returns the number of the fragment in the sequence
+     *
      * @return the number of the fragment in the sequence
      */
     public int getNumber() {
