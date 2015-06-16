@@ -76,7 +76,8 @@ public class SpectrumLowMemControllerTest {
         System.out.println("createSpectrumXMLForSpectrum");
         SpectrumLowMemController instance = new SpectrumLowMemController();
         instance.createSpectrumXMLForSpectrum(lSpectrum, msfFile);
-        FileUtils.writeStringToFile(new File("C:\\Users\\Davy\\spectrumoutput"), lSpectrum.getSpectrumXML());
+        FileUtils.writeStringToFile(new File("/spectrumoutput"), lSpectrum.getSpectrumXML());
+        //TODO test this file
     }
 
     /**

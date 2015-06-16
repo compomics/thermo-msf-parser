@@ -258,16 +258,16 @@ public class SpectrumLowMem {
     //TODO this looks wrong
     public boolean isHighestScoring(PeptideLowMem iSelectedPeptide, List<ScoreTypeLowMem> scoreTypes) {
         Boolean lIsHighestScore = null;
-        for (int l = 0; l < scoreTypes.size(); l++) {
-            if (iSelectedPeptide.getScoreByScoreType(scoreTypes.get(l)) != null) {
-                Double lScore = iSelectedPeptide.getScoreByScoreType(scoreTypes.get(l));
+        for (ScoreTypeLowMem scoreType : scoreTypes) {
+            if (iSelectedPeptide.getScoreByScoreType(scoreType) != null) {
+                Double lScore = iSelectedPeptide.getScoreByScoreType(scoreType);
                 if (lIsHighestScore == null) {
                     lIsHighestScore = true;
                 }
                 if (lScore != null) {
-                    for (int i = 0; i < iPeptides.size(); i++) {
-                        if (!iSelectedPeptide.getModifiedPeptideSequence().equalsIgnoreCase(iPeptides.get(i).getModifiedPeptideSequence())) {
-                            Double lCompareScore = iPeptides.get(i).getScoreByScoreType(scoreTypes.get(l));
+                    for (PeptideLowMem iPeptide : iPeptides) {
+                        if (!iSelectedPeptide.getModifiedPeptideSequence().equalsIgnoreCase(iPeptide.getModifiedPeptideSequence())) {
+                            Double lCompareScore = iPeptide.getScoreByScoreType(scoreType);
                             if (lCompareScore != null) {
                                 if (lScore < lCompareScore) {
                                     lIsHighestScore = false;
@@ -287,9 +287,9 @@ public class SpectrumLowMem {
 
     public boolean isLowestScoring(PeptideLowMem iSelectedPeptide, List<ScoreTypeLowMem> scoreTypes) {
         Boolean lIsLowestScore = null;
-        for (int i = 0; i < scoreTypes.size(); i++) {
-            if (iSelectedPeptide.getScoreByScoreType(scoreTypes.get(i)) != null) {
-                Double lScore = iSelectedPeptide.getScoreByScoreType(scoreTypes.get(i));
+        for (ScoreTypeLowMem scoreType : scoreTypes) {
+            if (iSelectedPeptide.getScoreByScoreType(scoreType) != null) {
+                Double lScore = iSelectedPeptide.getScoreByScoreType(scoreType);
                 if (lIsLowestScore == null) {
                     lIsLowestScore = true;
                 }

@@ -21,6 +21,7 @@ public class ProteinSorterByAccession implements Comparator<ProteinModel>, Seria
     public ProteinSorterByAccession(boolean lAtoZ){
         this.iAtoZ = lAtoZ;
     }
+
     @Override
     public int compare(ProteinModel o1, ProteinModel o2) {
         int comparator;

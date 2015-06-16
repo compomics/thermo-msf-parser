@@ -21,7 +21,7 @@ public class QuanResultLowMemController {
 
     /**
      *
-     * @param aConnection a connection to the msf file
+     * @param msfFile      * @param msfFile the proteome discoverer file to retrieve the isotope patterns from
      * @return a hashmap with key: the isotope pattern id and value: the
      * isotopePattern
      */

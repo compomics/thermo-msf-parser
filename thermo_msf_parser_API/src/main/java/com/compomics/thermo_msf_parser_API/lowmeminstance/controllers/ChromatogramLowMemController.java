@@ -24,7 +24,7 @@ public class ChromatogramLowMemController {
      * returns the chromatogram for a given peptide ID in the SQLite db
      *
      * @param peptideID the id of the peptide
-     * @param iConnection connection to the msf SQLite file
+     * @param msfFile the proteome discoverer file to retrieve the chromatograms from
      * @return a vector containing the chromatogram files
      */
     //TODO check of this returns one or multiple files

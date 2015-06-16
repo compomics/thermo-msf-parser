@@ -18,21 +18,16 @@ public interface ProteinControllerInterface {
     /**
     a method to fetch all the proteins stored in the msf file
 
-    @param iConnection connection to the msf file
+     @param msfFile the proteome discoverer file to retrieve from
     @return an iterator containing all the proteins in Protein objects
-    @throws SQLException if something went wrong with the retrieving
      */
 
     public List getAllProteins(MsfFile msfFile);
 
     /**
     get a protein from an accession
-
-     @return a Protein object
-    @throws SQLException if something went wrong with the retrieving
-
      * @param proteinAccession an accession
-     * @param iConnection a connection to the msf file
+     @param msfFile the proteome discoverer file to retrieve from
      */
 
     public ProteinLowMem getProteinFromAccession(String proteinAccession, MsfFile msfFile);
@@ -41,9 +36,8 @@ public interface ProteinControllerInterface {
     get the accession from a protein
 
     @param proteinID a protein id in the db
-    @param iConnection a connection to the msf file
+     @param msfFile the proteome discoverer file to retrieve from
     @return the accession for a given Protein object
-    @throws SQLException if something went wrong with the retrieving
     */
 
     public String getAccessionFromProteinID(int proteinID,MsfFile msfFile);
@@ -52,9 +46,8 @@ public interface ProteinControllerInterface {
      * get the sequence stored in the db for a given ProteinID
      *
      * @param proteinID the ID of the protein in the SQLite DB
-     * @param iConnection connection to the SQLite DB
+     @param msfFile the proteome discoverer file to retrieve from
      * @return string containing the sequence stored in the DB
-     * @throws SQLException if something went wrong with the retrieving
      */
 
     public String getSequenceForProteinID(int proteinID,MsfFile msfFile);
@@ -63,9 +56,8 @@ public interface ProteinControllerInterface {
      * method for retrieving all the proteins connected to a given peptide in the DB
      *
      * @param PeptideID peptideID stored in the SQLite DB
-     * @param iConnection connection to the SQLite DB
+     @param msfFile the proteome discoverer file to retrieve from
      * @return a vector containing all Protein objects connected to a given peptide
-     * @throws SQLException if something went wrong with the retrieving
      */
     public List<ProteinLowMem> getProteinsForPeptide(int PeptideID,MsfFile msfFile);
 }

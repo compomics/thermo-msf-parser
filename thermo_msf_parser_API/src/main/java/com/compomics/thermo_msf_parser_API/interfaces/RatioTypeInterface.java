@@ -16,9 +16,8 @@ public interface RatioTypeInterface {
 
     /**
      *
-     * @param aConnection connection to the SQLite db
+     @param msfFile the proteome discoverer file to retrieve from
      * @return vector containing the ratio types
-     * @throws java.sql.SQLException if something went wrong with the retrieving
      */
 
     public List<RatioTypeLowMem> parseRatioTypes(MsfFile msfFile);

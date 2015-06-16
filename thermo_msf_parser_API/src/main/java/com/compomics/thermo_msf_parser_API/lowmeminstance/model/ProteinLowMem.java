@@ -27,7 +27,6 @@ public class ProteinLowMem implements ProteinModel {
      * constructor for the ProteinLowMem object
      * 
      * @param aAccession the protein accession
-     * @param aConnection a connection to the SQLite database
      * @param aProteinID the protein id in the SQLite database
      */
     

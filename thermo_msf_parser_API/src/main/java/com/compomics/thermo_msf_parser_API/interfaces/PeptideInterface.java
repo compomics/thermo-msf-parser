@@ -16,8 +16,7 @@ public interface PeptideInterface {
 
     /**
     @param  protein: a Protein object
-    @param  iMsfVersion: enumeration object containing the version number of the current Msf file
-    @param iAminoAcids a List containing the objects returned from the AminoAcid
+     @param msfFile the proteome discoverer file to retrieve from
     @return a List containing all the peptides connected to the given Protein, empty if none are found
     */
     
@@ -25,9 +24,7 @@ public interface PeptideInterface {
 
    /**
    @param lProteinAccession: a string containing the accession of the protein
-   @param msfFileConnection: a connection to the SQLite database
-   @param iMsfVersion: enumeration object containing the version number of the current Msf file
-   @param iAminoAcids a List containing the objects returned from the AminoAcid
+    @param msfFile the proteome discoverer file to retrieve from
    @return a List containing all the peptides connected to the given protein accession, empty if none are found
    */
 
@@ -46,9 +43,7 @@ public interface PeptideInterface {
      /**
      *
      * @param confidenceLevel the confidence level of the peptides wanted
-     * @param msfFileConnection connection to the msf file
-     * @param iMsfVersion the version with which the msf file is made
-     * @param iAminoAcids vector with the amino acids fetched from the amino acid lowmem class
+      @param msfFile the proteome discoverer file to retrieve from
      * @return a vector containing the peptides identified and the specified confidence level, empty if none are found
      */
     public List<PeptideLowMem> getPeptidesWithConfidenceLevel(int confidenceLevel,MsfFile msfFile);
@@ -56,23 +51,21 @@ public interface PeptideInterface {
 
     /**
      * @param confidenceLevel the confidence level of the peptides wanted
-     * @param aConnection connection to the msf file
+     @param msfFile the proteome discoverer file to retrieve from
      */
     
     public int getNumberOfPeptidesForConfidenceLevel(int confidenceLevel,MsfFile msfFile);
     
     /**
      * @param proteinLowMemList a vector containing the protein objects we want to retrieve the peptides for
-     * @param msfFileConnection a connection to the msf file
-     * @param iAminoAcids a vector of the amino acids retrieved from the msf file
-     * @param iMsfVersion the msf file version
+     @param msfFile the proteome discoverer file to retrieve from
      * @param confidenceLevel the confidence level we want to retrieve the peptides at
      */
     public void getPeptidesForProteinList(List<ProteinLowMem> proteinLowMemList,MsfFile msfFile,int confidenceLevel);
     
     /**
-     * 
-     * @param msfFileConnection connection to the msf file
+     *
+     @param msfFile the proteome discoverer file to retrieve from
      */
     
     public int returnNumberOfPeptides(MsfFile msfFile);

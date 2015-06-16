@@ -15,7 +15,7 @@ public interface AminoAcidInterface {
 
     /**
      * fetches the amino acids from the proteome discoverer database
-     * @param iConnection connection to a msf file
+     * @param msfFile the proteome discoverer file to retrieve the amino acids for
      * @return a List containing all the amino acids stored in the msf file
      * @throws java.sql.SQLException if something went wrong with the retrieving
     */

@@ -39,17 +39,6 @@ public class ScoreTypeLowMem {
         this.iIsMainScore = isMainScore;
     }
 
-    /**
-     *
-     * @param iConnection a connection to the msf file
-     * @return a vector containing all the scoretypes stored in the msf file
-     * @throws SQLException
-     */
-    /**
-     *
-     * @return a vector containing all the scoretypes stored in the msf file
-     * @throws SQLException
-     */
     public int getScoreTypeId() {
         return iScoreTypeId;
     }

@@ -19,8 +19,8 @@ import org.apache.log4j.Logger;
 public class RatioTypeLowMemController implements RatioTypeInterface {
 
     private static final Logger logger = Logger.getLogger(RatioTypeLowMemController.class);
-    private List iComponents;
-    private List iQuanChannelIds;
+    private List iComponents = new ArrayList<String>();
+    private List iQuanChannelIds = new ArrayList<String>();
     private final Map<Integer, String> quanChannelID = new HashMap<Integer, String>();
 
     @Override

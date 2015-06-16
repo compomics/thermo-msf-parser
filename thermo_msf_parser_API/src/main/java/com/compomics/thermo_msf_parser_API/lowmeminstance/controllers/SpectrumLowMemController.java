@@ -310,7 +310,7 @@ public class SpectrumLowMemController implements SpectrumInterface {
     @Override
     public String getSpectrumTitle(String rawFileName, SpectrumLowMem lspectrum) {
         String spectrumTitle = rawFileName.substring(0, rawFileName.toLowerCase().lastIndexOf("."));
-        return new StringBuilder().append(spectrumTitle).append("_").append(lspectrum.getSpectrumId()).append("_").append(lspectrum.getFirstScan()).append("_").append(lspectrum.getCharge()).toString();
+        return spectrumTitle + "_" + lspectrum.getSpectrumId() + "_" + lspectrum.getFirstScan() + "_" + lspectrum.getCharge();
     }
 
     //TODO redo this part properly

@@ -17,7 +17,7 @@ public class AminoAcidLowMemController implements AminoAcidInterface {
 
     /**
      *
-     * @param aConnection a connection to the msf file
+     * @param msfFile the proteome discoverer file to retrieve the amino acids from
      * @return a vector containing all the amino acids in the database
      * @throws SQLException
      */

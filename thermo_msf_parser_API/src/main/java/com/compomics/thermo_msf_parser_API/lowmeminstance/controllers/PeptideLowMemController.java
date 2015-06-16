@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Observable;
 import java.util.List;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * Created by IntelliJ IDEA. User: Davy Date: 10/1/12 Time: 10:30 AM To change
@@ -37,12 +36,8 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
     /**
      *
      * @param protein: a Protein object
-     * @param iMsfVersion: enumeration object containing the version number of
-     * the current Msf file
-     * @param iAminoAcids a List containing the objects returned from the
-     * AminoAcid
+     * @param msfFile the proteome discoverer file to retrieve from
      * @return a vector containing all the peptides connected to the protein
-     * @throws java.sql.SQLException
      */
     @Override
     public List<PeptideLowMem> getPeptidesForProtein(ProteinLowMem protein, MsfFile msfFile) {
@@ -146,7 +141,7 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
                 ResultSet rs = null;
                 try {
                     if (fullInfo) {
-                        rs = stat.executeQuery("select Peptides.Sequence, SpectrumHeaders.FirstScan,SpectrumHeaders.LastScan,Peptides.Annotations,ProcessingNodes.FriendlyName from Peptides where ConfidenceLevel >= ");
+                        rs = stat.executeQuery("select Peptides.Sequence, SpectrumHeaders.FirstScan,SpectrumHeaders.LastScan,Peptides.Annotations,ProcessingNodes.FriendlyName from Peptides where ConfidenceLevel >= 1 ");
                     } else {
                         rs = stat.executeQuery("");
                     }
@@ -352,15 +347,9 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
         }
         return numberOfPeptides;
     }
-/**
- * 
- * @param protein
- * @param msfFile
- * @param processingNode
- * @return 
- */
+
     public List<PeptideLowMem> getPeptidesForProteinAndProcessingNode(ProteinLowMem protein, MsfFile msfFile, ProcessingNode processingNode) {
         processingNode.getProcessingNodeId();
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException("not yet implemented");
     }
 }

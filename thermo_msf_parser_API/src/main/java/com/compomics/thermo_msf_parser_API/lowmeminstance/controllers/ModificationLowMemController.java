@@ -177,35 +177,15 @@ public class ModificationLowMemController implements ModificationInterface {
         return getModList(msfFile, true, true);
     }
 
-    /**
-     *
-     * @param msfFileConnection
-     * @param msfVersion
-     * @param returnFixed
-     * @return
-     */
+
     public List<Modification> getListOfFixedModificationNumbers(MsfFile msfFile) {
         return getModList(msfFile, true, false);
     }
 
-    /**
-     *
-     * @param msfFileConnection
-     * @param msfVersion
-     * @return
-     */
     public List<Modification> getListOfVariableModidifcationNumbers(MsfFile msfFile) {
         return getModList(msfFile, false, true);
     }
 
-    /**
-     *
-     * @param msfFileConnection
-     * @param msfVersion
-     * @param getFixedModifications
-     * @param getVariableModifications
-     * @return
-     */
     private List<Modification> getModList(MsfFile msfFile, boolean getFixedModifications, boolean getVariableModifications) {
         StringBuilder modNumbersToFetch = new StringBuilder("(");
         List<Modification> modsToReturn = new ArrayList<Modification>();
@@ -274,12 +254,7 @@ public class ModificationLowMemController implements ModificationInterface {
         return modsToReturn;
     }
 
-    /**
-     *
-     * @param modification
-     * @param aminoAcids
-     * @param msfFile
-     */
+
     private void addAminoAcidsToModification(Modification modification, List<AminoAcid> aminoAcids, MsfFile msfFile) {
         try {
             PreparedStatement stat = null;

@@ -23,10 +23,6 @@ public class ProteinLowMemControllerTest {
 
     static MsfFile msfFile;
 
-    public ProteinLowMemControllerTest(MsfFile msfFile) {
-        this.msfFile = msfFile;
-    }
-
     @BeforeClass
     public static void setUpClass() throws ClassNotFoundException, SQLException {
         msfFile = new MsfFile(new File(ProteinLowMemControllerTest.class.getClassLoader().getResource("test-msf-v-1.2.msf").getPath()));

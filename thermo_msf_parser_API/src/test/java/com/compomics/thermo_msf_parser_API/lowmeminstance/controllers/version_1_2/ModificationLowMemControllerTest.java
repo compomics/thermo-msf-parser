@@ -20,9 +20,6 @@ public class ModificationLowMemControllerTest {
 
     private static MsfFile msfFile;
 
-    public ModificationLowMemControllerTest() {
-    }
-
     @BeforeClass
     public static void setUpClass() throws ClassNotFoundException, SQLException {
         msfFile = new MsfFile(new File(ModificationLowMemControllerTest.class.getClassLoader().getResource("test-msf-v-1.2.msf").getPath()));

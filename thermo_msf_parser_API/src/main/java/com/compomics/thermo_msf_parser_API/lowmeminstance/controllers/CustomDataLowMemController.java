@@ -80,8 +80,8 @@ public class CustomDataLowMemController implements CustomDataInterface {
     /**
      * adds the custom data of a protein to that protein object
      *
-     * @param protein the protein (low memory instance) object
-     * @param iConnection connection to the msf file
+     * @param protein the {@link ProteinLowMem} to add the custom data to
+     * @param msfFile msf File to get the protein data from
      * @throws SQLException
      */
     @Override

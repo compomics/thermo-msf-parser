@@ -15,7 +15,7 @@ public interface CustomDataInterface {
 
      /**
      *
-     * @param iConnection a connection to the msf file
+     * @param msfFile the proteome discoverer file to retrieve the custom data from
      * @return a hashmap containing the custom fields key: fieldid in the db
      * value: displayname given in the db
      */
@@ -27,9 +27,8 @@ public interface CustomDataInterface {
 
      /**
      *
-     * @param msfFileConnection connection to the msf file
+     * @param msfFile the proteome discoverer file to retrieve the custom spectrum data from
      * @return an List with the custom spectra data
-     * @throws SQLException
      */
     
     public List<CustomDataField> getCustomSpectraData(Map<Integer, CustomDataField> iCustomDataFieldsMap, MsfFile msfFile);

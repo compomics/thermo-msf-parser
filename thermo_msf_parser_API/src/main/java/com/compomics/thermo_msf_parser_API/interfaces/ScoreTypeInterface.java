@@ -21,7 +21,7 @@ public interface ScoreTypeInterface {
     /**
     method to fetch the score types stored in the msf file
 
-    @param aConnection a connection to the msf file
+     @param msfFile the proteome discoverer file to retrieve from
     @return a Hashmap containing the score types
      * @throws java.sql.SQLException if something went wrong with the retrieving
     */
@@ -30,7 +30,7 @@ public interface ScoreTypeInterface {
  
     /**
      * @param peptideLowMemList a vector containing the peptides we want to retrieve the scores for
-     * @param aConnection a connection to the msf file
+     @param msfFile the proteome discoverer file to retrieve from
      */
     
     public void getScoresForPeptideList(List<PeptideLowMem>peptideLowMemList,MsfFile msfFile);
@@ -38,7 +38,7 @@ public interface ScoreTypeInterface {
     /**
      * 
      * @param peptide a peptide to which we want to add the scores
-     * @param aConnection a connection to the msf file
+     @param msfFile the proteome discoverer file to retrieve from
      */
     
     public void addScoresToPeptide (PeptideLowMem peptide, MsfFile msfFile);
@@ -46,7 +46,7 @@ public interface ScoreTypeInterface {
      /**
      *
      * @param peptide a peptide to return the different score types for
-     * @param aConnection a connection to the msf file
+      @param msfFile the proteome discoverer file to retrieve from
      * @return a hashMap with key scoreID value: scoreValue
      * @throws SQLException
      */

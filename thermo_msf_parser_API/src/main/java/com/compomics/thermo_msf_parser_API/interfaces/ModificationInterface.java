@@ -37,7 +37,7 @@ public interface ModificationInterface {
     /**
     creates a hashmap containing the modifications stored in the msf file
 
-    @param iConnection: a connection to the SQLite database
+     @param msfFile the proteome discoverer file to retrieve the modifications from
     @return hashmap containing the modifications
     @throws SQLException if something went wrong with the retrieving
     */
@@ -46,8 +46,8 @@ public interface ModificationInterface {
     
     /**
      * fetch all the abbreviated names of the modifications used in the msf file
-     * 
-     * @param aConnection a connection to the SQLite database
+     *
+     @param msfFile the proteome discoverer file to retrieve the modification names from
      * @return a List containing all the names of the modifications used in the msf file
      */ 
     

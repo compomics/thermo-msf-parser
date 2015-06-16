@@ -16,12 +16,7 @@ public class ProteinGroupLowMemController {
 
     private static final Logger logger = Logger.getLogger(ProteinGroupLowMemController.class);
 
-    /**
-     *
-     * @param proteinID
-     * @param msfFile
-     * @return
-     */
+
     public int getProteinGroupIDForProteinID(int proteinID, MsfFile msfFile) {
         int proteinGroupID = 0;
         try {
@@ -47,12 +42,7 @@ public class ProteinGroupLowMemController {
         return proteinGroupID;
     }
 
-    /**
-     *
-     * @param proteinID
-     * @param msfFile
-     * @return
-     */
+
     public ProteinGroupLowMem getProteinGroupForProteinID(int proteinID, MsfFile msfFile) {
         return new ProteinGroupLowMem(getProteinGroupIDForProteinID(proteinID, msfFile));
 
