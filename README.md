@@ -54,7 +54,7 @@ You might also find some of the following projects interesting: [Peptizer](http:
 [dbtoolkit](https://github.com/compomics/dbtoolkit),
 [ms-lims](http://code.google.com/p/ms-lims),
 [Rover](http://code.google.com/p/compomics-rover) and
-[PeptideShaker](http://code.google.com/p/peptide-shaker)
+[PeptideShaker](http://code.google.com/p/peptide-shaker).
 
 [Go to top of page](#thermo-msf-parser)
 
