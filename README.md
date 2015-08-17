@@ -25,8 +25,9 @@ Note that we only support MSF files from ProteomeDiscoverer version 1.2, 1.3 and
 ----
 
 ## Downloads
+
 | Download | Version | Release info |
-| :------------: |:---------------:| :-----:|
+| :--: |:--:| :--:|
 | [![download](https://github.com/compomics/thermo-msf-parser/wiki/images/download_button.png)](http://genesis.ugent.be/downloadredirect.php?toolname=thermo-msf-parser) | *2.0.5 - All platforms* |    [Release notes](https://github.com/compomics/thermo-msf-parser/wiki/ReleaseNotes) |
 
 ### Example Dataset
@@ -53,7 +54,7 @@ You might also find some of the following projects interesting: [Peptizer](http:
 [dbtoolkit](https://github.com/compomics/dbtoolkit),
 [ms-lims](http://code.google.com/p/ms-lims),
 [Rover](http://code.google.com/p/compomics-rover) and
-[PeptideShaker](http://code.google.com/p/peptide-shaker)
+[PeptideShaker](http://code.google.com/p/peptide-shaker).
 
 [Go to top of page](#thermo-msf-parser)
 
