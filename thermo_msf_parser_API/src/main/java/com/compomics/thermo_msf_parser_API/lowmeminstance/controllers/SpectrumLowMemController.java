@@ -41,7 +41,7 @@ public class SpectrumLowMemController implements SpectrumInterface {
             try {
                 ResultSet rs;
                 Statement stat = msfFile.getConnection().createStatement();
-                rs = stat.executeQuery(new StringBuilder().append("select Spectrum from Spectra where UniqueSpectrumID = (select SpectrumID from Peptides where Peptides.PeptideID = ").append(peptide.getPeptideId()).append(")").toString());
+                rs = stat.executeQuery(new StringBuilder().append("select Spectrum from Spectra where UniqueSpectrumID = (select UniqueSpectrumID from Peptides,SpectrumHeaders where SpectrumHeaders.SpectrumID = Peptides.SpectrumID and Peptides.PeptideID = ").append(peptide.getPeptideId()).append(")").toString());
                 while (rs.next()) {
                     lZippedSpectrumXml = rs.getBytes(1);
                 }

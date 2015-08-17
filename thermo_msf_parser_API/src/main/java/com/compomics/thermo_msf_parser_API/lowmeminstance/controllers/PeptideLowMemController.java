@@ -41,7 +41,62 @@ public class PeptideLowMemController extends Observable implements PeptideInterf
      */
     public List<PeptideLowMem> getPeptidesForProteinAtConfidenceLevel(ProteinLowMem protein,MsfFile msfFile,int confidenceLevel){
         List<PeptideLowMem> foundPeptides = new ArrayList<PeptideLowMem>();
-        throw new UnsupportedOperationException("not yet implemented");
+        counter = 0;
+        try {
+            Statement stat = null;
+            try {
+                stat = msfFile.getConnection().createStatement();
+                if (msfFile.getVersion() == MsfVersion.VERSION1_2) {
+                    ResultSet rs = stat.executeQuery("select peptides.PeptideID as PeptideID,ConfidenceLevel,Sequence,TotalIonsCount,MatchedIonsCount,Annotation,ProcessingNodeNumber, s.*, FileID as file from spectrumheaders as s, masspeaks, Peptides,Spectra as sp,(select PeptideID as ID from PeptidesProteins where ProteinID =" + protein.getProteinID() + ") as pepid where pepid.ID = peptides.PeptideID and masspeaks.masspeakid = s.masspeakid and s.SpectrumID = peptides.SpectrumID and sp.UniqueSpectrumID = s.UniqueSpectrumID and ConfidenceLevel = "+ confidenceLevel+"order by peptides.PeptideID");
+                    while (rs.next()) {
+                        PeptideLowMem lPeptide = new PeptideLowMem(rs.getInt("PeptideID"), rs.getInt("SpectrumID"), rs.getInt("ConfidenceLevel"), rs.getString("Sequence"), rs.getInt("TotalIonsCount"), rs.getInt("MatchedIonsCount"), rs.getString("Annotation"), rs.getInt("ProcessingNodeNumber"), msfFile.getAminoAcids());
+                        //iScoreType.addScoresToPeptide(lPeptide,protein.getConnection());
+                        lPeptide.setParentSpectrum(new SpectrumLowMem(rs.getInt("SpectrumID"), rs.getInt("UniqueSpectrumID"), rs.getInt("MassPeakID"), rs.getInt("LastScan"), rs.getInt("FirstScan"), rs.getInt("ScanNumbers"), rs.getInt("Charge"), rs.getDouble("RetentionTime"), rs.getDouble("Mass"), rs.getInt("ScanEventID")));
+                        //TODO make initializer with fileID argument)
+                        lPeptide.getParentSpectrum().setFileId(rs.getInt("file"));
+                        //lPeptide.getParentSpectrum().setZippedSpectrumXML(rs.getBytes("Spectra"));
+                        //TODO check speed of this
+                        Statement customStat = msfFile.getConnection().createStatement();
+                        ResultSet customRs = customStat.executeQuery("select * from CustomDataPeptides where PeptideID = " + lPeptide.getPeptideId());
+                        while (customRs.next()) {
+                            lPeptide.addCustomDataField(customRs.getInt("FieldID"), customRs.getString("FieldValue"));
+                        }
+                        customRs.close();
+                        customStat.close();
+                        foundPeptides.add(lPeptide);
+                        counter++;
+                    }
+                    rs.close();
+                } else {
+                    ResultSet rs = stat.executeQuery("select peptides.PeptideID as peptideid,ConfidenceLevel,Sequence,TotalIonsCount,MatchedIonsCount,Annotation,MissedCleavages,UniquePeptideSequenceID,ProcessingNodeNumber, s.*,FileID as file from spectrumheaders as s, masspeaks, Peptides ,Spectra as sp,(select PeptideID as ID from PeptidesProteins where ProteinID =" + protein.getProteinID() + ") as pepid where pepid.ID = peptides.PeptideID and masspeaks.masspeakid = s.masspeakid and s.SpectrumID = peptides.SpectrumID and sp.UniqueSpectrumID = s.UniqueSpectrumID and ConfidenceLevel = "+ confidenceLevel+" order by peptides.PeptideID");
+                    while (rs.next()) {
+                        PeptideLowMem lPeptide = new PeptideLowMem(rs.getInt("PeptideID"), rs.getInt("SpectrumID"), rs.getInt("ConfidenceLevel"), rs.getString("Sequence"), rs.getInt("TotalIonsCount"), rs.getInt("MatchedIonsCount"), rs.getString("Annotation"), rs.getInt("ProcessingNodeNumber"), msfFile.getAminoAcids());
+                        lPeptide.setMissedCleavage(rs.getInt("MissedCleavages"));
+                        lPeptide.setUniquePeptideSequenceId(rs.getInt("UniquePeptideSequenceID"));
+                        lPeptide.setParentSpectrum(new SpectrumLowMem(rs.getInt("SpectrumID"), rs.getInt("UniqueSpectrumID"), rs.getInt("MassPeakID"), rs.getInt("LastScan"), rs.getInt("FirstScan"), rs.getInt("ScanNumbers"), rs.getInt("Charge"), rs.getDouble("RetentionTime"), rs.getDouble("Mass"), rs.getInt("ScanEventID")));
+                        //TODO make initializer with fileID argument)
+                        lPeptide.getParentSpectrum().setFileId(rs.getInt("file"));
+                        Statement customStat = msfFile.getConnection().createStatement();
+                        ResultSet customRs = customStat.executeQuery("select * from CustomDataPeptides where PeptideID = " + lPeptide.getPeptideId());
+                        while (customRs.next()) {
+                            lPeptide.addCustomDataField(customRs.getInt("FieldID"), customRs.getString("FieldValue"));
+                        }
+                        customRs.close();
+                        customStat.close();
+                        foundPeptides.add(lPeptide);
+                        counter++;
+                    }
+                    rs.close();
+                }
+            } finally {
+                if (stat != null) {
+                    stat.close();
+                }
+            }
+        } catch (SQLException ex) {
+            logger.error(ex);
+        }
+        return foundPeptides;
     }
     
     /** {@inheritDoc} */

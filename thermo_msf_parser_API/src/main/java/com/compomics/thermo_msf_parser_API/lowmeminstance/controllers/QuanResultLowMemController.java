@@ -4,11 +4,15 @@ import com.compomics.thermo_msf_parser_API.lowmeminstance.model.MsfFile;
 import com.compomics.thermo_msf_parser_API.highmeminstance.EventAnnotation;
 import com.compomics.thermo_msf_parser_API.highmeminstance.IsotopePattern;
 import com.compomics.thermo_msf_parser_API.highmeminstance.QuanResult;
+
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.compomics.thermo_msf_parser_API.lowmeminstance.model.QuanResultLowMem;
 import org.apache.log4j.Logger;
 
 /**
@@ -25,7 +29,7 @@ public class QuanResultLowMemController {
     /**
      * <p>getIsotopePatternMap.</p>
      *
-     * @param msfFile      * @param msfFile the proteome discoverer file to retrieve the isotope patterns from
+     * @param msfFile * @param msfFile the proteome discoverer file to retrieve the isotope patterns from
      * @return a hashmap with key: the isotope pattern id and value: the
      * isotopePattern
      */
@@ -35,7 +39,7 @@ public class QuanResultLowMemController {
             Statement stat = null;
             try {
                 stat = msfFile.getConnection().createStatement();
-                ResultSet rs = stat.executeQuery("select * from EventAnnotations");
+                ResultSet rs = stat.executeQuery("SELECT * FROM EventAnnotations");
                 try {
                     while (rs.next()) {
                         int lIsotopePatternId = rs.getInt("IsotopePatternID");
@@ -49,7 +53,7 @@ public class QuanResultLowMemController {
                         }
                     }
 
-                    rs = stat.executeQuery("select * from EventAreaAnnotations");
+                    rs = stat.executeQuery("SELECT * FROM EventAreaAnnotations");
                     while (rs.next()) {
                         int lIsotopePatternId = rs.getInt("IsotopePatternID");
                         EventAnnotation lEventAnno = new EventAnnotation(rs.getInt("EventID"), rs.getInt("IsotopePatternID"), rs.getInt("QuanResultID"), -1);
@@ -78,9 +82,9 @@ public class QuanResultLowMemController {
     /**
      * <p>getQuanResults.</p>
      *
+     * @param msfFile a {@link com.compomics.thermo_msf_parser_API.lowmeminstance.model.MsfFile} object.
      * @return hashmap containing the quan results key:quanresultid value:quan
      * object
-     * @param msfFile a {@link com.compomics.thermo_msf_parser_API.lowmeminstance.model.MsfFile} object.
      */
     public HashMap getQuanResults(MsfFile msfFile) {
         HashMap<Integer, QuanResult> iQuanResultsMap = new HashMap<Integer, QuanResult>();
@@ -88,7 +92,7 @@ public class QuanResultLowMemController {
             Statement stat = null;
             try {
                 stat = msfFile.getConnection().createStatement();
-                ResultSet rs = stat.executeQuery("select * from PrecursorIonQuanResults");
+                ResultSet rs = stat.executeQuery("SELECT * FROM PrecursorIonQuanResults");
                 try {
                     while (rs.next()) {
                         int lQuantId = rs.getInt("QuanResultID");
@@ -101,7 +105,7 @@ public class QuanResultLowMemController {
                         }
                     }
                     //add the spectrumid
-                    rs = stat.executeQuery("select * from PrecursorIonAreaSearchSpectra");
+                    rs = stat.executeQuery("SELECT * FROM PrecursorIonAreaSearchSpectra");
                     while (rs.next()) {
                         int lQuantId = rs.getInt("QuanResultID");
                         if (iQuanResultsMap.get(lQuantId) != null) {
@@ -126,5 +130,22 @@ public class QuanResultLowMemController {
             logger.error(ex);
         }
         return iQuanResultsMap;
+    }
+
+    public QuanResult getQuantForSpectrum(int spectrumId, MsfFile msfFile) throws SQLException {
+
+        PreparedStatement stat = msfFile.getConnection().prepareStatement("SELECT QuanResultID FROM PrecursorIonAreaSearchSpectra WHERE SearchSpectrumID = ?");
+        stat.setInt(1, spectrumId);
+        ResultSet rs = stat.executeQuery();
+        QuanResult result = null;
+        while (rs.next()) {
+            result = new QuanResult(rs.getInt("QuanResultID"));
+            stat = msfFile.getConnection().prepareStatement("SELECT QuanChannelID,Mass,Charge,Area,RetentionTime FROM PrecursorIonQuanResults WHERE QuanResultID = ?");
+            stat.setInt(1, result.getQuanResultId());
+            while (rs.next()) {
+                result.addQuanValues(rs.getInt("QuanChannelID"), rs.getDouble("Mass"), rs.getInt("Charge"), rs.getDouble("Area"), rs.getDouble("RetentionTime"));
+            }
+        }
+        return result;
     }
 }

@@ -352,7 +352,7 @@ public class ModificationLowMemController implements ModificationInterface {
         try {
             PreparedStatement stat = null;
             try {
-                stat = msfFile.getConnection().prepareStatement("select amod.*,pepamod.position from aminoacidmodifications as amod,peptideaminoacidmodifications as pepamod where amod.modificationid = pepamod.modificationid and pepamod.peptideid = ?");
+                stat = msfFile.getConnection().prepareStatement("select amod.*,pepamod.position from aminoacidmodifications as amod,peptidesaminoacidmodifications as pepamod where amod.modificationid = pepamod.modificationid and pepamod.peptideid = ?");
                 stat.setInt(1, peptide.getPeptideId());
                 ResultSet rs = null;
                 try {
