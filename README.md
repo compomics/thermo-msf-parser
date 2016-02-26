@@ -26,11 +26,11 @@ Note that we only support MSF files from ProteomeDiscoverer version 1.2, 1.3 and
 
 ## Downloads
 
-<a href="http://genesis.ugent.be/downloadredirect.php?toolname=thermo-msf-parser" onclick="trackOutboundLink('thermo-msf-parser'); return false;"><img src="https://github.com/compomics/thermo-msf-parser/wiki/images/download_button.png"></a>
+<a href="http://genesis.ugent.be/maven2/com/compomics/thermo_msf_parser/thermo_msf_parser_GUI/2.0.5/thermo_msf_parser_GUI-2.0.5-archive.zip" onclick="trackOutboundLink('thermo-msf-parser'); return false;"><img src="https://github.com/compomics/thermo-msf-parser/wiki/images/download_button.png" alt="download" /></a>
 
 | Download | Version | Release info |
 | :--: |:--:| :--:|
-| <a href="http://genesis.ugent.be/downloadredirect.php?toolname=thermo-msf-parser" onclick="trackOutboundLink('thermo-msf-parser'); return false;"><img src="https://github.com/compomics/thermo-msf-parser/wiki/images/download_button.png"></a> | *2.0.5 - All platforms* |    [Release notes](https://github.com/compomics/thermo-msf-parser/wiki/ReleaseNotes) |
+| <a href="http://genesis.ugent.be/maven2/com/compomics/thermo_msf_parser/thermo_msf_parser_GUI/2.0.5/thermo_msf_parser_GUI-2.0.5-archive.zip" onclick="trackOutboundLink('thermo-msf-parser'); return false;"><img src="https://github.com/compomics/thermo-msf-parser/wiki/images/download_button.png" alt="download" /></a> | *2.0.5 - All platforms* |    [Release notes](https://github.com/compomics/thermo-msf-parser/wiki/ReleaseNotes) |
 
 ### Example Dataset
 [Example Dataset 1](https://github.com/compomics/thermo-msf-parser/blob/master/thermo_msf_parser_API/src/test/resources/test-msf-v-1.2.msf), click on *raw* to download.
